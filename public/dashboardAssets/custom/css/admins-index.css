@@ -1,0 +1,109 @@
+/* Admins Index Page Styles */
+
+.filter-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+    border: 1px solid #e7e7e7;
+}
+
+.filter-card .card-header {
+    border-bottom: 1px solid #e7e7e7;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+}
+
+.filter-card .card-header h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #5e5873;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-card .card-body {
+    padding: 1.5rem;
+}
+
+.filter-card .form-label {
+    font-weight: 500;
+    color: #5e5873;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.filter-card .form-control {
+    border-radius: 6px;
+    border: 1px solid #d8d6de;
+    transition: all 0.3s ease;
+}
+
+.filter-card .form-control:focus {
+    border-color: #9C88FF;
+    box-shadow: 0 0 0 0.2rem rgba(156, 136, 255, 0.25);
+    outline: none;
+}
+
+.filter-card .btn {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filter-card .btn-primary:hover {
+    background: #8B7EC8;
+    border-color: #8B7EC8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(156, 136, 255, 0.3);
+}
+
+.filter-card .gap-2 {
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .filter-card .col-md-3,
+    .filter-card .col-md-2 {
+        margin-bottom: 1rem;
+    }
+
+    .filter-card .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Dark Mode */
+body.dark-layout .filter-card {
+    background: #2b3553 !important;
+    border-color: #414561 !important;
+}
+
+body.dark-layout .filter-card .card-header {
+    background: #323a5a !important;
+    border-bottom-color: #414561 !important;
+}
+
+body.dark-layout .filter-card .card-header h5 {
+    color: #ebeefd !important;
+}
+
+body.dark-layout .filter-card .form-label {
+    color: #c2c6dc !important;
+}
+
+body.dark-layout .filter-card .form-control {
+    background: #323a5a !important;
+    border-color: #414561 !important;
+    color: #ebeefd !important;
+}
+
+body.dark-layout .filter-card .form-control:focus {
+    border-color: #9C88FF !important;
+    background: #3a4260 !important;
+}
+
+body.dark-layout .filter-card .form-control::placeholder {
+    color: #8b8fa8 !important;
+}

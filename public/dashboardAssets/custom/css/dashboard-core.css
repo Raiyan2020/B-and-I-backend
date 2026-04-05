@@ -1,0 +1,42 @@
+/* Dashboard Core Styles */
+
+/* Navigation Font */
+.navigation.navigation-main {
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+}
+
+/* Scroll to Top Button */
+.scroll-top {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 9999 !important;
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s ease !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.scroll-top i {
+    font-size: 1.2rem;
+}
+
+.scroll-top:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+@media (max-width: 768px) {
+    .scroll-top {
+        bottom: 15px !important;
+        right: 15px !important;
+        width: 40px !important;
+        height: 40px !important;
+    }
+}
