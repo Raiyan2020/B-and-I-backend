@@ -2,94 +2,79 @@
 
 namespace App\Services\Auth;
 
-use App\Traits\UploadTrait;
-use App\Traits\GeneralTrait;
-use Illuminate\Http\Response;
-use App\Services\Core\BaseService;
-use Illuminate\Support\Facades\Schema;
+use App\DTO\Auth\RegisterAdvertiserDTO;
+use App\DTO\Auth\RegisterInvestorDTO;
+use App\DTO\Auth\LoginDTO;
+use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
-
-class AuthService extends BaseService
+class AuthService implements AuthServiceInterface
 {
-    use GeneralTrait, UploadTrait;
-
-
-    public function sendVerificationCodeToPhone($user): array
+    public function registerInvestor(RegisterInvestorDTO $dto): array
     {
-        $user->sendVerificationCode();
+        $user = User::create([
+            'role' => 'investor',
+            'first_name' => $dto->first_name,
+            'last_name' => $dto->last_name,
+            'email' => $dto->email,
+            'phone' => $dto->phone,
+            'password' => Hash::make($dto->password),
+            'investor_type' => $dto->investor_type,
+            'investor_sector' => $dto->investor_sector,
+            'investor_capital' => $dto->investor_capital,
+            'investment_count' => $dto->investment_count,
+            'investor_experience' => $dto->investor_experience,
+        ]);
 
-        return [
-            'key'  => 'success',
-            'msg'  => __('auth.send_verification_code_to_phone'),
-            'data' => [
-                'phone'        => $user->phone,
-                'country_code' => $user->country_code
-            ]
-        ];
+        $token = $user->createToken('investor')->plainTextToken;
+
+        return ['user' => $user, 'token' => $token];
     }
 
-    public function login($user): array
+    public function registerAdvertiser(RegisterAdvertiserDTO $dto): array
     {
-        $token = $user->login();
-        return [
-            'key'  => 'success',
-            'msg'  => __('auth.success_login'),
-            'data' => [
-                'token' => $token,
-                'user'  => $user->refresh(),
-            ]
-        ];
+        // file storage and other logic should be implemented here
+        $user = User::create([
+            'role' => 'advertiser',
+            'first_name' => $dto->first_name,
+            'last_name' => $dto->last_name,
+            'email' => $dto->email,
+            'phone' => $dto->phone,
+            'password' => Hash::make($dto->password),
+            'company_name' => $dto->company_name,
+            'license_number' => $dto->license_number,
+        ]);
+
+        $token = $user->createToken('advertiser')->plainTextToken;
+
+        return ['user' => $user, 'token' => $token];
     }
 
-    public function activate($request): array
+    public function login(LoginDTO $dto): array
     {
-        $table = $request['user']->getTable();
-        $msg = (Schema::hasColumn($table, 'active')&&!$request['user']->active) ? __('auth.delivery_company_join_request_sent') : __('auth.registered_success');
-        $request['user']->markAsActive();
-        // Return the response data
-        return [
-            'key'  => 'success',
-            'msg'  => $msg,
-            'data' => [
-                // 'token' => $request['user']->login(),
-                'user'  => $request['user']->refresh(),
-            ]
-        ];
+        $user = User::where('email', $dto->email)->first();
+        if (! $user || $user->phone !== $dto->phone) {
+            throw new \Illuminate\Auth\AuthenticationException('Invalid credentials.');
+        }
+
+        $user->tokens()->delete();
+        $token = $user->createToken($user->role)->plainTextToken;
+
+        return ['user' => $user, 'token' => $token];
     }
 
-    public function register($request): array
+    public function logout(User $user): void
     {
-        $user = $this->model::create($request);
-
-        return [
-            'key'  => 'success',
-            'msg'  => __('auth.done_registration_verification_code_sent_to_phone'),
-            'data' => $user
-        ];
+        $user->currentAccessToken()?->delete();
     }
 
-
-    public function resendCode($request): array
+    public function resendVerification(User $user): void
     {
-        $request['user']->sendVerificationCode();
-        return [
-            'key'  => 'success',
-            'msg'  => __('auth.code_re_send'),
-            'user' => $request['user']->refresh()
-        ];
-    }
+        if ($user->email_verified_at) {
+            throw new \InvalidArgumentException('Already verified');
+        }
 
-    public function logout($request): array
-    {
-        auth()->user()->logout($request);
-        return [
-            'msg' => __('auth.logout_success')
-        ];
-    }
-
-    public function deleteAccount($request)
-    {
-        auth()->user()->delete();
-        return ['msg' => __('auth.account_deleted')];
+        $user->sendEmailVerificationNotification();
     }
 }

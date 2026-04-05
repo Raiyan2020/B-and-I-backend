@@ -1,19 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\AdditionsController;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\DeliveryMan\AuthController as DeliveryAuthController;
-use App\Http\Controllers\Api\BranchController;
-use App\Http\Controllers\Api\CartController;
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\DeliveryTypesControllr;
-use App\Http\Controllers\Api\NotificationsController;
-use App\Http\Controllers\Api\OfferController;
-use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\PaymentMethodsControllr;
-use App\Http\Controllers\Api\ServiceController;
-use App\Http\Controllers\Api\SubCategoryController;
-use Illuminate\Http\Request;
+
+use App\Http\Controllers\Api\V1\Auth\LoginController;
+use App\Http\Controllers\Api\V1\Auth\LogoutController;
+use App\Http\Controllers\Api\V1\Auth\ProfileController;
+use App\Http\Controllers\Api\V1\Auth\RegisterAdvertiserController;
+use App\Http\Controllers\Api\V1\Auth\RegisterInvestorController;
+use App\Http\Controllers\Api\V1\General\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,10 +20,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-
-
-
-
-
-
+Route::prefix('v1')->group(function () {
+    Route::prefix('auth')->group(function () {
+        Route::post('register/investor', [RegisterInvestorController::class, '__invoke']);
+        Route::post('register/advertiser', [RegisterAdvertiserController::class, '__invoke']);
+        Route::post('login', [LoginController::class, '__invoke']);
+        Route::post('logout', [LogoutController::class, '__invoke'])->middleware('auth:sanctum');
+        Route::get('profile', [ProfileController::class, '__invoke'])->middleware('auth:sanctum');
+    });
+    Route::prefix('general')->group(function () {
+        Route::get('categories', [CategoryController::class, 'index']);
+    });
+});

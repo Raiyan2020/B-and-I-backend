@@ -22,8 +22,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'role',
+        'first_name',
+        'last_name',
         'image',
-        'name',
         'country_code',
         'phone',
         'email',
@@ -31,6 +33,17 @@ class User extends Authenticatable
         'code',
         'is_blocked',
         'is_active',
+        'subscription_plan',
+        'bio',
+        'tagline',
+        'investor_type',
+        'investor_sector',
+        'investor_capital',
+        'investment_count',
+        'investor_experience',
+        'company_name',
+        'company_license_url',
+        'license_number',
     ];
 
     /**
