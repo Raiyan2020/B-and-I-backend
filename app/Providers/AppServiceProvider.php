@@ -46,8 +46,20 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
-        View::share('site_name', ['ar' => GeneralSetting::getValueForKey('website_name_ar'), 'en' => GeneralSetting::getValueForKey('website_name_en')]);
         Schema::defaultStringLength(191);
+
+        $siteName = ['ar' => null, 'en' => null];
+        try {
+            if (Schema::hasTable('general_settings')) {
+                $siteName = [
+                    'ar' => GeneralSetting::getValueForKey('website_name_ar'),
+                    'en' => GeneralSetting::getValueForKey('website_name_en'),
+                ];
+            }
+        } catch (\Throwable) {
+            // Settings table or DB unavailable (fresh clone, migrate pending, bad credentials).
+        }
+        View::share('site_name', $siteName);
         Paginator::useBootstrap();
         Model::preventLazyLoading(!app()->isProduction());
     }

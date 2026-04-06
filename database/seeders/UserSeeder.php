@@ -174,9 +174,9 @@ class UserSeeder extends Seeder
                 'license_number' => 'LC-T124',
             ],
 
-            // أدمن
+            // حساب تجريبي (دور admin غير موجود في users؛ الأدمن الفعلي في جدول admins عبر AdminSeeder)
             [
-                'role' => 'admin',
+                'role' => 'investor',
                 'first_name' => 'سوبر',
                 'last_name' => 'أدمن',
                 'country_code' => '+966',
@@ -186,6 +186,11 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
+                'investor_type' => 'angel',
+                'investor_sector' => 'التقنية',
+                'investor_capital' => 50000.000,
+                'investment_count' => 1,
+                'investor_experience' => 'beginner',
             ],
         ];
 
