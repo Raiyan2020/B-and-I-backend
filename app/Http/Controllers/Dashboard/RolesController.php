@@ -7,6 +7,8 @@ use App\Http\Requests\Dashboard\Roles\StoreRoleRequest;
 use App\Http\Requests\Dashboard\Roles\UpdateRoleRequest;
 use App\Models\Admin;
 use App\Models\Role;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
@@ -137,9 +139,18 @@ class RolesController extends Controller
         $role->syncPermissions($permissions);
     }
 
-    public function destroy(Role $role)
+    public function destroy(Role $role): RedirectResponse|JsonResponse
     {
+        $json = request()->ajax() || request()->wantsJson();
+
         if ($role->id === 1 || $role->name === 'super_admin') {
+            if ($json) {
+                return response()->json([
+                    'key' => 'error',
+                    'msg' => __('dashboard.cannot_delete_super_admin_role'),
+                ], 422);
+            }
+
             return back()->withErrors(['error' => __('dashboard.cannot_delete_super_admin_role')]);
         }
 
@@ -149,10 +160,24 @@ class RolesController extends Controller
             ->count();
 
         if ($assignedCount > 0) {
+            if ($json) {
+                return response()->json([
+                    'key' => 'error',
+                    'msg' => __('dashboard.cannot_delete_role_assigned_to_admins'),
+                ], 422);
+            }
+
             return back()->withErrors(['error' => __('dashboard.cannot_delete_role_assigned_to_admins')]);
         }
 
         $role->delete();
+
+        if ($json) {
+            return response()->json([
+                'key' => 'success',
+                'msg' => __('dashboard.item deleted successfully'),
+            ]);
+        }
 
         return back()->with(['success' => __('dashboard.item deleted successfully')]);
     }

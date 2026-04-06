@@ -17,7 +17,7 @@ class AboutUsItemController extends AdminBasicController
     {
         $this->middleware('permission:about-us-items', ['only' => ['index']]);
         $this->middleware('permission:add-about-us-item', ['only' => ['create', 'store']]);
-        $this->middleware('permission:edit-about-us-item', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:edit-about-us-item', ['only' => ['edit', 'update', 'updateSettings']]);
         $this->middleware('permission:delete-about-us-item', ['only' => ['destroy', 'destroyMultiple']]);
 
         $this->model = AboutUsItem::class;
@@ -38,12 +38,14 @@ class AboutUsItemController extends AdminBasicController
             return parent::index();
         }
 
-        $aboutUsTitle = GeneralSetting::getValueForKey('about_us_title');
-        $aboutUsDescription = GeneralSetting::getValueForKey('about_us_description');
+        $legacyTitle = GeneralSetting::getValueForKey('about_us_title');
+        $legacyDescription = GeneralSetting::getValueForKey('about_us_description');
 
         return view('dashboard.about_us_items.index', [
-            'about_us_title' => $aboutUsTitle,
-            'about_us_description' => $aboutUsDescription,
+            'about_us_title_ar' => GeneralSetting::getValueForKey('about_us_title_ar') ?: $legacyTitle,
+            'about_us_title_en' => GeneralSetting::getValueForKey('about_us_title_en') ?: '',
+            'about_us_description_ar' => GeneralSetting::getValueForKey('about_us_description_ar') ?: $legacyDescription,
+            'about_us_description_en' => GeneralSetting::getValueForKey('about_us_description_en') ?: '',
         ]);
     }
 
@@ -53,19 +55,23 @@ class AboutUsItemController extends AdminBasicController
     public function updateSettings(Request $request): JsonResponse
     {
         $request->validate([
-            'about_us_title' => ['required', 'string', 'max:255'],
-            'about_us_description' => ['required', 'string', 'max:1000'],
+            'about_us_title_ar' => ['required', 'string', 'max:255'],
+            'about_us_title_en' => ['required', 'string', 'max:255'],
+            'about_us_description_ar' => ['required', 'string', 'max:5000'],
+            'about_us_description_en' => ['required', 'string', 'max:5000'],
         ]);
 
-        GeneralSetting::updateOrCreate(
-            ['key' => 'about_us_title'],
-            ['value' => $request->about_us_title]
-        );
-
-        GeneralSetting::updateOrCreate(
-            ['key' => 'about_us_description'],
-            ['value' => $request->about_us_description]
-        );
+        foreach ([
+            'about_us_title_ar',
+            'about_us_title_en',
+            'about_us_description_ar',
+            'about_us_description_en',
+        ] as $key) {
+            GeneralSetting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $request->input($key)]
+            );
+        }
 
         return response()->json([
             'key' => 'success',

@@ -72,6 +72,10 @@
     <script src="{{asset('dashboardAssets/app-assets/vendors/js/tables/datatable/datatables.bootstrap4.min.js')}}"></script>
     @endpush
 
+    @push('page-styles')
+        <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/admins-index.css') }}">
+    @endpush
+
     @push('page-scripts')
     <script>
         $(document).ready(function () {
@@ -97,32 +101,33 @@
                             }},
                         {data: 'created_at',name: 'created_at'},
                         {data: 'id',
+                            orderable: false,
+                            searchable: false,
                             render:function (data, type, row){
                                 if (data <= 1) {
                                     return '';
                                 }
-                                var edit = 'roles/' + data + '/edit';
-                                var deleting = 'roles/' + data;
+                                var editUrl = '{{ route('admin.roles.edit', ':id') }}'.replace(':id', data);
+                                var deleteUrl = '{{ route('admin.roles.destroy', ':id') }}'.replace(':id', data);
                                 var canEdit = @json(auth()->user()->can('edit-role'));
                                 var canDelete = @json(auth()->user()->can('delete-role'));
                                 var hasAdmins = parseInt(row.users_count, 10) > 0;
                                 if (!canEdit && !canDelete) {
                                     return '';
                                 }
-                                var parts = [];
+                                var html = '<div class="d-flex align-items-center justify-content-center flex-wrap">';
                                 if (canEdit) {
-                                    parts.push('<a class="dropdown-item" href="' + edit + '"><i class="fa fa-edit mr-1"></i>{{__('dashboard.edit')}}</a>');
+                                    html += '<a class="btn btn-sm btn-icon btn-outline-primary mr-1 mb-1" href="' + editUrl + '" title="{{ __('dashboard.edit') }}"><i class="feather icon-edit text-primary"></i></a>';
                                 }
-                                if (canDelete && !hasAdmins) {
-                                    parts.push('<form action="' + deleting + '" method="POST" class="role-' + data + '"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE"></form><button type="button" class="dropdown-item" onClick="remove(' + data + ',\'role\')"><i class="fa fa-trash mr-1"></i>{{__('dashboard.delete')}}</button>');
+                                if (canDelete) {
+                                    if (!hasAdmins) {
+                                        html += '<button type="button" class="btn btn-sm btn-icon btn-outline-danger mb-1 delete-row" data-url="' + deleteUrl + '" title="{{ __('dashboard.delete') }}"><i class="feather icon-trash-2 text-danger"></i></button>';
+                                    } else {
+                                        html += '<span class="btn btn-sm btn-icon btn-outline-secondary mb-1" style="opacity:0.55;cursor:not-allowed" title="{{ __('dashboard.cannot_delete_role_assigned_to_admins') }}"><i class="feather icon-trash-2 text-secondary"></i></span>';
+                                    }
                                 }
-                                if (parts.length === 0) {
-                                    return '';
-                                }
-                                return '<div class="btn-group">' +
-                                    '<div class="dropdown">' +
-                                    '<button class="btn btn-flat-dark dropdown-toggle mr-1 mb-1" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{__('dashboard.actions')}}</button>' +
-                                    '<div class="dropdown-menu">' + parts.join('') + '</div></div></div>';
+                                html += '</div>';
+                                return html;
                             }
                         },
                     ]

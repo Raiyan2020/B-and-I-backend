@@ -27,18 +27,36 @@
                                         @csrf
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>{{ __('dashboard.about_us_title') }}</label>
-                                                <input type="text" class="form-control" name="about_us_title"
-                                                    value="{{ $about_us_title }}"
-                                                    placeholder="{{ __('dashboard.about_us_title') }}">
+                                                <label>{{ __('dashboard.about_us_title_ar') }}</label>
+                                                <input type="text" class="form-control" name="about_us_title_ar"
+                                                    value="{{ $about_us_title_ar }}"
+                                                    placeholder="{{ __('dashboard.about_us_title_ar') }}"
+                                                    dir="rtl">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>{{ __('dashboard.about_us_description') }}</label>
-                                                <input type="text" class="form-control" name="about_us_description"
-                                                    value="{{ $about_us_description }}"
-                                                    placeholder="{{ __('dashboard.about_us_description') }}">
+                                                <label>{{ __('dashboard.about_us_title_en') }}</label>
+                                                <input type="text" class="form-control" name="about_us_title_en"
+                                                    value="{{ $about_us_title_en }}"
+                                                    placeholder="{{ __('dashboard.about_us_title_en') }}"
+                                                    dir="ltr">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>{{ __('dashboard.about_us_description_ar') }}</label>
+                                                <textarea class="form-control" name="about_us_description_ar" rows="4"
+                                                    placeholder="{{ __('dashboard.about_us_description_ar') }}"
+                                                    dir="rtl">{{ $about_us_description_ar }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>{{ __('dashboard.about_us_description_en') }}</label>
+                                                <textarea class="form-control" name="about_us_description_en" rows="4"
+                                                    placeholder="{{ __('dashboard.about_us_description_en') }}"
+                                                    dir="ltr">{{ $about_us_description_en }}</textarea>
                                             </div>
                                         </div>
                                         <div class="col-12">
