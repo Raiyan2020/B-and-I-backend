@@ -466,21 +466,47 @@
     @section('script')
     <script>
         $(document).ready(function() {
-            // Permission Search
+            function updateGroupSelectAllState($group) {
+                var $boxes = $group.find('.permission-checkbox');
+                var total = $boxes.length;
+                var checked = $boxes.filter(':checked').length;
+                var $master = $group.find('.permission-group-select-all');
+                $master.prop('indeterminate', false);
+                if (total === 0) {
+                    $master.prop('checked', false);
+                    return;
+                }
+                if (checked === 0) {
+                    $master.prop('checked', false);
+                } else if (checked === total) {
+                    $master.prop('checked', true);
+                } else {
+                    $master.prop('checked', false);
+                    $master.prop('indeterminate', true);
+                }
+            }
+
+            function updateAllGroupSelectAllStates() {
+                $('.permission-group').each(function () {
+                    updateGroupSelectAllState($(this));
+                });
+            }
+
             $('#permission-search').on('keyup', function() {
                 var searchTerm = $(this).val().toLowerCase();
-                
+
                 if (searchTerm === '') {
                     $('.permission-item').removeClass('hidden').show();
                     $('.permission-group').removeClass('hidden').show();
                     updatePermissionCounts();
+                    updateAllGroupSelectAllStates();
                     return;
                 }
 
                 $('.permission-item').each(function() {
                     var permissionName = $(this).data('name');
                     var permissionText = $(this).find('.permission-text').text().toLowerCase();
-                    
+
                     if (permissionName.includes(searchTerm) || permissionText.includes(searchTerm)) {
                         $(this).removeClass('hidden').show();
                     } else {
@@ -488,7 +514,6 @@
                     }
                 });
 
-                // Hide groups with no visible permissions
                 $('.permission-group').each(function() {
                     var visibleItems = $(this).find('.permission-item:not(.hidden):visible').length;
                     if (visibleItems === 0) {
@@ -499,28 +524,37 @@
                 });
 
                 updatePermissionCounts();
+                updateAllGroupSelectAllStates();
             });
 
-            // Select All Permissions
             $('#select-all-permissions').on('click', function() {
                 $('.permission-checkbox:visible:not(.hidden)').prop('checked', true);
                 updatePermissionCounts();
+                updateAllGroupSelectAllStates();
             });
 
-            // Deselect All Permissions
             $('#deselect-all-permissions').on('click', function() {
                 $('.permission-checkbox:visible:not(.hidden)').prop('checked', false);
                 updatePermissionCounts();
+                updateAllGroupSelectAllStates();
             });
 
-            // Toggle permission group on header click
-            $('.permission-group-header').on('click', function() {
+            $(document).on('change', '.permission-group-select-all', function() {
+                var $group = $(this).closest('.permission-group');
+                var on = $(this).prop('checked');
+                $(this).prop('indeterminate', false);
+                $group.find('.permission-checkbox').prop('checked', on);
+                updatePermissionCounts();
+                updateGroupSelectAllState($group);
+            });
+
+            $('.permission-group-title-toggle').on('click', function() {
                 $(this).closest('.permission-group').find('.permission-group-body').slideToggle(300);
             });
 
-            // Update permission counts on change
             $('.permission-checkbox').on('change', function() {
                 updatePermissionCounts();
+                updateGroupSelectAllState($(this).closest('.permission-group'));
             });
 
             function updatePermissionCounts() {
@@ -534,7 +568,6 @@
                 });
             }
 
-            // Form validation
             $('#role-form').on('submit', function(e) {
                 var checkedPermissions = $('.permission-checkbox:checked').length;
                 if (checkedPermissions === 0) {
@@ -544,8 +577,8 @@
                 }
             });
 
-            // Initialize counts
             updatePermissionCounts();
+            updateAllGroupSelectAllStates();
         });
     </script>
     @endsection
