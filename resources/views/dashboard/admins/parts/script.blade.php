@@ -61,8 +61,11 @@
                 {
                     data: 'roles',
                     render: function(data) {
-                        return data && data.length > 0 ? data[0].name :
-                            '{{ __('dashboard.no role') }}';
+                        if (!data || data.length === 0) {
+                            return '{{ __('dashboard.no role') }}';
+                        }
+                        var r = data[0];
+                        return r.display_name || r.name;
                     }
                 },
                 {

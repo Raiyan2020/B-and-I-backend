@@ -1,64 +1,5 @@
 @php
-    // Group permissions by model (not by action)
-    $groupedPermissions = [];
-    $modelNames = ['users', 'user', 'roles', 'role', 'admins', 'admin', 'categories', 'category'];
-    
-    foreach($permissions as $permission) {
-        $permissionName = strtolower($permission->name);
-        $category = 'other';
-        
-        // Find the model in permission name
-        foreach($modelNames as $model) {
-            if (strpos($permissionName, $model) !== false) {
-                // Normalize model name (user/users -> users, admin/admins -> admins, role/roles -> roles)
-                if (in_array($model, ['user', 'users'])) {
-                    $category = 'users';
-                } elseif (in_array($model, ['role', 'roles'])) {
-                    $category = 'roles';
-                } elseif (in_array($model, ['admin', 'admins'])) {
-                    $category = 'admins';
-                } elseif (in_array($model, ['category', 'categories'])) {
-                    $category = 'categories';
-                } else {
-                    $category = $model;
-                }
-                break;
-            }
-        }
-        
-        // If no model found, check if it's a standalone model name (like 'users', 'roles', 'admins')
-        if ($category === 'other') {
-            if (in_array($permissionName, $modelNames)) {
-                if (in_array($permissionName, ['user', 'users'])) {
-                    $category = 'users';
-                } elseif (in_array($permissionName, ['role', 'roles'])) {
-                    $category = 'roles';
-                } elseif (in_array($permissionName, ['admin', 'admins'])) {
-                    $category = 'admins';
-                } elseif (in_array($permissionName, ['category', 'categories'])) {
-                    $category = 'categories';
-                } else {
-                    $category = $permissionName;
-                }
-            } else {
-                // For other permissions like 'add-permission', put them in a separate group
-                $category = 'other';
-            }
-        }
-        
-        if(!isset($groupedPermissions[$category])) {
-            $groupedPermissions[$category] = [];
-        }
-        $groupedPermissions[$category][] = $permission;
-    }
-    
-    // Sort groups by priority: users, admins, roles, categories, other
-    $order = ['users' => 1, 'admins' => 2, 'roles' => 3, 'categories' => 4, 'other' => 99];
-    uksort($groupedPermissions, function($a, $b) use ($order) {
-        $aOrder = $order[$a] ?? 98;
-        $bOrder = $order[$b] ?? 98;
-        return $aOrder <=> $bOrder;
-    });
+    $groupedPermissions = \App\Support\PermissionGroups::group($permissions);
 @endphp
 
 <x-dashboard.layouts.master title="{{__('dashboard.add roles')}}">
@@ -160,12 +101,31 @@
                                                     <!-- Grouped Permissions -->
                                                     <div class="permissions-container">
                                                         @foreach($groupedPermissions as $category => $categoryPermissions)
+                                                            @php
+                                                                $groupIcon = match ($category) {
+                                                                    'users' => 'users',
+                                                                    'admins' => 'shield',
+                                                                    'roles' => 'lock',
+                                                                    'categories' => 'list',
+                                                                    'settings' => 'settings',
+                                                                    'preferred_sectors' => 'star',
+                                                                    'about_us' => 'info',
+                                                                    default => 'folder',
+                                                                };
+                                                                $categoryLabel = match ($category) {
+                                                                    'other' => __('dashboard.other'),
+                                                                    'settings' => __('dashboard.settings'),
+                                                                    'preferred_sectors' => __('dashboard.preferred_sectors'),
+                                                                    'about_us' => __('dashboard.about_us'),
+                                                                    default => __('dashboard.' . $category),
+                                                                };
+                                                            @endphp
                                                             <div class="permission-group mb-3" data-category="{{ $category }}">
                                                                 <div class="permission-group-header">
                                                                     <h6 class="mb-0 d-flex justify-content-between align-items-center flex-wrap permission-group-header-inner">
                                                                         <span class="permission-group-title-toggle d-flex align-items-center flex-grow-1">
-                                                                            <i class="feather icon-{{ $category == 'users' ? 'users' : ($category == 'admins' ? 'shield' : ($category == 'roles' ? 'lock' : ($category == 'categories' ? 'list' : 'folder'))) }} text-info"></i>
-                                                                            <span class="mr-1 ml-1">{{ $category == 'other' ? __('dashboard.other') : __('dashboard.' . $category) }}</span>
+                                                                            <i class="feather icon-{{ $groupIcon }} text-info"></i>
+                                                                            <span class="mr-1 ml-1">{{ $categoryLabel }}</span>
                                                                         </span>
                                                                         <span class="d-flex align-items-center mt-1 mt-sm-0">
                                                                             <span class="group-permission-select-wrap d-inline-flex align-items-center mr-2">

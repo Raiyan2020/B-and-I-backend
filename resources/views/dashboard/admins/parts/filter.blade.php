@@ -24,7 +24,7 @@
                         <select class="form-control" id="role-filter">
                             <option value="">{{ __('dashboard.all') }}</option>
                             @foreach ($roles as $role)
-                                <option value="{{ $role->name }}">{{ $role->name }}</option>
+                                <option value="{{ $role->name }}">{{ $role->display_name }}</option>
                             @endforeach
                         </select>
                     </div>

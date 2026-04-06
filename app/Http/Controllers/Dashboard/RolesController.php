@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\Roles\StoreRoleRequest;
 use App\Http\Requests\Dashboard\Roles\UpdateRoleRequest;
+use App\Models\Admin;
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -138,6 +139,19 @@ class RolesController extends Controller
 
     public function destroy(Role $role)
     {
+        if ($role->id === 1 || $role->name === 'super_admin') {
+            return back()->withErrors(['error' => __('dashboard.cannot_delete_super_admin_role')]);
+        }
+
+        $assignedCount = DB::table('model_has_roles')
+            ->where('role_id', $role->id)
+            ->where('model_type', Admin::class)
+            ->count();
+
+        if ($assignedCount > 0) {
+            return back()->withErrors(['error' => __('dashboard.cannot_delete_role_assigned_to_admins')]);
+        }
+
         $role->delete();
 
         return back()->with(['success' => __('dashboard.item deleted successfully')]);
