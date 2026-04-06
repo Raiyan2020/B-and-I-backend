@@ -2,6 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Enums\InvestorExperience;
+use App\Enums\InvestorType;
+use App\Enums\UserRole;
+use App\Models\Category;
+use App\Models\PreferredSector;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
@@ -19,11 +24,14 @@ class UserSeeder extends Seeder
         User::truncate();
         Schema::enableForeignKeyConstraints();
 
+        $sectorIds = PreferredSector::query()->orderBy('id')->pluck('id')->values()->all();
+        $categoryIds = Category::query()->orderBy('id')->pluck('id')->values()->all();
+
         // مستثمرين من شركات مختلفة مع بيانات كاملة
         $users = [
             // مستثمرين من شركة الرياض للتطوير العقاري
             [
-                'role' => 'investor',
+                'role' => UserRole::Investor,
                 'first_name' => 'أحمد',
                 'last_name' => 'محمد الدعيع',
                 'country_code' => '+966',
@@ -33,14 +41,16 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'investor_type' => 'company',
-                'investor_sector' => 'العقارات',
-                'investor_capital' => 500000.000,
-                'investment_count' => 10,
-                'investor_experience' => 'expert',
+                'investor_type' => InvestorType::Company,
+                'preferred_sector_id' => $sectorIds[0],
+                'category_id' => $categoryIds[0],
+                'available_capital' => 500000.000,
+                'capital' => 500000.000,
+                'previous_investments_count' => 10,
+                'investor_experience' => InvestorExperience::Expert,
             ],
             [
-                'role' => 'investor',
+                'role' => UserRole::Investor,
                 'first_name' => 'فاطمة',
                 'last_name' => 'علي العتيبي',
                 'country_code' => '+966',
@@ -50,14 +60,16 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'investor_type' => 'angel',
-                'investor_sector' => 'العقارات',
-                'investor_capital' => 100000.000,
-                'investment_count' => 5,
-                'investor_experience' => 'intermediate',
+                'investor_type' => InvestorType::Angel,
+                'preferred_sector_id' => $sectorIds[0],
+                'category_id' => $categoryIds[1],
+                'available_capital' => 100000.000,
+                'capital' => 100000.000,
+                'previous_investments_count' => 5,
+                'investor_experience' => InvestorExperience::Intermediate,
             ],
             [
-                'role' => 'investor',
+                'role' => UserRole::Investor,
                 'first_name' => 'محمد',
                 'last_name' => 'خالد القحطاني',
                 'country_code' => '+966',
@@ -67,16 +79,18 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'investor_type' => 'crowdfunding',
-                'investor_sector' => 'التقنية',
-                'investor_capital' => 10000.000,
-                'investment_count' => 20,
-                'investor_experience' => 'beginner',
+                'investor_type' => InvestorType::Crowdfunding,
+                'preferred_sector_id' => $sectorIds[1],
+                'category_id' => $categoryIds[2],
+                'available_capital' => 10000.000,
+                'capital' => 10000.000,
+                'previous_investments_count' => 20,
+                'investor_experience' => InvestorExperience::Beginner,
             ],
 
             // مستثمرين من شركة الجزيرة للاستثمار
             [
-                'role' => 'investor',
+                'role' => UserRole::Investor,
                 'first_name' => 'سارة',
                 'last_name' => 'أحمد السليمان',
                 'country_code' => '+966',
@@ -86,14 +100,16 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'investor_type' => 'angel',
-                'investor_sector' => 'التجارة',
-                'investor_capital' => 300000.000,
-                'investment_count' => 8,
-                'investor_experience' => 'intermediate',
+                'investor_type' => InvestorType::Angel,
+                'preferred_sector_id' => $sectorIds[2],
+                'category_id' => $categoryIds[3],
+                'available_capital' => 300000.000,
+                'capital' => 300000.000,
+                'previous_investments_count' => 8,
+                'investor_experience' => InvestorExperience::Intermediate,
             ],
             [
-                'role' => 'investor',
+                'role' => UserRole::Investor,
                 'first_name' => 'علي',
                 'last_name' => 'حسن المطيري',
                 'country_code' => '+966',
@@ -103,16 +119,18 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'investor_type' => 'company',
-                'investor_sector' => 'الطاقة',
-                'investor_capital' => 1500000.000,
-                'investment_count' => 12,
-                'investor_experience' => 'expert',
+                'investor_type' => InvestorType::Company,
+                'preferred_sector_id' => $sectorIds[3],
+                'category_id' => $categoryIds[4],
+                'available_capital' => 1500000.000,
+                'capital' => 1500000.000,
+                'previous_investments_count' => 12,
+                'investor_experience' => InvestorExperience::Expert,
             ],
 
             // معلنين من الخليج للأوراق المالية
             [
-                'role' => 'advertiser',
+                'role' => UserRole::Advertiser,
                 'first_name' => 'نور',
                 'last_name' => 'محمود الحربي',
                 'country_code' => '+966',
@@ -122,12 +140,10 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'company_name' => 'الخليج للأوراق',
-                'company_license_url' => 'licenses/noor_license.pdf',
-                'license_number' => 'LC-G901',
+                'company_license' => 'licenses/noor_license.pdf',
             ],
             [
-                'role' => 'advertiser',
+                'role' => UserRole::Advertiser,
                 'first_name' => 'حسام',
                 'last_name' => 'علاء الدين',
                 'country_code' => '+966',
@@ -137,14 +153,12 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'company_name' => 'الخليج للاستثمار',
-                'company_license_url' => 'licenses/hossam_license.pdf',
-                'license_number' => 'LC-G902',
+                'company_license' => 'licenses/hossam_license.pdf',
             ],
 
             // معلنين من شركة النقل الموحدة
             [
-                'role' => 'advertiser',
+                'role' => UserRole::Advertiser,
                 'first_name' => 'ليلى',
                 'last_name' => 'محمد الشهري',
                 'country_code' => '+966',
@@ -154,12 +168,10 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'company_name' => 'النقل الموحد',
-                'company_license_url' => 'licenses/layla_license.pdf',
-                'license_number' => 'LC-T123',
+                'company_license' => 'licenses/layla_license.pdf',
             ],
             [
-                'role' => 'advertiser',
+                'role' => UserRole::Advertiser,
                 'first_name' => 'خالد',
                 'last_name' => 'إبراهيم العنزي',
                 'country_code' => '+966',
@@ -169,14 +181,12 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'company_name' => 'النقل الموحد فرع',
-                'company_license_url' => 'licenses/khaled_license.pdf',
-                'license_number' => 'LC-T124',
+                'company_license' => 'licenses/khaled_license.pdf',
             ],
 
             // حساب تجريبي (دور admin غير موجود في users؛ الأدمن الفعلي في جدول admins عبر AdminSeeder)
             [
-                'role' => 'investor',
+                'role' => UserRole::Investor,
                 'first_name' => 'سوبر',
                 'last_name' => 'أدمن',
                 'country_code' => '+966',
@@ -186,11 +196,13 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'is_active' => true,
                 'is_blocked' => false,
-                'investor_type' => 'angel',
-                'investor_sector' => 'التقنية',
-                'investor_capital' => 50000.000,
-                'investment_count' => 1,
-                'investor_experience' => 'beginner',
+                'investor_type' => InvestorType::Angel,
+                'preferred_sector_id' => $sectorIds[1],
+                'category_id' => $categoryIds[5],
+                'available_capital' => 50000.000,
+                'capital' => 50000.000,
+                'previous_investments_count' => 1,
+                'investor_experience' => InvestorExperience::Beginner,
             ],
         ];
 
@@ -198,6 +210,6 @@ class UserSeeder extends Seeder
             User::create($user);
         }
 
-        $this->command->info('✅ تم إنشاء 10 مستثمرين من 5 شركات مختلفة بنجاح!');
+        $this->command->info('✅ تم إنشاء 6 مستثمرين و4 معلنين تجريبيين بنجاح!');
     }
 }

@@ -59,6 +59,13 @@
                     <span class="menu-title" data-i18n="Wish List">{{ __('dashboard.categories') }}</span></a>
             </li>
 
+            @can('preferred-sectors')
+                <li class=" nav-item {{ Route::is('admin.preferred_sectors.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.preferred_sectors.index') }}">
+                        <i class="feather icon-target"></i>
+                        <span class="menu-title">{{ __('dashboard.preferred sectors') }}</span></a>
+                </li>
+            @endcan
 
             <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
                 <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>

@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\Dashboard\CategoryController;
+use App\Http\Controllers\Dashboard\PreferredSectorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\AuthController;
@@ -72,10 +73,16 @@ Route::group([
             Route::get('categories/{category}/toggle-status', 'toggleStatus')->name('categories.toggleStatus');
         });
 
+        Route::controller(PreferredSectorController::class)->group(function () {
+            Route::post('preferred-sectors/destroy-multiple', 'destroyMultiple')->name('preferred_sectors.destroyMultiple');
+            Route::get('preferred-sectors/{preferred_sector}/toggle-status', 'toggleStatus')->name('preferred_sectors.toggleStatus');
+        });
+
         Route::resources([
             'admins' => AdminController::class,
             'roles' => RolesController::class,
             'categories' => CategoryController::class,
+            'preferred_sectors' => PreferredSectorController::class,
             'users' => UserController::class,
         ]);
 

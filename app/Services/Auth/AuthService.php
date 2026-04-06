@@ -5,29 +5,32 @@ namespace App\Services\Auth;
 use App\DTO\Auth\RegisterAdvertiserDTO;
 use App\DTO\Auth\RegisterInvestorDTO;
 use App\DTO\Auth\LoginDTO;
+use App\Enums\UserRole;
 use App\Models\User;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
 
 class AuthService implements AuthServiceInterface
 {
     public function registerInvestor(RegisterInvestorDTO $dto): array
     {
         $user = User::create([
-            'role' => 'investor',
+            'role' => UserRole::Investor,
             'first_name' => $dto->first_name,
             'last_name' => $dto->last_name,
             'email' => $dto->email,
             'phone' => $dto->phone,
-            'password' => Hash::make($dto->password),
+            'country_code' => $dto->country_code,
+            'password' => $dto->password,
             'investor_type' => $dto->investor_type,
-            'investor_sector' => $dto->investor_sector,
-            'investor_capital' => $dto->investor_capital,
-            'investment_count' => $dto->investment_count,
-            'investor_experience' => $dto->investor_experience,
+            'preferred_sector_id' => $dto->preferred_sector_id,
+            'category_id' => $dto->category_id,
+            'capital' => $dto->capital,
+            'available_capital' => $dto->available_capital,
+            'previous_investments_count' => $dto->previous_investments_count,
+            'investor_experience' => $dto->investment_experience,
+            'experience_level' => $dto->experience_level,
         ]);
 
-        $token = $user->createToken('investor')->plainTextToken;
+        $token = $user->createToken(UserRole::Investor->value)->plainTextToken;
 
         return ['user' => $user, 'token' => $token];
     }
@@ -36,17 +39,17 @@ class AuthService implements AuthServiceInterface
     {
         // file storage and other logic should be implemented here
         $user = User::create([
-            'role' => 'advertiser',
+            'role' => UserRole::Advertiser,
             'first_name' => $dto->first_name,
             'last_name' => $dto->last_name,
             'email' => $dto->email,
             'phone' => $dto->phone,
-            'password' => Hash::make($dto->password),
-            'company_name' => $dto->company_name,
-            'license_number' => $dto->license_number,
+            'country_code' => $dto->country_code,
+            'password' => $dto->password,
+            'company_license' => $dto->company_license,
         ]);
 
-        $token = $user->createToken('advertiser')->plainTextToken;
+        $token = $user->createToken(UserRole::Advertiser->value)->plainTextToken;
 
         return ['user' => $user, 'token' => $token];
     }
@@ -59,7 +62,7 @@ class AuthService implements AuthServiceInterface
         }
 
         $user->tokens()->delete();
-        $token = $user->createToken($user->role)->plainTextToken;
+        $token = $user->createToken($user->role->value)->plainTextToken;
 
         return ['user' => $user, 'token' => $token];
     }

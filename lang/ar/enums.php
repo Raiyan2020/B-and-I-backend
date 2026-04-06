@@ -1,7 +1,14 @@
 <?php
 
 return [
-    'CHARGE' => 'شحن',
-    'PAYMENT' => 'دفع',
-    'TRANSFER' => 'تحويل',
+    'investor_type' => [
+        'angel' => 'مستثمر ملائكي',
+        'company' => 'شركة',
+        'crowdfunding' => 'تمويل جماعي',
+    ],
+    'investor_experience' => [
+        'beginner' => 'مبتدئ',
+        'intermediate' => 'متوسط',
+        'expert' => 'خبير',
+    ],
 ];

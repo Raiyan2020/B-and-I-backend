@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\RegisterAdvertiserController;
 use App\Http\Controllers\Api\V1\Auth\RegisterInvestorController;
 use App\Http\Controllers\Api\V1\General\CategoryController;
+use App\Http\Controllers\Api\V1\General\ReferenceDataController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,5 +31,8 @@ Route::prefix('v1')->group(function () {
     });
     Route::prefix('general')->group(function () {
         Route::get('categories', [CategoryController::class, 'index']);
+        Route::get('investor-types', [ReferenceDataController::class, 'investorTypes']);
+        Route::get('investor-experience', [ReferenceDataController::class, 'investorExperience']);
+        Route::get('preferred-sectors', [ReferenceDataController::class, 'preferredSectors']);
     });
 });

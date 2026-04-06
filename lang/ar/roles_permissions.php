@@ -50,6 +50,12 @@ return [
     'edit category' => 'تعديل قسم',
     'delete category' => 'حذف قسم',
 
+    'preferred-sectors' => 'المجالات المفضلة',
+    'add-preferred-sector' => 'إضافة مجال مفضل',
+    'edit-preferred-sector' => 'تعديل مجال مفضل',
+    'show-preferred-sector' => 'معاينة مجال مفضل',
+    'delete-preferred-sector' => 'حذف مجال مفضل',
+
     'branches' => 'الفروع',
     'add branch' => 'إضافة فرع',
     'edit branch' => 'تعديل فرع',

@@ -45,7 +45,7 @@ return [
     'distinct' => 'The :attribute field has a duplicate value.',
     'email' => 'لابد ان يكون الحقل من نوع بريد الكتروني.',
     'ends_with' => 'The :attribute must end with one of the following: :values.',
-    'enum' => 'The selected :attribute is invalid.',
+    'enum' => 'قيمة :attribute المختارة غير صالحة.',
     'exists' => 'هذه البيانات غير صحيحه.',
     'file' => 'The :attribute must be a file.',
     'filled' => 'The :attribute field must have a value.',
@@ -99,7 +99,7 @@ return [
     'multiple_of' => 'The :attribute must be a multiple of :value.',
     'not_in' => 'The selected :attribute is invalid.',
     'not_regex' => 'The :attribute format is invalid.',
-    'numeric' => 'The :attribute must be a number.',
+    'numeric' => 'يجب أن يكون :attribute رقماً.',
     'password' => 'The password is incorrect.',
     'present' => 'The :attribute field must be present.',//->ignore($this->category->id)
     'prohibited' => 'The :attribute field is prohibited.',//->ignore($this->category->id)
@@ -142,8 +142,8 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'agreed_to_terms' => [
+            'accepted' => 'يجب الموافقة على الشروط والأحكام.',
         ],
     ],
 
@@ -163,6 +163,20 @@ return [
         'today' => 'اليوم',
         'account_number' => 'رقم الحساب',
         'IBAN' => 'رقم الحساب الايبان',
+        'investor_type' => 'نوع المستثمر',
+        'investor_experience' => 'خبرة الاستثمار',
+        'experience_level' => 'مستوى الخبرة',
+        'capital' => 'رأس المال',
+        'available_capital' => 'رأس المال المتاح',
+        'preferred_sector_id' => 'المجال المفضل',
+        'category_id' => 'قطاع التركيز',
+        'previous_investments_count' => 'عدد الاستثمارات السابقة',
+        'first_name' => 'الاسم الأول',
+        'last_name' => 'اسم العائلة',
+        'email' => 'البريد الإلكتروني',
+        'password' => 'كلمة المرور',
+        'country_code' => 'رمز الدولة',
+        'agreed_to_terms' => 'الموافقة على الشروط',
     ],
 
 ];

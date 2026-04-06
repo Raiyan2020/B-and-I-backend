@@ -50,6 +50,12 @@ return [
     'edit category' => 'Edit Category',
     'delete category' => 'Delete Category',
 
+    'preferred-sectors' => 'Preferred sectors',
+    'add-preferred-sector' => 'Add preferred sector',
+    'edit-preferred-sector' => 'Edit preferred sector',
+    'show-preferred-sector' => 'Show preferred sector',
+    'delete-preferred-sector' => 'Delete preferred sector',
+
     'branches' => 'Branches',
     'add branch' => 'Add Branch',
     'edit branch' => 'Edit Branch',

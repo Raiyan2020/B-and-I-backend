@@ -53,6 +53,12 @@ class PermissionsSeeder extends Seeder
             ['guard_name' => 'admin', 'name' => 'show-category'],
             ['guard_name' => 'admin', 'name' => 'delete-category'],
 
+            ['guard_name' => 'admin', 'name' => 'preferred-sectors'],
+            ['guard_name' => 'admin', 'name' => 'add-preferred-sector'],
+            ['guard_name' => 'admin', 'name' => 'edit-preferred-sector'],
+            ['guard_name' => 'admin', 'name' => 'show-preferred-sector'],
+            ['guard_name' => 'admin', 'name' => 'delete-preferred-sector'],
+
         ];
 
         // إنشاء الرول super_admin

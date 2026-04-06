@@ -33,6 +33,8 @@ return [
     'order cancelled successfully' => 'Order Cancelled Successfully' ,
     'order rated successfully' => 'Order Rated Successfully' ,
     'your account is not approved until now' => 'Your Account Is Not Approved Until Now' ,
+    'the_given_data_was_invalid' => 'The given data was invalid.',
+    'have_no_permission' => 'You do not have permission to perform this action.',
     '' => '' ,
     '' => '' ,
     '' => '' ,

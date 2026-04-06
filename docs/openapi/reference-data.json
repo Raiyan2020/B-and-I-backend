@@ -1,0 +1,130 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "B_and_I — Reference data (investor enums)",
+    "version": "1.0.0",
+    "description": "Public GET endpoints that return allowed values for investor registration fields (InvestorType, InvestorExperience). Response shape matches App\\Traits\\ResponseTrait::jsonResponse."
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "Laravel API prefix"
+    }
+  ],
+  "paths": {
+    "/v1/general/investor-types": {
+      "get": {
+        "tags": ["Reference data"],
+        "summary": "List investor types",
+        "operationId": "getInvestorTypes",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceResponse"
+                },
+                "example": {
+                  "key": "success",
+                  "msg": "Data Retrieved Successfully",
+                  "code": 200,
+                  "response_status": {
+                    "error": false,
+                    "validation_errors": []
+                  },
+                  "data": {
+                    "items": [
+                      { "value": "angel", "label": "Angel investor" },
+                      { "value": "company", "label": "Company" },
+                      { "value": "crowdfunding", "label": "Crowdfunding" }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/general/investor-experience": {
+      "get": {
+        "tags": ["Reference data"],
+        "summary": "List investor experience levels",
+        "operationId": "getInvestorExperience",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceResponseExperience"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EnumOption": {
+        "type": "object",
+        "required": ["value", "label"],
+        "properties": {
+          "value": { "type": "string", "description": "Stored enum value (matches DB / API validation)" },
+          "label": { "type": "string", "description": "Human-readable label (locale from Accept-Language / app locale)" }
+        }
+      },
+      "ReferenceResponse": {
+        "type": "object",
+        "properties": {
+          "key": { "type": "string", "example": "success" },
+          "msg": { "type": "string" },
+          "code": { "type": "integer", "example": 200 },
+          "response_status": {
+            "type": "object",
+            "properties": {
+              "error": { "type": "boolean" },
+              "validation_errors": { "type": "array", "items": { "type": "object" } }
+            }
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/EnumOption" }
+              }
+            }
+          }
+        }
+      },
+      "ReferenceResponseExperience": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ReferenceResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/EnumOption" },
+                    "example": [
+                      { "value": "beginner", "label": "Beginner" },
+                      { "value": "intermediate", "label": "Intermediate" },
+                      { "value": "expert", "label": "Expert" }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

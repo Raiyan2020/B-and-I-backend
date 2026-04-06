@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\Admin;
 use App\Models\Category;
 use App\Models\GeneralSetting;
+use App\Models\PreferredSector;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\AdminSeeder;
@@ -30,6 +32,8 @@ class DatabaseSeeder extends Seeder
         Role::truncate();
         Permission::truncate();
         Category::truncate();
+        User::truncate();
+        PreferredSector::truncate();
         Schema::enableForeignKeyConstraints();
 
         $this->call([
@@ -37,6 +41,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class, // بعد PermissionsSeeder لاستخدام الرولات
             GeneralSettingSeeder::class,
             CategorySeeder::class,
+            PreferredSectorSeeder::class,
             UserSeeder::class,
         ]);
     }

@@ -142,8 +142,8 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'agreed_to_terms' => [
+            'accepted' => 'You must accept the terms and conditions.',
         ],
     ],
 

@@ -2,31 +2,33 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\DTO\Auth\RegisterAdvertiserDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterAdvertiserRequest;
-use App\Services\Auth\AuthServiceInterface;
-use App\DTO\Auth\RegisterAdvertiserDTO;
 use App\Http\Resources\UserResource;
+use App\Services\Auth\AuthServiceInterface;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class RegisterAdvertiserController extends Controller
 {
+    use ResponseTrait;
     public function __construct(private AuthServiceInterface $service) {}
 
     public function __invoke(RegisterAdvertiserRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-        $file = $request->file('company_license');
-        $dto = RegisterAdvertiserDTO::fromRequest($validated, $file);
-        $result = $this->service->registerAdvertiser($dto);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Account created. Please verify your email.',
-            'data' => [
-                'token' => $result['token'],
-                'user' => new UserResource($result['user']),
-            ],
-        ], 201);
+        try{
+            return DB::transaction(function () use ($request) {
+                $validated = $request->validated();
+                $file = $request->file('company_license');
+                $dto = RegisterAdvertiserDTO::fromRequest($validated, $file);
+                $result = $this->service->registerAdvertiser($dto);
+                return $this->jsonResponse(data: UserResource::make($result['user'])->setToken($result['token']), code: Response::HTTP_CREATED);
+            });
+        } catch (\Exception $e) {
+            return $this->jsonResponse(msg: $e->getMessage(), code: Response::HTTP_INTERNAL_SERVER_ERROR, error: true);
+        }
     }
 }

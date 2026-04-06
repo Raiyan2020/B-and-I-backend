@@ -33,6 +33,8 @@ return [
     'order cancelled successfully' => 'تم الغاء الطلب بنجاح' ,
     'order rated successfully' => 'تم تقييم الطلب بنجاح' ,
     'your account is not approved until now' => 'مازال حسابكم قيد المراجعه' ,
+    'the_given_data_was_invalid' => 'البيانات المُرسلة غير صالحة.',
+    'have_no_permission' => 'ليس لديك صلاحية لتنفيذ هذا الإجراء.',
     '' => '' ,
     '' => '' ,
     '' => '' ,
