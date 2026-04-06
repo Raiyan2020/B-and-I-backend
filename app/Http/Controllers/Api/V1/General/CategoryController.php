@@ -15,7 +15,8 @@ class CategoryController extends Controller
     use ResponseTrait;
     public function index(): JsonResponse
     {
-        $categories = BaseService::setModel(Category::class)->all(new QueryOptions());
+        $options = (new QueryOptions())->latest()->conditions(['status' => true]);
+        $categories = BaseService::setModel(Category::class)->all($options);
 
         return $this->jsonResponse(data: CategoryResource::collection($categories));
     }

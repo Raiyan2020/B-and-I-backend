@@ -1,4 +1,4 @@
-@php use Spatie\Permission\Models\Role; @endphp
+@php use App\Models\Role; @endphp
 <x-dashboard.layouts.master title="{{ __('dashboard.admins list') }}">
     <!-- BEGIN: Content-->
     <div class="app-content content">

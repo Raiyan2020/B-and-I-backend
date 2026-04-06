@@ -114,4 +114,37 @@ return [
     'add addition' => 'Add Addition',
     'edit addition' => 'Edit Addition',
 
+    'about-us-items' => 'About Us Management',
+    'add-about-us-item' => 'Add About Us Item',
+    'edit-about-us-item' => 'Edit About Us Item',
+    'delete-about-us-item' => 'Delete About Us Item',
+
+    /*
+    | Keys matching DB permission names (hyphenated) — used on roles UI
+    */
+    'add-user' => 'Add User',
+    'edit-user' => 'Edit User',
+    'show-user' => 'View User',
+    'delete-user' => 'Delete User',
+    'block-user' => 'Block User',
+
+    'add-role' => 'Add Role',
+    'edit-role' => 'Edit Role',
+    'show-role' => 'View Role',
+    'delete-role' => 'Delete Role',
+
+    'add-admin' => 'Add Admin',
+    'edit-admin' => 'Edit Admin',
+    'show-admin' => 'View Admin',
+    'delete-admin' => 'Delete Admin',
+    'block-admin' => 'Block Admin',
+
+    'add-category' => 'Add Category',
+    'edit-category' => 'Edit Category',
+    'show-category' => 'View Category',
+    'delete-category' => 'Delete Category',
+
+    'show-settings' => 'View Settings',
+    'edit-settings' => 'Edit Settings',
+
 ];

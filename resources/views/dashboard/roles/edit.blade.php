@@ -88,23 +88,43 @@
                                         @csrf
                                         @method('PUT')
                                         
-                                        <!-- Role Name Section -->
+                                        <!-- Role titles (ar / en) -->
                                         <div class="row mb-3">
-                                            <div class="col-12">
+                                            <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="name" class="form-label">
+                                                    <label for="title-ar" class="form-label">
                                                         <i class="feather icon-tag text-primary"></i>
-                                                        {{__('dashboard.role name')}} <span class="text-danger">*</span>
+                                                        {{__('dashboard.role title ar')}} <span class="text-danger">*</span>
                                                     </label>
-                                                    <input type="text" 
-                                                           class="form-control @error('name') is-invalid @enderror" 
-                                                           name="name" 
-                                                           id="name"
-                                                           value="{{old('name', $role->name)}}"  
-                                                           placeholder="{{__('dashboard.role name')}}"
-                                                           required>
-                                                    @error('name')
-                                                    <div class="invalid-feedback">{{$message}}</div>
+                                                    <input type="text"
+                                                           class="form-control @error('title.ar') is-invalid @enderror"
+                                                           name="title[ar]"
+                                                           id="title-ar"
+                                                           value="{{ old('title.ar', $role->getTranslation('title', 'ar')) }}"
+                                                           placeholder="{{__('dashboard.role title ar')}}"
+                                                           required
+                                                           dir="rtl">
+                                                    @error('title.ar')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="title-en" class="form-label">
+                                                        <i class="feather icon-tag text-primary"></i>
+                                                        {{__('dashboard.role title en')}} <span class="text-danger">*</span>
+                                                    </label>
+                                                    <input type="text"
+                                                           class="form-control @error('title.en') is-invalid @enderror"
+                                                           name="title[en]"
+                                                           id="title-en"
+                                                           value="{{ old('title.en', $role->getTranslation('title', 'en')) }}"
+                                                           placeholder="{{__('dashboard.role title en')}}"
+                                                           required
+                                                           dir="ltr">
+                                                    @error('title.en')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
                                             </div>
@@ -144,12 +164,24 @@
                                                         @foreach($groupedPermissions as $category => $categoryPermissions)
                                                             <div class="permission-group mb-3" data-category="{{ $category }}">
                                                                 <div class="permission-group-header">
-                                                                    <h6 class="mb-0 d-flex justify-content-between align-items-center">
-                                                                        <span>
+                                                                    <h6 class="mb-0 d-flex justify-content-between align-items-center flex-wrap permission-group-header-inner">
+                                                                        <span class="permission-group-title-toggle d-flex align-items-center flex-grow-1">
                                                                             <i class="feather icon-{{ $category == 'users' ? 'users' : ($category == 'admins' ? 'shield' : ($category == 'roles' ? 'lock' : ($category == 'categories' ? 'list' : 'folder'))) }} text-info"></i>
-                                                                            {{ $category == 'other' ? __('dashboard.other') : __('dashboard.' . $category) }}
+                                                                            <span class="mr-1 ml-1">{{ $category == 'other' ? __('dashboard.other') : __('dashboard.' . $category) }}</span>
                                                                         </span>
-                                                                        <span class="badge badge-light-primary permission-count-{{ $category }}">{{ count($categoryPermissions) }}</span>
+                                                                        <span class="d-flex align-items-center mt-1 mt-sm-0">
+                                                                            <span class="group-permission-select-wrap d-inline-flex align-items-center mr-2">
+                                                                                <div class="form-check custom-checkbox mb-0">
+                                                                                    <input type="checkbox"
+                                                                                           class="form-check-input permission-group-select-all"
+                                                                                           id="group-select-all-{{ $category }}"
+                                                                                           data-category="{{ $category }}"
+                                                                                           title="{{ __('dashboard.select all in group') }}">
+                                                                                    <label class="form-check-label small mb-0" for="group-select-all-{{ $category }}">{{ __('dashboard.select all in group') }}</label>
+                                                                                </div>
+                                                                            </span>
+                                                                            <span class="badge badge-light-primary permission-count-{{ $category }}">{{ count($categoryPermissions) }}</span>
+                                                                        </span>
                                                                     </h6>
                                                                 </div>
                                                                 <div class="permission-group-body">

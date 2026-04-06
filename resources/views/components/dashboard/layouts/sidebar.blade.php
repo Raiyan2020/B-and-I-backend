@@ -67,6 +67,14 @@
                 </li>
             @endcan
 
+            @can('about-us-items')
+                <li class=" nav-item {{ Route::is('admin.about_us_items.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.about_us_items.index') }}">
+                        <i class="feather icon-info"></i>
+                        <span class="menu-title">{{ __('dashboard.about_us_management') }}</span></a>
+                </li>
+            @endcan
+
             <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
                 <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>
                     <span class="menu-title" data-i18n="Ecommerce">{{ __('dashboard.general settings') }}</span></a>

@@ -28,7 +28,7 @@
                             <h4 class="card-title mt-2 mb-1">{{ $admin->name }}</h4>
                             <p class="text-muted mb-0">
                                 <span
-                                    class="badge badge-danger">{{ $admin->getRoleNames()->first() ?? __('dashboard.no role') }}</span>
+                                    class="badge badge-danger">{{ $admin->roles->first()?->display_name ?? __('dashboard.no role') }}</span>
                             </p>
                         </div>
                         <div class="card-content">
@@ -59,7 +59,7 @@
                                     <div class="profile-info-content">
                                         <span class="profile-info-label">{{ __('dashboard.role name') }}</span>
                                         <span
-                                            class="profile-info-value">{{ $admin->getRoleNames()->first() ?? __('dashboard.no role') }}</span>
+                                            class="profile-info-value">{{ $admin->roles->first()?->display_name ?? __('dashboard.no role') }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -175,7 +175,7 @@
                                                             @foreach ($roles as $role)
                                                                 <option value="{{ $role->id }}"
                                                                     {{ $admin->hasRole($role->name) ? 'selected' : '' }}>
-                                                                    {{ $role->name }}</option>
+                                                                    {{ $role->display_name }}</option>
                                                             @endforeach
                                                         </select>
                                                         <div class="form-control-position">

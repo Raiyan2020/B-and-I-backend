@@ -10,7 +10,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\AdminSeeder;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Support\Facades\Schema;
 use Database\Seeders\PermissionsSeeder;

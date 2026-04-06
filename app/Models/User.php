@@ -80,6 +80,21 @@ class User extends Authenticatable
     ];
 
     /**
+     * @var list<string>
+     */
+    protected $appends = [
+        'name',
+    ];
+
+    /**
+     * الاسم الكامل للعرض في لوحة التحكم / DataTables (first_name + last_name).
+     */
+    public function getNameAttribute(): string
+    {
+        return trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
+    }
+
+    /**
      * Get image attribute with default fallback.
      */
     public function getImageAttribute()

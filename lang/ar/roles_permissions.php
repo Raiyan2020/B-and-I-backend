@@ -114,4 +114,37 @@ return [
     'add addition' => 'إضافة خدمه إضافيه',
     'edit addition' => 'تعديل خدمه إضافيه',
 
+    'about-us-items' => 'إدارة من نحن',
+    'add-about-us-item' => 'إضافة عنصر من نحن',
+    'edit-about-us-item' => 'تعديل عنصر من نحن',
+    'delete-about-us-item' => 'حذف عنصر من نحن',
+
+    /*
+    | مفاتيح بنفس اسم الصلاحية في قاعدة البيانات (شرطات) — تُستخدم في واجهة الأدوار
+    */
+    'add-user' => 'إضافة مستخدم',
+    'edit-user' => 'تعديل مستخدم',
+    'show-user' => 'معاينة مستخدم',
+    'delete-user' => 'حذف مستخدم',
+    'block-user' => 'حظر مستخدم',
+
+    'add-role' => 'إضافة دور',
+    'edit-role' => 'تعديل دور',
+    'show-role' => 'معاينة دور',
+    'delete-role' => 'حذف دور',
+
+    'add-admin' => 'إضافة مسؤول للتطبيق',
+    'edit-admin' => 'تعديل مسؤول التطبيق',
+    'show-admin' => 'معاينة مسؤول التطبيق',
+    'delete-admin' => 'حذف مسؤول التطبيق',
+    'block-admin' => 'حظر مسؤول',
+
+    'add-category' => 'إضافة قسم',
+    'edit-category' => 'تعديل قسم',
+    'show-category' => 'معاينة قسم',
+    'delete-category' => 'حذف قسم',
+
+    'show-settings' => 'معاينة الإعدادات',
+    'edit-settings' => 'تعديل الإعدادات',
+
 ];

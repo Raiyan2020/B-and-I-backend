@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1\General;
 
+use App\Facades\BaseService;
 use App\Enums\InvestorExperience;
 use App\Enums\InvestorType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PreferredSectorOptionResource;
 use App\Models\PreferredSector;
+use App\Support\QueryOptions;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 
@@ -31,10 +33,8 @@ class ReferenceDataController extends Controller
 
     public function preferredSectors(): JsonResponse
     {
-        $sectors = PreferredSector::query()
-            ->where('status', true)
-            ->orderBy('id')
-            ->get();
+        $options = (new QueryOptions())->latest()->conditions(['status' => true]);
+        $sectors = BaseService::setModel(PreferredSector::class)->all($options);
 
         return $this->jsonResponse(
             data: PreferredSectorOptionResource::collection($sectors),

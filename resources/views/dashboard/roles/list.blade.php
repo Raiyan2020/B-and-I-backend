@@ -90,7 +90,7 @@
                     "paging": true,
                     order : [[2,'asc']],
                     columns: [
-                        {data: 'name', name:'name'},
+                        {data: 'display_name', name:'display_name'},
                         {data: 'users_count', name:'users_count',
                             render:function (data){
                                 return `<span class="badge badge-primary text text-center font-medium-2">${data}</span><i class="fa fa-users fa-2x text text-primary ml-2"></i>`;

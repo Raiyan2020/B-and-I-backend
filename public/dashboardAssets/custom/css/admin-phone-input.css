@@ -1,0 +1,40 @@
+/* Phone + country selector (admin forms) */
+.admin-phone-field .admin-phone-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+.admin-phone-field .admin-country-wrap {
+    flex: 1 1 280px;
+    min-width: 220px;
+    max-width: 100%;
+}
+
+.admin-phone-field .admin-phone-local-wrap {
+    flex: 2 1 200px;
+    min-width: 160px;
+}
+
+.admin-phone-field .select2-container {
+    width: 100% !important;
+}
+
+.admin-phone-field .select2-container--default .select2-selection--single {
+    min-height: 2.714rem;
+    display: flex;
+    align-items: center;
+    border-radius: 0.358rem;
+}
+
+.admin-phone-field .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 1.6;
+    padding-inline-start: 0.75rem;
+    padding-inline-end: 1.5rem;
+}
+
+.admin-phone-field .admin-country-option-line {
+    white-space: normal;
+    line-height: 1.35;
+}

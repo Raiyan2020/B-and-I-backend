@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Dashboard\Roles\StoreRoleRequest;
+use App\Http\Requests\Dashboard\Roles\UpdateRoleRequest;
+use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
 class RolesController extends Controller
@@ -66,30 +64,29 @@ class RolesController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $rules = [
-            'name' => ['required','string',Rule::unique('roles','name')],
-            'permission.*' => ['numeric','required',Rule::exists('permissions','id')],
-            'permission' => ['required']
-        ];
+        $validated = $request->validated();
+        $slug = Role::generateUniqueSlug($validated['title']['en']);
 
-        $validator = Validator::make($request->all(),$rules);
+        $role = Role::create([
+            'name' => $slug,
+            'guard_name' => 'admin',
+        ]);
+        $role->setTranslations('title', [
+            'ar' => $validated['title']['ar'],
+            'en' => $validated['title']['en'],
+        ]);
+        $role->save();
+        $this->syncRolePermissions($role, $validated['permission']);
 
-        if($validator->fails()){
-
-            return back()->withErrors($validator);
-        }
-
-        $role =Role::create(['name'=>$validator->validated()['name']]);
-        $role->syncPermissions($validator->validated()['permission']);
         return redirect()->route('admin.roles.index')->with(['success' => __('dashboard.item added successfully')]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \Spatie\Permission\Models\Role  $role
+     * @param  \App\Models\Role  $role
      * @return \Illuminate\Http\Response
      */
     public function show(Role $role)
@@ -100,7 +97,7 @@ class RolesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \Spatie\Permission\Models\Role  $role
+     * @param  \App\Models\Role  $role
      * @return \Illuminate\Http\Response
      */
     public function edit(Role $role)
@@ -112,23 +109,32 @@ class RolesController extends Controller
     }
 
 
-    public function update(Request $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-//        dd($role);
-        $rules = [
-            'name' => ['required','string',Rule::unique('roles','name')->ignore($role->id)],
-            'permission.*' => ['required',Rule::exists('permissions','id')],
-            'permission' => ['required','array']
-        ];
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails()){
-            return back()->withErrors($validator);
-        }
-        $request->name == $role->name ?:$role->update(['name' => $validator->validated()['name']]);
-        $role->syncPermissions($validator->validated()['permission']);
+        $validated = $request->validated();
+        $role->setTranslations('title', [
+            'ar' => $validated['title']['ar'],
+            'en' => $validated['title']['en'],
+        ]);
+        $role->save();
+        $this->syncRolePermissions($role, $validated['permission']);
+
         return redirect()->route('admin.roles.index')->with(['success' => __('dashboard.item updated successfully')]);
     }
 
+    /**
+     * Sync permissions by ID. Request sends string IDs; Spatie otherwise treats "1" as a permission *name*.
+     */
+    protected function syncRolePermissions(Role $role, array $permissionIds): void
+    {
+        $ids = array_values(array_filter(array_map(static fn ($id) => (int) $id, $permissionIds)));
+        $permissions = Permission::query()
+            ->where('guard_name', $role->guard_name)
+            ->whereIn('id', $ids)
+            ->get();
+
+        $role->syncPermissions($permissions);
+    }
 
     public function destroy(Role $role)
     {

@@ -15,29 +15,14 @@ class PreferredSectorService extends BaseService
     }
 
     /**
-     * Block delete if any investor references this sector (FK or legacy text match).
+     * Block delete if any investor references this sector via {@see User::$preferred_sector_id}.
      */
     public function hasLinkedInvestors(int $sectorId): bool
     {
-        $sector = PreferredSector::query()->find($sectorId);
-        if (! $sector) {
-            return false;
-        }
-
-        $investors = User::query()->where('role', UserRole::Investor);
-
-        if ($investors->clone()->where('preferred_sector_id', $sectorId)->exists()) {
-            return true;
-        }
-
-        foreach (['ar', 'en'] as $locale) {
-            $label = $sector->getTranslation('name', $locale);
-            if ($label !== '' && $investors->clone()->where('investor_sector', $label)->exists()) {
-                return true;
-            }
-        }
-
-        return false;
+        return User::query()
+            ->where('role', UserRole::Investor)
+            ->where('preferred_sector_id', $sectorId)
+            ->exists();
     }
 
     public function delete(int $id, array $relationsToCheck = [], array $conditions = [], array $relationConditions = []): array
