@@ -7,6 +7,7 @@ use App\DTO\Auth\RegisterInvestorDTO;
 use App\DTO\Auth\LoginDTO;
 use App\Enums\UserRole;
 use App\Models\User;
+use Exception;
 
 class AuthService implements AuthServiceInterface
 {
@@ -56,9 +57,17 @@ class AuthService implements AuthServiceInterface
 
     public function login(LoginDTO $dto): array
     {
-        $user = User::where('email', $dto->email)->first();
-        if (! $user || $user->phone !== $dto->phone) {
-            throw new \Illuminate\Auth\AuthenticationException('Invalid credentials.');
+        $user = User::where([
+            'email' => $dto->email,
+            'country_code' => $dto->country_code,
+            'phone' => $dto->phone,
+        ])->first();
+        if (! $user) {
+            throw new Exception(__('apis.invalid_credentials'));
+        }
+
+        if (!isset($user->email_verified_at)) {
+            throw new Exception(__('apis.email_not_verified'));
         }
 
         $user->tokens()->delete();
@@ -75,7 +84,7 @@ class AuthService implements AuthServiceInterface
     public function resendVerification(User $user): void
     {
         if ($user->email_verified_at) {
-            throw new \InvalidArgumentException('Already verified');
+            throw new \InvalidArgumentException(__('apis.already_verified'));
         }
 
         $user->sendEmailVerificationNotification();

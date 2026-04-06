@@ -2,16 +2,12 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumRetriever;
+
 enum UserRole: string
 {
+    use EnumRetriever;
     case Investor = 'investor';
     case Advertiser = 'advertiser';
 
-    /**
-     * @return list<string>
-     */
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 }
