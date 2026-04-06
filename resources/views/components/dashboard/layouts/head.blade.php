@@ -86,6 +86,9 @@ use App\Models\GeneralSetting;
     <!-- SweetAlert2 CSS (Global - Used for flash messages)-->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css" rel="stylesheet">
 
+    <!-- Toastr (validation / admin notifications) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <!-- Dashboard Core CSS (Extracted from inline styles)-->
     <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/dashboard-core.css') }}">
 

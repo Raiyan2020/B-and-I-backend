@@ -1,64 +1,5 @@
 @php
-    // Group permissions by model (not by action)
-    $groupedPermissions = [];
-    $modelNames = ['users', 'user', 'roles', 'role', 'admins', 'admin', 'categories', 'category'];
-    
-    foreach($permissions as $permission) {
-        $permissionName = strtolower($permission->name);
-        $category = 'other';
-        
-        // Find the model in permission name
-        foreach($modelNames as $model) {
-            if (strpos($permissionName, $model) !== false) {
-                // Normalize model name (user/users -> users, admin/admins -> admins, role/roles -> roles)
-                if (in_array($model, ['user', 'users'])) {
-                    $category = 'users';
-                } elseif (in_array($model, ['role', 'roles'])) {
-                    $category = 'roles';
-                } elseif (in_array($model, ['admin', 'admins'])) {
-                    $category = 'admins';
-                } elseif (in_array($model, ['category', 'categories'])) {
-                    $category = 'categories';
-                } else {
-                    $category = $model;
-                }
-                break;
-            }
-        }
-        
-        // If no model found, check if it's a standalone model name (like 'users', 'roles', 'admins')
-        if ($category === 'other') {
-            if (in_array($permissionName, $modelNames)) {
-                if (in_array($permissionName, ['user', 'users'])) {
-                    $category = 'users';
-                } elseif (in_array($permissionName, ['role', 'roles'])) {
-                    $category = 'roles';
-                } elseif (in_array($permissionName, ['admin', 'admins'])) {
-                    $category = 'admins';
-                } elseif (in_array($permissionName, ['category', 'categories'])) {
-                    $category = 'categories';
-                } else {
-                    $category = $permissionName;
-                }
-            } else {
-                // For other permissions like 'add-permission', put them in a separate group
-                $category = 'other';
-            }
-        }
-        
-        if(!isset($groupedPermissions[$category])) {
-            $groupedPermissions[$category] = [];
-        }
-        $groupedPermissions[$category][] = $permission;
-    }
-    
-    // Sort groups by priority: users, admins, roles, categories, other
-    $order = ['users' => 1, 'admins' => 2, 'roles' => 3, 'categories' => 4, 'other' => 99];
-    uksort($groupedPermissions, function($a, $b) use ($order) {
-        $aOrder = $order[$a] ?? 98;
-        $bOrder = $order[$b] ?? 98;
-        return $aOrder <=> $bOrder;
-    });
+    $groupedPermissions = \App\Support\PermissionGroups::group($permissions);
 @endphp
 
 <x-dashboard.layouts.master title="{{__('dashboard.add roles')}}">
@@ -86,23 +27,43 @@
                                     <form class="form form-vertical" method="POST" action="{{route('admin.roles.store')}}" id="role-form">
                                         @csrf
                                         
-                                        <!-- Role Name Section -->
+                                        <!-- Role titles (ar / en) -->
                                         <div class="row mb-3">
-                                            <div class="col-12">
+                                            <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="name" class="form-label">
+                                                    <label for="title-ar" class="form-label">
                                                         <i class="feather icon-tag text-primary"></i>
-                                                        {{__('dashboard.role name')}} <span class="text-danger">*</span>
+                                                        {{__('dashboard.role title ar')}} <span class="text-danger">*</span>
                                                     </label>
-                                                    <input type="text" 
-                                                           class="form-control @error('name') is-invalid @enderror" 
-                                                           name="name" 
-                                                           id="name"
-                                                           value="{{old('name')}}"  
-                                                           placeholder="{{__('dashboard.role name')}}"
-                                                           required>
-                                                    @error('name')
-                                                    <div class="invalid-feedback">{{$message}}</div>
+                                                    <input type="text"
+                                                           class="form-control @error('title.ar') is-invalid @enderror"
+                                                           name="title[ar]"
+                                                           id="title-ar"
+                                                           value="{{ old('title.ar') }}"
+                                                           placeholder="{{__('dashboard.role title ar')}}"
+                                                           required
+                                                           dir="rtl">
+                                                    @error('title.ar')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="title-en" class="form-label">
+                                                        <i class="feather icon-tag text-primary"></i>
+                                                        {{__('dashboard.role title en')}} <span class="text-danger">*</span>
+                                                    </label>
+                                                    <input type="text"
+                                                           class="form-control @error('title.en') is-invalid @enderror"
+                                                           name="title[en]"
+                                                           id="title-en"
+                                                           value="{{ old('title.en') }}"
+                                                           placeholder="{{__('dashboard.role title en')}}"
+                                                           required
+                                                           dir="ltr">
+                                                    @error('title.en')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
                                             </div>
@@ -140,14 +101,45 @@
                                                     <!-- Grouped Permissions -->
                                                     <div class="permissions-container">
                                                         @foreach($groupedPermissions as $category => $categoryPermissions)
+                                                            @php
+                                                                $groupIcon = match ($category) {
+                                                                    'users' => 'users',
+                                                                    'admins' => 'shield',
+                                                                    'roles' => 'lock',
+                                                                    'categories' => 'list',
+                                                                    'settings' => 'settings',
+                                                                    'preferred_sectors' => 'star',
+                                                                    'about_us' => 'info',
+                                                                    default => 'folder',
+                                                                };
+                                                                $categoryLabel = match ($category) {
+                                                                    'other' => __('dashboard.other'),
+                                                                    'settings' => __('dashboard.settings'),
+                                                                    'preferred_sectors' => __('dashboard.preferred_sectors'),
+                                                                    'about_us' => __('dashboard.about_us'),
+                                                                    default => __('dashboard.' . $category),
+                                                                };
+                                                            @endphp
                                                             <div class="permission-group mb-3" data-category="{{ $category }}">
                                                                 <div class="permission-group-header">
-                                                                    <h6 class="mb-0 d-flex justify-content-between align-items-center">
-                                                                        <span>
-                                                                            <i class="feather icon-{{ $category == 'users' ? 'users' : ($category == 'admins' ? 'shield' : ($category == 'roles' ? 'lock' : ($category == 'categories' ? 'list' : 'folder'))) }} text-info"></i>
-                                                                            {{ $category == 'other' ? __('dashboard.other') : __('dashboard.' . $category) }}
+                                                                    <h6 class="mb-0 d-flex justify-content-between align-items-center flex-wrap permission-group-header-inner">
+                                                                        <span class="permission-group-title-toggle d-flex align-items-center flex-grow-1">
+                                                                            <i class="feather icon-{{ $groupIcon }} text-info"></i>
+                                                                            <span class="mr-1 ml-1">{{ $categoryLabel }}</span>
                                                                         </span>
-                                                                        <span class="badge badge-light-primary permission-count-{{ $category }}">{{ count($categoryPermissions) }}</span>
+                                                                        <span class="d-flex align-items-center mt-1 mt-sm-0">
+                                                                            <span class="group-permission-select-wrap d-inline-flex align-items-center mr-2">
+                                                                                <div class="form-check custom-checkbox mb-0">
+                                                                                    <input type="checkbox"
+                                                                                           class="form-check-input permission-group-select-all"
+                                                                                           id="group-select-all-{{ $category }}"
+                                                                                           data-category="{{ $category }}"
+                                                                                           title="{{ __('dashboard.select all in group') }}">
+                                                                                    <label class="form-check-label small mb-0" for="group-select-all-{{ $category }}">{{ __('dashboard.select all in group') }}</label>
+                                                                                </div>
+                                                                            </span>
+                                                                            <span class="badge badge-light-primary permission-count-{{ $category }}">{{ count($categoryPermissions) }}</span>
+                                                                        </span>
                                                                     </h6>
                                                                 </div>
                                                                 <div class="permission-group-body">
@@ -431,21 +423,48 @@
     @section('script')
     <script>
         $(document).ready(function() {
+            function updateGroupSelectAllState($group) {
+                var $boxes = $group.find('.permission-checkbox');
+                var total = $boxes.length;
+                var checked = $boxes.filter(':checked').length;
+                var $master = $group.find('.permission-group-select-all');
+                $master.prop('indeterminate', false);
+                if (total === 0) {
+                    $master.prop('checked', false);
+                    return;
+                }
+                if (checked === 0) {
+                    $master.prop('checked', false);
+                } else if (checked === total) {
+                    $master.prop('checked', true);
+                } else {
+                    $master.prop('checked', false);
+                    $master.prop('indeterminate', true);
+                }
+            }
+
+            function updateAllGroupSelectAllStates() {
+                $('.permission-group').each(function () {
+                    updateGroupSelectAllState($(this));
+                });
+            }
+
             // Permission Search
             $('#permission-search').on('keyup', function() {
                 var searchTerm = $(this).val().toLowerCase();
-                
+
                 if (searchTerm === '') {
                     $('.permission-item').removeClass('hidden').show();
                     $('.permission-group').removeClass('hidden').show();
                     updatePermissionCounts();
+                    updateAllGroupSelectAllStates();
                     return;
                 }
 
                 $('.permission-item').each(function() {
                     var permissionName = $(this).data('name');
                     var permissionText = $(this).find('.permission-text').text().toLowerCase();
-                    
+
                     if (permissionName.includes(searchTerm) || permissionText.includes(searchTerm)) {
                         $(this).removeClass('hidden').show();
                     } else {
@@ -453,7 +472,6 @@
                     }
                 });
 
-                // Hide groups with no visible permissions
                 $('.permission-group').each(function() {
                     var visibleItems = $(this).find('.permission-item:not(.hidden):visible').length;
                     if (visibleItems === 0) {
@@ -464,28 +482,37 @@
                 });
 
                 updatePermissionCounts();
+                updateAllGroupSelectAllStates();
             });
 
-            // Select All Permissions
             $('#select-all-permissions').on('click', function() {
                 $('.permission-checkbox:visible:not(.hidden)').prop('checked', true);
                 updatePermissionCounts();
+                updateAllGroupSelectAllStates();
             });
 
-            // Deselect All Permissions
             $('#deselect-all-permissions').on('click', function() {
                 $('.permission-checkbox:visible:not(.hidden)').prop('checked', false);
                 updatePermissionCounts();
+                updateAllGroupSelectAllStates();
             });
 
-            // Toggle permission group on header click
-            $('.permission-group-header').on('click', function() {
+            $(document).on('change', '.permission-group-select-all', function() {
+                var $group = $(this).closest('.permission-group');
+                var on = $(this).prop('checked');
+                $(this).prop('indeterminate', false);
+                $group.find('.permission-checkbox').prop('checked', on);
+                updatePermissionCounts();
+                updateGroupSelectAllState($group);
+            });
+
+            $('.permission-group-title-toggle').on('click', function() {
                 $(this).closest('.permission-group').find('.permission-group-body').slideToggle(300);
             });
 
-            // Update permission counts on change
             $('.permission-checkbox').on('change', function() {
                 updatePermissionCounts();
+                updateGroupSelectAllState($(this).closest('.permission-group'));
             });
 
             function updatePermissionCounts() {
@@ -499,7 +526,6 @@
                 });
             }
 
-            // Form validation
             $('#role-form').on('submit', function(e) {
                 var checkedPermissions = $('.permission-checkbox:checked').length;
                 if (checkedPermissions === 0) {
@@ -509,8 +535,8 @@
                 }
             });
 
-            // Initialize counts
             updatePermissionCounts();
+            updateAllGroupSelectAllStates();
         });
     </script>
     @endsection

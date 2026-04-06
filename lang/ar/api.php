@@ -13,6 +13,7 @@ return [
     |
     */
     'data retrieved successfully' => 'تم جلب الداتا بنجاح' ,
+    'data_retrieved_successfully' => 'تم استرجاع البيانات بنجاح' ,
     'otp sent successfully' => 'تم ارسال رمز التحقق بنجاح تحقق من رسائلك النصيه' ,
     'wrong otp' => 'رمز التحقق غير صحيح' ,
     'you are logged in successfully' => 'تم تسجيل الدخول بنجاح' ,

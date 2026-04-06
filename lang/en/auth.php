@@ -13,6 +13,7 @@ return [
     |
     */
 
+    'unauthenticated' => 'Unauthenticated.',
     'failed' => 'These credentials do not match our records.',
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
@@ -20,5 +21,6 @@ return [
     'welcome' => 'Welcome back, please login to your account',
     'email' => 'E-Mail',
     'password' => 'Password',
+    'register_success' => 'We have sent a verification link to your email. Please check your inbox to activate your account.',
 
 ];

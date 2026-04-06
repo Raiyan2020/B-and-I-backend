@@ -13,6 +13,7 @@ return [
     |
     */
     'data retrieved successfully' => 'Data Retrieved Successfully' ,
+    'data_retrieved_successfully' => 'Data Retrieved Successfully' ,
     'otp sent successfully' => 'OTP Sent Successfully Check Your SMS' ,
     'wrong otp' => 'Wrong OTP' ,
     'you are logged in successfully' => 'You Are Logged In Successfully' ,

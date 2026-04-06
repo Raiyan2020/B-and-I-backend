@@ -142,10 +142,14 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'agreed_to_terms' => [
+            'accepted' => 'You must accept the terms and conditions.',
         ],
     ],
+
+    'phone_international' => 'Enter a valid international phone number starting with + followed by country and number (no spaces).',
+
+    'unique_role_title_locale' => 'This :locale is already used by another role.',
 
     /*
     |--------------------------------------------------------------------------
@@ -158,6 +162,11 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'title_ar' => 'Role name (Arabic)',
+        'title_en' => 'Role name (English)',
+        'title.ar' => 'Role name (Arabic)',
+        'title.en' => 'Role name (English)',
+    ],
 
 ];

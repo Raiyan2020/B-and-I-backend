@@ -7,8 +7,12 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Enums\InvestorExperience;
+use App\Enums\InvestorType;
+use App\Enums\UserRole;
 use App\Traits\FilterTrait;
 use App\Traits\UploadTrait;
+use Illuminate\Http\UploadedFile;
 
 class User extends Authenticatable
 {
@@ -22,13 +26,26 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'image',
-        'name',
+        'role',
+        'first_name',
+        'last_name',
         'country_code',
         'phone',
         'email',
         'password',
-        'code',
+        'company_license',
+
+        'investor_type',
+        'capital',
+        'available_capital',
+        'preferred_sector_id',
+        'category_id',
+        'experience_level',
+        'previous_investments_count',
+        'investor_experience',
+
+        'image',
+        'lang',
         'is_blocked',
         'is_active',
     ];
@@ -41,7 +58,6 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'code',
     ];
 
     /**
@@ -54,16 +70,28 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_blocked' => 'boolean',
         'is_active' => 'boolean',
+        'role' => UserRole::class,
+        'investor_type' => InvestorType::class,
+        'investor_experience' => InvestorExperience::class,
+        'capital' => 'decimal:3',
+        'available_capital' => 'decimal:3',
+        'experience_level' => 'decimal:3',
+        'previous_investments_count' => 'integer',
     ];
 
     /**
-     * Set password attribute with encryption.
+     * @var list<string>
      */
-    public function setPasswordAttribute($value)
+    protected $appends = [
+        'name',
+    ];
+
+    /**
+     * الاسم الكامل للعرض في لوحة التحكم / DataTables (first_name + last_name).
+     */
+    public function getNameAttribute(): string
     {
-        if ($value) {
-            $this->attributes['password'] = bcrypt($value);
-        }
+        return trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
     }
 
     /**
@@ -91,11 +119,58 @@ class User extends Authenticatable
     }
 
     /**
+     * Store uploaded company license (image or PDF) under storage/images/{FOLDER}.
+     */
+    public function setCompanyLicenseAttribute(mixed $value): void
+    {
+        if ($value === null || $value === '') {
+            $this->attributes['company_license'] = null;
+
+            return;
+        }
+
+        if ($value instanceof UploadedFile) {
+            $existing = $this->attributes['company_license'] ?? null;
+            if (! empty($existing)) {
+                $this->deleteFile($existing, self::FOLDER);
+            }
+            $this->attributes['company_license'] = $this->uploadAllTypes($value, self::FOLDER);
+
+            return;
+        }
+
+        $this->attributes['company_license'] = $value;
+    }
+
+    /**
+     * Public URL for the stored company license file (image or PDF).
+     */
+    public function getCompanyLicenseUrlAttribute(): ?string
+    {
+        $value = $this->attributes['company_license'] ?? null;
+        if (empty($value)) {
+            return null;
+        }
+
+        return static::getImage($value, self::FOLDER);
+    }
+
+    /**
      * Get notifications relationship.
      */
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function preferredSector()
+    {
+        return $this->belongsTo(PreferredSector::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     /**

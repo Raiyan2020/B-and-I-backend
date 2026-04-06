@@ -84,6 +84,20 @@ class CountryHelper
     }
 
     /**
+     * Unicode regional-indicator flag emoji from ISO 3166-1 alpha-2 (e.g. sa → 🇸🇦).
+     */
+    public static function flagEmojiFromIso(string $iso2): string
+    {
+        $iso2 = strtoupper(substr($iso2, 0, 2));
+        if (strlen($iso2) !== 2 || ! ctype_alpha($iso2)) {
+            return '';
+        }
+
+        return mb_chr(0x1F1E6 + (ord($iso2[0]) - ord('A')), 'UTF-8')
+            .mb_chr(0x1F1E6 + (ord($iso2[1]) - ord('A')), 'UTF-8');
+    }
+
+    /**
      * Get country by code.
      *
      * @param string $code
@@ -110,5 +124,34 @@ class CountryHelper
     {
         $country = self::getCountryByCode($code);
         return $country['phone_start'] ?? null;
+    }
+
+    /**
+     * Split stored phone (e.g. +966501234567) into dial code + local digits for admin forms.
+     *
+     * @return array{code: string, local: string}
+     */
+    public static function splitDialCodeAndLocal(?string $stored): array
+    {
+        $stored = $stored ?? '';
+        $digitsOnly = preg_replace('/\D/', '', $stored);
+        if ($digitsOnly === '') {
+            return ['code' => '+966', 'local' => ''];
+        }
+
+        $countries = self::getCountries();
+        usort($countries, fn ($a, $b) => strlen($b['code']) <=> strlen($a['code']));
+
+        foreach ($countries as $c) {
+            $codeDigits = preg_replace('/\D/', '', $c['code']);
+            if ($codeDigits !== '' && str_starts_with($digitsOnly, $codeDigits)) {
+                return [
+                    'code' => $c['code'],
+                    'local' => substr($digitsOnly, strlen($codeDigits)),
+                ];
+            }
+        }
+
+        return ['code' => '+966', 'local' => $digitsOnly];
     }
 }

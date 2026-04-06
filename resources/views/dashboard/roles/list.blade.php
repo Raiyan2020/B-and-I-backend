@@ -72,6 +72,10 @@
     <script src="{{asset('dashboardAssets/app-assets/vendors/js/tables/datatable/datatables.bootstrap4.min.js')}}"></script>
     @endpush
 
+    @push('page-styles')
+        <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/admins-index.css') }}">
+    @endpush
+
     @push('page-scripts')
     <script>
         $(document).ready(function () {
@@ -90,43 +94,40 @@
                     "paging": true,
                     order : [[2,'asc']],
                     columns: [
-                        {data: 'name', name:'name'},
+                        {data: 'display_name', name:'display_name'},
                         {data: 'users_count', name:'users_count',
                             render:function (data){
                                 return `<span class="badge badge-primary text text-center font-medium-2">${data}</span><i class="fa fa-users fa-2x text text-primary ml-2"></i>`;
                             }},
                         {data: 'created_at',name: 'created_at'},
                         {data: 'id',
-                            render:function (data,two,three){
-                                let edit ='roles/'+data+'/edit';
-                                // let show ='roles/'+data;
-                                let deleting ='roles/'+data;
-                                if(data <= 1){ // TODO make condition more or equal 3
-                                    return ``;
+                            orderable: false,
+                            searchable: false,
+                            render:function (data, type, row){
+                                if (data <= 1) {
+                                    return '';
                                 }
-                                @if(auth()->user()->can('edit role')||auth()->user()->can('delete role'))
-                                return `<div class="btn-group">
-                                <div class="dropdown">
-                                    <button class="btn btn-flat-dark dropdown-toggle mr-1 mb-1" type="button" id="dropdownMenuButton700" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {{__('dashboard.actions')}}
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton700">
-                                @can('edit role')
-                                    <a class="dropdown-item" href="${edit}"><i class="fa fa-edit mr-1"></i>{{__('dashboard.edit')}}</a>
-                                    @endcan
-
-                                @can('delete role')
-                                    <form action='${deleting}' method='POST' class="role-${data}">
-                                    @csrf
-                                    @method('DELETE')
-                                    </form>
-                                    <button class="dropdown-item" onClick="remove(${data},'role')"><i class="fa fa-trash mr-1"></i>{{__('dashboard.delete')}}</button>
-                                @endcan
-                                </div>
-                                </div>
-                            </div>`;
-                            @endif
-                                return ''
+                                var editUrl = '{{ route('admin.roles.edit', ':id') }}'.replace(':id', data);
+                                var deleteUrl = '{{ route('admin.roles.destroy', ':id') }}'.replace(':id', data);
+                                var canEdit = @json(auth()->user()->can('edit-role'));
+                                var canDelete = @json(auth()->user()->can('delete-role'));
+                                var hasAdmins = parseInt(row.users_count, 10) > 0;
+                                if (!canEdit && !canDelete) {
+                                    return '';
+                                }
+                                var html = '<div class="d-flex align-items-center justify-content-center flex-wrap">';
+                                if (canEdit) {
+                                    html += '<a class="btn btn-sm btn-icon btn-outline-primary mr-1 mb-1" href="' + editUrl + '" title="{{ __('dashboard.edit') }}"><i class="feather icon-edit text-primary"></i></a>';
+                                }
+                                if (canDelete) {
+                                    if (!hasAdmins) {
+                                        html += '<button type="button" class="btn btn-sm btn-icon btn-outline-danger mb-1 delete-row" data-url="' + deleteUrl + '" title="{{ __('dashboard.delete') }}"><i class="feather icon-trash-2 text-danger"></i></button>';
+                                    } else {
+                                        html += '<span class="btn btn-sm btn-icon btn-outline-secondary mb-1" style="opacity:0.55;cursor:not-allowed" title="{{ __('dashboard.cannot_delete_role_assigned_to_admins') }}"><i class="feather icon-trash-2 text-secondary"></i></span>';
+                                    }
+                                }
+                                html += '</div>';
+                                return html;
                             }
                         },
                     ]

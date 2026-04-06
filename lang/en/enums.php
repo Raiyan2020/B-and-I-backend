@@ -1,7 +1,14 @@
 <?php
 
 return [
-    'CHARGE' => 'Charge',
-    'PAYMENT' => 'Payment',
-    'TRANSFER' => 'Transfer',
+    'investor_type' => [
+        'angel' => 'Angel investor',
+        'company' => 'Company',
+        'crowdfunding' => 'Crowdfunding',
+    ],
+    'investor_experience' => [
+        'beginner' => 'Beginner',
+        'intermediate' => 'Intermediate',
+        'expert' => 'Expert',
+    ],
 ];

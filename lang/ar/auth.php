@@ -13,6 +13,7 @@ return [
     |
     */
 
+    'unauthenticated' => 'غير مصرّح بالدخول.',
     'failed' => 'These credentials do not match our records.',
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
@@ -20,5 +21,7 @@ return [
     'welcome' => 'مرحبا بك من فضلك سجل دخول',
     'email' => 'البريد الإلكتروني',
     'password' => 'الرقم السري',
+    'register_success' => 'لقد أرسلنا رابط التحقق إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد لتفعيل حسابك.',
+
 
 ];

@@ -12,45 +12,29 @@
             </div>
             <div class="card-body">
                 <form id="filter-form" class="row g-3">
-                    <div class="col-md-2">
+                    <div class="col-md-3 col-lg-2">
                         <label class="form-label">{{ __('dashboard.order') }}</label>
                         <select class="form-control" id="order-filter">
                             <option value="DESC">{{ __('dashboard.desc') }}</option>
                             <option value="ASC" selected>{{ __('dashboard.asc') }}</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">{{ __('dashboard.role name') }}</label>
-                        <select class="form-control" id="role-filter">
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">{{ __('dashboard.table status') }}</label>
+                        <select class="form-control" id="status-filter">
                             <option value="">{{ __('dashboard.all') }}</option>
-                            @foreach ($roles as $role)
-                                <option value="{{ $role->name }}">{{ $role->name }}</option>
-                            @endforeach
+                            <option value="1">{{ __('dashboard.active') }}</option>
+                            <option value="0">{{ __('dashboard.in-active') }}</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">{{ __('dashboard.block_status') }}</label>
-                        <select class="form-control" id="block-status-filter">
-                            <option value="">{{ __('dashboard.all') }}</option>
-                            <option value="1">{{ __('dashboard.blocked') }}</option>
-                            <option value="0">{{ __('dashboard.un_blocked') }}</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3 col-lg-2">
                         <label class="form-label">{{ __('dashboard.search by name') }}</label>
                         <input type="text" class="form-control" id="search-name"
                             placeholder="{{ __('dashboard.search') }}...">
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">{{ __('dashboard.search by phone') }}</label>
-                        <input type="text" class="form-control" id="search-phone"
-                            placeholder="{{ __('dashboard.search') }}...">
-                    </div>
 
-
-
-                    <div class="col-md-2 d-flex align-items-end gap-2">
-                        <button type="button" class="btn btn-primary flex-fill" id="filter-btn">
+                    <div class="col-md-12 col-lg-12 d-flex align-items-end gap-2 mt-2">
+                        <button type="button" class="btn btn-primary" id="filter-btn">
                             <i class="feather icon-filter"></i>
                             {{ __('dashboard.filter') }}
                         </button>

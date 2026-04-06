@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Admin;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class RolesControllerTest extends TestCase
@@ -27,19 +27,42 @@ class RolesControllerTest extends TestCase
             ['name' => 'super_admin', 'guard_name' => 'admin']
         );
 
+        if (! $superAdminRole->getTranslation('title', 'en')) {
+            $superAdminRole->setTranslations('title', [
+                'ar' => 'Super Admin',
+                'en' => 'Super Admin',
+            ]);
+            $superAdminRole->save();
+        }
+
         // Create permissions
         $permissions = [
-            'roles', 'add-role', 'edit-role', 'show-role', 'delete-role'
+            'roles', 'add-role', 'edit-role', 'show-role', 'delete-role',
         ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
                 'name' => $permission,
-                'guard_name' => 'admin'
+                'guard_name' => 'admin',
             ]);
         }
 
         $superAdminRole->syncPermissions(Permission::where('guard_name', 'admin')->get());
+    }
+
+    protected function createRoleWithTitles(string $slug, string $ar, string $en): Role
+    {
+        $role = Role::create([
+            'name' => $slug,
+            'guard_name' => 'admin',
+        ]);
+        $role->setTranslations('title', [
+            'ar' => $ar,
+            'en' => $en,
+        ]);
+        $role->save();
+
+        return $role;
     }
 
     /**
@@ -86,18 +109,15 @@ class RolesControllerTest extends TestCase
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        Role::create([
-            'name' => 'test_role',
-            'guard_name' => 'admin',
-        ]);
+        $this->createRoleWithTitles('test_role', 'اختبار', 'Test Role');
 
         $response = $this->getJson('/en/admin/roles');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'name', 'users_count']
-            ]
+                '*' => ['id', 'name', 'display_name', 'users_count'],
+            ],
         ]);
     }
 
@@ -126,22 +146,25 @@ class RolesControllerTest extends TestCase
 
         $permission = Permission::firstOrCreate([
             'name' => 'test-permission',
-            'guard_name' => 'admin'
+            'guard_name' => 'admin',
         ]);
 
         $response = $this->post('/en/admin/roles', [
-            'name' => 'new_role',
+            'title' => [
+                'ar' => 'دور جديد',
+                'en' => 'New Role Unique',
+            ],
             'permission' => [$permission->id],
         ]);
 
         $response->assertRedirect(route('admin.roles.index'));
         $response->assertSessionHas('success');
-        $this->assertDatabaseHas('roles', [
-            'name' => 'new_role',
-            'guard_name' => 'admin',
-        ]);
 
-        $role = Role::where('name', 'new_role')->first();
+        $role = Role::where('guard_name', 'admin')
+            ->where('title->en', 'New Role Unique')
+            ->first();
+        $this->assertNotNull($role);
+        $this->assertSame('دور جديد', $role->getTranslation('title', 'ar'));
         $this->assertTrue($role->hasPermissionTo($permission));
     }
 
@@ -155,33 +178,59 @@ class RolesControllerTest extends TestCase
 
         $response = $this->post('/en/admin/roles', []);
 
-        $response->assertSessionHasErrors(['name', 'permission']);
+        $response->assertSessionHasErrors(['title.ar', 'title.en', 'permission']);
     }
 
     /**
-     * Test role creation prevents duplicate names.
+     * Test role creation prevents duplicate title per locale.
      */
-    public function test_role_creation_prevents_duplicate_names(): void
+    public function test_role_creation_prevents_duplicate_titles(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        Role::create([
-            'name' => 'existing_role',
-            'guard_name' => 'admin',
-        ]);
+        $this->createRoleWithTitles('existing_role', 'موجود', 'Duplicate English');
 
         $permission = Permission::firstOrCreate([
             'name' => 'test-permission',
-            'guard_name' => 'admin'
+            'guard_name' => 'admin',
         ]);
 
         $response = $this->post('/en/admin/roles', [
-            'name' => 'existing_role',
+            'title' => [
+                'ar' => 'أخرى',
+                'en' => 'Duplicate English',
+            ],
             'permission' => [$permission->id],
         ]);
 
-        $response->assertSessionHasErrors('name');
+        $response->assertSessionHasErrors('title.en');
+    }
+
+    /**
+     * Test role creation prevents duplicate Arabic title.
+     */
+    public function test_role_creation_prevents_duplicate_arabic_titles(): void
+    {
+        $admin = $this->createSuperAdmin();
+        $this->actingAs($admin, 'admin');
+
+        $this->createRoleWithTitles('existing_role_ar', 'نفس العربي', 'Other English');
+
+        $permission = Permission::firstOrCreate([
+            'name' => 'test-permission',
+            'guard_name' => 'admin',
+        ]);
+
+        $response = $this->post('/en/admin/roles', [
+            'title' => [
+                'ar' => 'نفس العربي',
+                'en' => 'Different English',
+            ],
+            'permission' => [$permission->id],
+        ]);
+
+        $response->assertSessionHasErrors('title.ar');
     }
 
     /**
@@ -192,10 +241,7 @@ class RolesControllerTest extends TestCase
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $role = Role::create([
-            'name' => 'test_role',
-            'guard_name' => 'admin',
-        ]);
+        $role = $this->createRoleWithTitles('test_role', 'اختبار', 'Test Role');
 
         $response = $this->get("/en/admin/roles/{$role->id}/edit");
 
@@ -213,34 +259,32 @@ class RolesControllerTest extends TestCase
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $role = Role::create([
-            'name' => 'old_role',
-            'guard_name' => 'admin',
-        ]);
+        $role = $this->createRoleWithTitles('old_role', 'قديم', 'Old Role');
 
         $permission1 = Permission::firstOrCreate([
             'name' => 'permission1',
-            'guard_name' => 'admin'
+            'guard_name' => 'admin',
         ]);
 
         $permission2 = Permission::firstOrCreate([
             'name' => 'permission2',
-            'guard_name' => 'admin'
+            'guard_name' => 'admin',
         ]);
 
         $response = $this->put("/en/admin/roles/{$role->id}", [
-            'name' => 'updated_role',
+            'title' => [
+                'ar' => 'محدث',
+                'en' => 'Updated Role',
+            ],
             'permission' => [$permission1->id, $permission2->id],
         ]);
 
         $response->assertRedirect(route('admin.roles.index'));
         $response->assertSessionHas('success');
-        $this->assertDatabaseHas('roles', [
-            'id' => $role->id,
-            'name' => 'updated_role',
-        ]);
 
         $role->refresh();
+        $this->assertSame('old_role', $role->name);
+        $this->assertSame('Updated Role', $role->getTranslation('title', 'en'));
         $this->assertTrue($role->hasPermissionTo($permission1));
         $this->assertTrue($role->hasPermissionTo($permission2));
     }
@@ -253,14 +297,11 @@ class RolesControllerTest extends TestCase
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $role = Role::create([
-            'name' => 'test_role',
-            'guard_name' => 'admin',
-        ]);
+        $role = $this->createRoleWithTitles('test_role', 'اختبار', 'Test Role');
 
         $response = $this->put("/en/admin/roles/{$role->id}", []);
 
-        $response->assertSessionHasErrors(['name', 'permission']);
+        $response->assertSessionHasErrors(['title.ar', 'title.en', 'permission']);
     }
 
     /**
@@ -271,10 +312,7 @@ class RolesControllerTest extends TestCase
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $role = Role::create([
-            'name' => 'test_role',
-            'guard_name' => 'admin',
-        ]);
+        $role = $this->createRoleWithTitles('test_role', 'اختبار', 'Test Role');
 
         $response = $this->delete("/en/admin/roles/{$role->id}");
 

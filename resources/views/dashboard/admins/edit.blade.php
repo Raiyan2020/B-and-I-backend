@@ -1,4 +1,4 @@
-@php use Spatie\Permission\Models\Role; @endphp
+@php use App\Models\Role; @endphp
 <x-dashboard.layouts.master title="{{ __('dashboard.edit admin') }}">
     <div class="app-content content">
         <div class="content-overlay"></div>
@@ -35,7 +35,7 @@
                                                     @foreach ($roles as $role)
                                                         <option value="{{ $role->name }}"
                                                             {{ $row->hasRole($role->name) ? 'selected' : '' }}>
-                                                            {{ $role->name }}</option>
+                                                            {{ $role->display_name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -58,22 +58,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-6">
-                                            <div class="form-group">
-                                                <label for="password-icon">{{ __('dashboard.table phone') }}</label>
-                                                <div class="position-relative has-icon-left">
-                                                    <input type="text" class="form-control"
-                                                        value="{{ old('phone', $row->phone) }}"
-                                                        name="phone" placeholder="{{ __('dashboard.table phone') }}">
-                                                    <div class="form-control-position">
-                                                        <i class="fa fa-phone"></i>
-                                                    </div>
-                                                </div>
-                                                @error('phone')
-                                                    <span class="text text-danger">{{ $message }}</span>
-                                                @enderror
-                                            </div>
-                                        </div>
+                                        @include('dashboard.admins.parts.phone-country', ['row' => $row])
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label for="password-icon">{{ __('dashboard.table email') }}</label>

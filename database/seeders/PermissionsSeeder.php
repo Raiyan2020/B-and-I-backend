@@ -7,7 +7,7 @@ use App\Facades\BaseService;
 use App\Support\QueryOptions;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 
@@ -53,6 +53,17 @@ class PermissionsSeeder extends Seeder
             ['guard_name' => 'admin', 'name' => 'show-category'],
             ['guard_name' => 'admin', 'name' => 'delete-category'],
 
+            ['guard_name' => 'admin', 'name' => 'preferred-sectors'],
+            ['guard_name' => 'admin', 'name' => 'add-preferred-sector'],
+            ['guard_name' => 'admin', 'name' => 'edit-preferred-sector'],
+            ['guard_name' => 'admin', 'name' => 'show-preferred-sector'],
+            ['guard_name' => 'admin', 'name' => 'delete-preferred-sector'],
+
+            ['guard_name' => 'admin', 'name' => 'about-us-items'],
+            ['guard_name' => 'admin', 'name' => 'add-about-us-item'],
+            ['guard_name' => 'admin', 'name' => 'edit-about-us-item'],
+            ['guard_name' => 'admin', 'name' => 'delete-about-us-item'],
+
         ];
 
         // إنشاء الرول super_admin
@@ -60,12 +71,22 @@ class PermissionsSeeder extends Seeder
             'name' => 'super_admin',
             'guard_name' => 'admin',
         ]);
+        $superAdminRole->setTranslations('title', [
+            'ar' => 'مدير النظام',
+            'en' => 'Super Admin',
+        ]);
+        $superAdminRole->save();
 
         // إنشاء الرول admin
         $adminRole = Role::create([
             'name' => 'admin',
             'guard_name' => 'admin',
         ]);
+        $adminRole->setTranslations('title', [
+            'ar' => 'مدير',
+            'en' => 'Admin',
+        ]);
+        $adminRole->save();
 
         // إدراج الـ permissions
         Permission::insert($permissions);

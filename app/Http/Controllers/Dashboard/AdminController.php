@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Helpers\CountryHelper;
 use App\Models\Admin;
 use App\Support\QueryOptions;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 use App\Facades\BaseService as FacadesBaseService;
 use App\Http\Requests\Dashboard\Admins\StoreRequest;
 use App\Http\Requests\Dashboard\Admins\UpdateRequest;
@@ -35,10 +36,16 @@ class AdminController extends AdminBasicController
         }
         $this->indexScopes = 'search';
         if (Route::currentRouteName() == 'admin.admins.create') {
-            $this->createCompactVariables = ['roles' => $roles];
+            $this->createCompactVariables = [
+                'roles' => $roles,
+                'countries' => CountryHelper::getCountries(),
+            ];
         }
         if (Route::currentRouteName() == 'admin.admins.edit') {
-            $this->editCompactVariables = ['roles' => $roles];
+            $this->editCompactVariables = [
+                'roles' => $roles,
+                'countries' => CountryHelper::getCountries(),
+            ];
         }
     }
 

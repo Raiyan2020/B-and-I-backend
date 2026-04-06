@@ -2,6 +2,8 @@
 
 
 use App\Http\Controllers\Dashboard\CategoryController;
+use App\Http\Controllers\Dashboard\PreferredSectorController;
+use App\Http\Controllers\Dashboard\AboutUsItemController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\AuthController;
@@ -72,10 +74,24 @@ Route::group([
             Route::get('categories/{category}/toggle-status', 'toggleStatus')->name('categories.toggleStatus');
         });
 
+        Route::controller(PreferredSectorController::class)->group(function () {
+            Route::post('preferred-sectors/destroy-multiple', 'destroyMultiple')->name('preferred_sectors.destroyMultiple');
+            Route::get('preferred-sectors/{preferred_sector}/toggle-status', 'toggleStatus')->name('preferred_sectors.toggleStatus');
+        });
+
+        // About Us Items routes
+        Route::controller(AboutUsItemController::class)->group(function () {
+            Route::post('about-us-items/update-settings', 'updateSettings')->name('about_us_items.updateSettings');
+            Route::post('about-us-items/destroy-multiple', 'destroyMultiple')->name('about_us_items.destroyMultiple');
+            Route::get('about-us-items/{about_us_item}/toggle-status', 'toggleStatus')->name('about_us_items.toggleStatus');
+        });
+
         Route::resources([
             'admins' => AdminController::class,
             'roles' => RolesController::class,
             'categories' => CategoryController::class,
+            'preferred_sectors' => PreferredSectorController::class,
+            'about_us_items' => AboutUsItemController::class,
             'users' => UserController::class,
         ]);
 

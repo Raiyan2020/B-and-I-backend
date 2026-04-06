@@ -31,6 +31,27 @@
 <!-- SweetAlert2 JS (Global - Used for flash messages)-->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
 
+<!-- Toastr (validation toasts for .store AJAX forms) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    window.dashboardValidationTitle = @json(__('dashboard.validation_errors_title'));
+    if (typeof toastr !== 'undefined') {
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            newestOnTop: true,
+            timeOut: 10000,
+            extendedTimeOut: 3000,
+            positionClass: (document.documentElement.getAttribute('data-textdirection') === 'rtl')
+                ? 'toast-top-left'
+                : 'toast-top-right',
+            preventDuplicates: true,
+            showMethod: 'fadeIn',
+            hideMethod: 'fadeOut'
+        };
+    }
+</script>
+
 <!-- Dashboard Core JS (Extracted from inline scripts)-->
 <script src="{{ asset('dashboardAssets/custom/js/dashboard-core.js') }}"></script>
 
@@ -85,6 +106,8 @@
     window.dashboardPleaseSelectItems = @json(__('dashboard.please_select_items', ['default' => 'يرجى تحديد عناصر للحذف']));
     window.dashboardDeleting = @json(__('dashboard.deleting', ['default' => 'جاري الحذف...']));
     window.dashboardPleaseWait = @json(__('dashboard.please_wait', ['default' => 'يرجى الانتظار']));
+
+    window.dashboardGenericError = @json(__('dashboard.something_went_wrong'));
 
     // Toggle block translations
     window.dashboardToggleBlockText = @json(__('dashboard.toggle_block_text', ['default' => 'هل تريد تغيير حالة الحظر لهذا العنصر؟']));

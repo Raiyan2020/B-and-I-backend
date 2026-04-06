@@ -57,7 +57,7 @@ class AuthController extends Controller
 
     public function profile(){
         $admin = Admin::with('roles')->find(\auth('admin')->user()->id);
-        $roles = \Spatie\Permission\Models\Role::where('guard_name', 'admin')->get();
+        $roles = \App\Models\Role::where('guard_name', 'admin')->get();
         return view('dashboard.auth.profile', ['admin' => $admin, 'roles' => $roles]);
     }
     public function update_profile(Request $request){
@@ -104,7 +104,7 @@ class AuthController extends Controller
 
         // Update role if provided
         if($request->role){
-            $role = \Spatie\Permission\Models\Role::find($request->role);
+            $role = \App\Models\Role::find($request->role);
             if($role && $role->guard_name === 'admin'){
                 $admin->syncRoles([$role->name]);
             }
