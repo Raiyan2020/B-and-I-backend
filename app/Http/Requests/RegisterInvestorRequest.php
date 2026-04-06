@@ -38,7 +38,7 @@ class RegisterInvestorRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email:dns,rfc', 'unique:users,email'],
-            'phone' => ['required', 'regex:/^[4569]\d{7}$/'],
+            'phone' => ['required', 'regex:/^[4569]\d{7}$/', 'unique:users,phone'],
             'country_code' => ['required', 'string', 'digits_between:1,5'],
             'password' => ['required', 'string', 'min:8', 'max:100'],
 

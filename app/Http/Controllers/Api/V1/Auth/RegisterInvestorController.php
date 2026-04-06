@@ -24,7 +24,11 @@ class RegisterInvestorController extends Controller
                 $validated = $request->validated();
                 $dto = RegisterInvestorDTO::fromRequest($validated);
                 $result = $this->service->registerInvestor($dto);
-                return $this->jsonResponse(data: UserResource::make($result['user'])->setToken($result['token']), code: Response::HTTP_CREATED);
+                return $this->jsonResponse(
+                    data: UserResource::make($result['user'])->setToken($result['token']), 
+                    code: Response::HTTP_CREATED,
+                    msg: __('auth.register_success')
+                );
             });
         } catch (\Exception $e) {
             return $this->jsonResponse(msg: $e->getMessage(), code: Response::HTTP_INTERNAL_SERVER_ERROR, error: true);

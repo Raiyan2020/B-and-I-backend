@@ -25,7 +25,11 @@ class RegisterAdvertiserController extends Controller
                 $file = $request->file('company_license');
                 $dto = RegisterAdvertiserDTO::fromRequest($validated, $file);
                 $result = $this->service->registerAdvertiser($dto);
-                return $this->jsonResponse(data: UserResource::make($result['user'])->setToken($result['token']), code: Response::HTTP_CREATED);
+                return $this->jsonResponse(
+                    data: UserResource::make($result['user'])->setToken($result['token']), 
+                    code: Response::HTTP_CREATED,
+                    msg: __('auth.register_success')
+                );
             });
         } catch (\Exception $e) {
             return $this->jsonResponse(msg: $e->getMessage(), code: Response::HTTP_INTERNAL_SERVER_ERROR, error: true);
