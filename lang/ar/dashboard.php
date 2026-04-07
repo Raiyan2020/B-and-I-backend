@@ -191,6 +191,7 @@ return [
     'View More' => 'المزيد',
     'weather' => 'الطقس',
     'website name' => 'اسم الموقع',
+    'project brief' => 'نبذة عن المنصة',
     'logo' => 'الشعار',
     'favicon' => 'أيقونة الموقع',
     'welcome' => 'مرحبا',
@@ -376,5 +377,22 @@ return [
     'activate_about_us_confirm' => 'هل أنت متأكد من تفعيل هذا العنصر؟',
     'deactivate_about_us_confirm' => 'هل أنت متأكد من إلغاء تفعيل هذا العنصر؟',
     'search_title_or_description' => 'بحث بالعنوان أو الوصف',
+
+    // Features Management
+    'features' => 'مميزاتنا',
+    'features list' => 'قائمة المميزات',
+    'add feature' => 'إضافة ميزة جديدة',
+    'edit feature' => 'تعديل الميزة',
+    'title in arabic' => 'العنوان (عربي)',
+    'title in english' => 'العنوان (إنجليزي)',
+    'description in arabic' => 'الوصف (عربي)',
+    'description in english' => 'الوصف (إنجليزي)',
+    'activate_feature_confirm' => 'هل أنت متأكد من تفعيل هذه الميزة؟',
+    'deactivate_feature_confirm' => 'هل أنت متأكد من إلغاء تفعيل هذه الميزة؟',
+
+    // Website Settings
+    'website settings' => 'إعدادات الموقع الالكتروني',
+    'website header title' => 'عنوان المقدمة الرئيسية',
+    'website header description' => 'وصف  المقدمة الرئيسية',
 
 ];

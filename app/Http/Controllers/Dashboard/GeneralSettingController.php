@@ -21,6 +21,8 @@ class GeneralSettingController extends Controller
             $rules = [
               'type.website_name_ar' => ['required','min:5','max:100'],
               'type.website_name_en' => ['required','min:5','max:100'],
+              'type.project_brief_ar' => ['nullable','string','max:5000'],
+              'type.project_brief_en' => ['nullable','string','max:5000'],
               'type.commercial_register' => ['required','numeric'],
               'type.tax_number' => ['required','numeric'],
               'type.contact_number'=> ['required','min:9','max:12'],

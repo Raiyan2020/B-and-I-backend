@@ -122,6 +122,44 @@ class GeneralSettingControllerTest extends TestCase
     }
 
     /**
+     * Project brief fields are persisted when provided with general settings.
+     */
+    public function test_general_settings_persists_project_briefs(): void
+    {
+        $admin = $this->createSuperAdmin();
+        $this->actingAs($admin, 'admin');
+
+        $logo = UploadedFile::fake()->image('logo.jpg');
+        $favicon = UploadedFile::fake()->image('favicon.jpg');
+
+        $response = $this->post('/en/admin/general_settings/store', [
+            'generalSettings' => true,
+            'type' => [
+                'website_name_ar' => 'اسم الموقع',
+                'website_name_en' => 'Website Name',
+                'project_brief_ar' => 'نبذة بالعربية',
+                'project_brief_en' => 'Brief in English',
+                'commercial_register' => '123456789',
+                'tax_number' => '987654321',
+                'contact_number' => '1234567890',
+                'copy_right' => 'Copyright 2024',
+            ],
+            'logo1' => $logo,
+            'favicon2' => $favicon,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('general_settings', [
+            'key' => 'project_brief_ar',
+            'value' => 'نبذة بالعربية',
+        ]);
+        $this->assertDatabaseHas('general_settings', [
+            'key' => 'project_brief_en',
+            'value' => 'Brief in English',
+        ]);
+    }
+
+    /**
      * Test general settings update requires valid data.
      */
     public function test_general_settings_update_requires_valid_data(): void

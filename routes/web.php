@@ -4,6 +4,7 @@
 use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\Dashboard\PreferredSectorController;
 use App\Http\Controllers\Dashboard\AboutUsItemController;
+use App\Http\Controllers\Dashboard\FeatureController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\AuthController;
@@ -86,12 +87,19 @@ Route::group([
             Route::get('about-us-items/{about_us_item}/toggle-status', 'toggleStatus')->name('about_us_items.toggleStatus');
         });
 
+        // Features routes
+        Route::controller(FeatureController::class)->group(function () {
+            Route::post('features/destroy-multiple', 'destroyMultiple')->name('features.destroyMultiple');
+            Route::get('features/{feature}/toggle-status', 'toggleStatus')->name('features.toggleStatus');
+        });
+
         Route::resources([
             'admins' => AdminController::class,
             'roles' => RolesController::class,
             'categories' => CategoryController::class,
             'preferred_sectors' => PreferredSectorController::class,
             'about_us_items' => AboutUsItemController::class,
+            'features' => FeatureController::class,
             'users' => UserController::class,
         ]);
 

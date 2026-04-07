@@ -38,6 +38,7 @@
                                 @enderror
                             </div>
                         </div>
+
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="type['contact_number']">{{ __('dashboard.contact number') }}</label>
@@ -98,6 +99,93 @@
                         <x-dashboard.generalSettings.uploadImage i="2" name="favicon" folder="logo/" src="{{ $favicon2 }}"  />
                     </div>
                     <x-dashboard.generalSettings.submitButton id="general-settings-save" />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Website Settings -->
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">{{ __('dashboard.website settings') }}</h4>
+        </div>
+        <div class="card-content">
+            <div class="card-body">
+                <form method="POST" action="{{ route('admin.generalSetting.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="websiteSettings">
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label
+                                    for="type_project_brief_ar">{{ __('dashboard.project brief') . ' ' . __('dashboard.in arabic') }}</label>
+                                <textarea class="form-control" id="type_project_brief_ar" name="type[project_brief_ar]"
+                                    rows="4"
+                                    placeholder="{{ __('dashboard.project brief') . ' ' . __('dashboard.in arabic') }}">{{ old('type.project_brief_ar', GeneralSetting::getValueForKey('project_brief_ar')) }}</textarea>
+                                @error('type.project_brief_ar')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label
+                                    for="type_project_brief_en">{{ __('dashboard.project brief') . ' ' . __('dashboard.in english') }}</label>
+                                <textarea class="form-control" id="type_project_brief_en" name="type[project_brief_en]"
+                                    rows="4"
+                                    placeholder="{{ __('dashboard.project brief') . ' ' . __('dashboard.in english') }}">{{ old('type.project_brief_en', GeneralSetting::getValueForKey('project_brief_en')) }}</textarea>
+                                @error('type.project_brief_en')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label for="type['website_header_title_ar']">{{ __('dashboard.website header title') . ' ' . __('dashboard.in arabic') }}</label>
+                                <input type="text" class="form-control" name="type[website_header_title_ar]"
+                                    value="{{ old('type.website_header_title_ar', GeneralSetting::getValueForKey('website_header_title_ar')) }}"
+                                    placeholder="{{ __('dashboard.website header title') . ' ' . __('dashboard.in arabic') }}">
+                                @error('type.website_header_title_ar')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label for="type['website_header_title_en']">{{ __('dashboard.website header title') . ' ' . __('dashboard.in english') }}</label>
+                                <input type="text" class="form-control" name="type[website_header_title_en]"
+                                    value="{{ old('type.website_header_title_en', GeneralSetting::getValueForKey('website_header_title_en')) }}"
+                                    placeholder="{{ __('dashboard.website header title') . ' ' . __('dashboard.in english') }}">
+                                @error('type.website_header_title_en')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label for="type_website_header_desc_ar">{{ __('dashboard.website header description') . ' ' . __('dashboard.in arabic') }}</label>
+                                <textarea class="form-control" id="type_website_header_desc_ar" name="type[website_header_desc_ar]"
+                                    rows="4"
+                                    placeholder="{{ __('dashboard.website header description') . ' ' . __('dashboard.in arabic') }}">{{ old('type.website_header_desc_ar', GeneralSetting::getValueForKey('website_header_desc_ar')) }}</textarea>
+                                @error('type.website_header_desc_ar')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label for="type_website_header_desc_en">{{ __('dashboard.website header description') . ' ' . __('dashboard.in english') }}</label>
+                                <textarea class="form-control" id="type_website_header_desc_en" name="type[website_header_desc_en]"
+                                    rows="4"
+                                    placeholder="{{ __('dashboard.website header description') . ' ' . __('dashboard.in english') }}">{{ old('type.website_header_desc_en', GeneralSetting::getValueForKey('website_header_desc_en')) }}</textarea>
+                                @error('type.website_header_desc_en')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <x-dashboard.generalSettings.submitButton id="hero-settings-save" />
                 </form>
             </div>
         </div>

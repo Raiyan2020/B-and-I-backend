@@ -59,21 +59,29 @@
                     <span class="menu-title" data-i18n="Wish List">{{ __('dashboard.categories') }}</span></a>
             </li>
 
-            @can('preferred-sectors')
+            {{-- @can('preferred-sectors') --}}
                 <li class=" nav-item {{ Route::is('admin.preferred_sectors.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.preferred_sectors.index') }}">
                         <i class="feather icon-target"></i>
                         <span class="menu-title">{{ __('dashboard.preferred sectors') }}</span></a>
                 </li>
-            @endcan
+            {{-- @endcan --}}
 
-            @can('about-us-items')
+            {{-- @can('about-us-items') --}}
                 <li class=" nav-item {{ Route::is('admin.about_us_items.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.about_us_items.index') }}">
                         <i class="feather icon-info"></i>
                         <span class="menu-title">{{ __('dashboard.about_us_management') }}</span></a>
                 </li>
-            @endcan
+            {{-- @endcan --}}
+
+            {{-- @can('features') --}}
+                <li class=" nav-item {{ Route::is('admin.features.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.features.index') }}">
+                        <i class="feather icon-star"></i>
+                        <span class="menu-title">{{ __('dashboard.features') }}</span></a>
+                </li>
+            {{-- @endcan --}}
 
             <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
                 <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>

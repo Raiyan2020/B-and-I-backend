@@ -189,6 +189,7 @@ return [
     'View More' => 'View More',
     'weather' => 'Weather',
     'website name' => 'Website Name',
+    'project brief' => 'Website brief',
     'logo' => 'Logo',
     'favicon' => 'Favicon',
     'welcome' => 'Welcome',
@@ -375,5 +376,22 @@ return [
     'activate_about_us_confirm' => 'Are you sure you want to activate this item?',
     'deactivate_about_us_confirm' => 'Are you sure you want to deactivate this item?',
     'search_title_or_description' => 'Search by title or description',
+
+    // Features Management
+    'features' => 'Features',
+    'features list' => 'Features List',
+    'add feature' => 'Add Feature',
+    'edit feature' => 'Edit Feature',
+    'title in arabic' => 'Title (Arabic)',
+    'title in english' => 'Title (English)',
+    'description in arabic' => 'Description (Arabic)',
+    'description in english' => 'Description (English)',
+    'activate_feature_confirm' => 'Are you sure you want to activate this feature?',
+    'deactivate_feature_confirm' => 'Are you sure you want to deactivate this feature?',
+
+    // Website Settings
+    'website settings' => 'Website Settings',
+    'website header title' => 'Website Header Title',
+    'website header description' => 'Website Header Description',
 
 ];
