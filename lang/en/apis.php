@@ -38,6 +38,7 @@ return [
     'invalid_credentials' => 'Invalid credentials.',
     'email_not_verified' => 'Email not verified.',
     'already_verified' => 'Email is already verified.',
+    'price_per_month' => ':price KD / month',
     '' => '' ,
     '' => '' ,
     '' => '' ,

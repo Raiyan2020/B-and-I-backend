@@ -394,4 +394,22 @@ return [
     'website header title' => 'Website Header Title',
     'website header description' => 'Website Header Description',
 
+    // Subscription packages
+    'name' => 'Name',
+    'kwd' => 'KWD',
+    'package_name' => 'Package name',
+    'price_monthly' => 'Monthly price',
+    'subscription_packages_menu' => 'Subscription packages',
+    'subscription_packages_list' => 'Subscription packages',
+    'add_subscription_package' => 'Add package',
+    'edit_subscription_package' => 'Edit package',
+    'packages_page_settings' => 'Packages page (title & intro)',
+    'packages_page_title_ar' => 'Page title (Arabic)',
+    'packages_page_title_en' => 'Page title (English)',
+    'packages_page_description_ar' => 'Page intro (Arabic)',
+    'packages_page_description_en' => 'Page intro (English)',
+    'packages_settings_saved' => 'Packages page settings saved successfully',
+    'activate_package_confirm' => 'Activate this package?',
+    'deactivate_package_confirm' => 'Deactivate this package?',
+
 ];

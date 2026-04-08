@@ -395,4 +395,22 @@ return [
     'website header title' => 'عنوان المقدمة الرئيسية',
     'website header description' => 'وصف  المقدمة الرئيسية',
 
+    // Subscription packages
+    'name' => 'الاسم',
+    'kwd' => 'د.ك',
+    'package_name' => 'اسم الباقة',
+    'price_monthly' => 'السعر الشهري',
+    'subscription_packages_menu' => 'باقات الاشتراك',
+    'subscription_packages_list' => 'قائمة باقات الاشتراك',
+    'add_subscription_package' => 'إضافة باقة',
+    'edit_subscription_package' => 'تعديل باقة',
+    'packages_page_settings' => 'صفحة الباقات (العنوان والمقدمة)',
+    'packages_page_title_ar' => 'عنوان الصفحة (عربي)',
+    'packages_page_title_en' => 'عنوان الصفحة (إنجليزي)',
+    'packages_page_description_ar' => 'مقدمة الصفحة (عربي)',
+    'packages_page_description_en' => 'مقدمة الصفحة (إنجليزي)',
+    'packages_settings_saved' => 'تم حفظ إعدادات صفحة الباقات بنجاح',
+    'activate_package_confirm' => 'تفعيل هذه الباقة؟',
+    'deactivate_package_confirm' => 'إلغاء تفعيل هذه الباقة؟',
+
 ];

@@ -79,6 +79,7 @@
 
 <!-- DataTables Initializer (Global - Sets defaults) - MUST load after translations are defined -->
 <script src="{{ asset('dashboardAssets/custom/js/datatable-initializer.js') }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/admin-collapsible-panels.js') }}"></script>
 
 <!-- Submit Add Form Handler (Global - Used across forms)-->
 <script src="{{ asset('dashboardAssets/custom/js/submit-add-form.js') }}"></script>

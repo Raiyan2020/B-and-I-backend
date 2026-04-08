@@ -83,6 +83,12 @@
                 </li>
             {{-- @endcan --}}
 
+            <li class=" nav-item {{ Route::is('admin.subscription_packages.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.subscription_packages.index') }}">
+                    <i class="feather icon-layers"></i>
+                    <span class="menu-title">{{ __('dashboard.subscription_packages_menu') }}</span></a>
+            </li>
+
             <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
                 <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>
                     <span class="menu-title" data-i18n="Ecommerce">{{ __('dashboard.general settings') }}</span></a>

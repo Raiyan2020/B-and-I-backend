@@ -12,64 +12,54 @@
                     <x-dashboard.layouts.breadcrumb now="{{ __('dashboard.about_us_items_list') }}">
                     </x-dashboard.layouts.breadcrumb>
 
-                    <!-- About Us Settings Section -->
-                    <div class="row mb-2">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h5 class="card-title mb-0">
-                                        <i class="feather icon-settings text-primary"></i>
-                                        {{ __('dashboard.about_us_settings') }}
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <form id="settings-form" class="row">
-                                        @csrf
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>{{ __('dashboard.about_us_title_ar') }}</label>
-                                                <input type="text" class="form-control" name="about_us_title_ar"
-                                                    value="{{ $about_us_title_ar }}"
-                                                    placeholder="{{ __('dashboard.about_us_title_ar') }}"
-                                                    dir="rtl">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>{{ __('dashboard.about_us_title_en') }}</label>
-                                                <input type="text" class="form-control" name="about_us_title_en"
-                                                    value="{{ $about_us_title_en }}"
-                                                    placeholder="{{ __('dashboard.about_us_title_en') }}"
-                                                    dir="ltr">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>{{ __('dashboard.about_us_description_ar') }}</label>
-                                                <textarea class="form-control" name="about_us_description_ar" rows="4"
-                                                    placeholder="{{ __('dashboard.about_us_description_ar') }}"
-                                                    dir="rtl">{{ $about_us_description_ar }}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>{{ __('dashboard.about_us_description_en') }}</label>
-                                                <textarea class="form-control" name="about_us_description_en" rows="4"
-                                                    placeholder="{{ __('dashboard.about_us_description_en') }}"
-                                                    dir="ltr">{{ $about_us_description_en }}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <button type="button" class="btn btn-primary btn-sm" id="save-settings-btn">
-                                                <i class="feather icon-save"></i>
-                                                {{ __('dashboard.save') }}
-                                            </button>
-                                        </div>
-                                    </form>
+                    <x-dashboard.collapsible-panel
+                        :title="__('dashboard.about_us_settings')"
+                        icon="icon-settings"
+                        panel-id="about-us-settings-panel">
+                        <form id="settings-form" class="row">
+                            @csrf
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>{{ __('dashboard.about_us_title_ar') }}</label>
+                                    <input type="text" class="form-control" name="about_us_title_ar"
+                                        value="{{ $about_us_title_ar }}"
+                                        placeholder="{{ __('dashboard.about_us_title_ar') }}"
+                                        dir="rtl">
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>{{ __('dashboard.about_us_title_en') }}</label>
+                                    <input type="text" class="form-control" name="about_us_title_en"
+                                        value="{{ $about_us_title_en }}"
+                                        placeholder="{{ __('dashboard.about_us_title_en') }}"
+                                        dir="ltr">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>{{ __('dashboard.about_us_description_ar') }}</label>
+                                    <textarea class="form-control" name="about_us_description_ar" rows="4"
+                                        placeholder="{{ __('dashboard.about_us_description_ar') }}"
+                                        dir="rtl">{{ $about_us_description_ar }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>{{ __('dashboard.about_us_description_en') }}</label>
+                                    <textarea class="form-control" name="about_us_description_en" rows="4"
+                                        placeholder="{{ __('dashboard.about_us_description_en') }}"
+                                        dir="ltr">{{ $about_us_description_en }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary btn-sm" id="save-settings-btn">
+                                    <i class="feather icon-save"></i>
+                                    {{ __('dashboard.save') }}
+                                </button>
+                            </div>
+                        </form>
+                    </x-dashboard.collapsible-panel>
 
                     <!-- Filter Section -->
                     @include('dashboard.about_us_items.parts.filter')

@@ -54,6 +54,14 @@
                 var url = $(this).attr('action');
                 var form = $(this);
 
+                if (typeof CKEDITOR !== 'undefined') {
+                    for (var key in CKEDITOR.instances) {
+                        if (CKEDITOR.instances.hasOwnProperty(key)) {
+                            CKEDITOR.instances[key].updateElement();
+                        }
+                    }
+                }
+
                 $.ajax({
                     url: url,
                     method: 'post',

@@ -1,0 +1,90 @@
+/* Collapsible panels above admin DataTables (default collapsed) */
+
+.admin-collapsible-panel {
+    margin-bottom: 1rem;
+}
+
+.admin-collapsible-card {
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.admin-collapsible-panel-toggle {
+    cursor: pointer;
+    /* يمنع الشريط الرفيع: مساحة رأسية أوضح */
+    padding: 1rem 1.35rem !important;
+    min-height: 3.5rem;
+    align-items: center !important;
+}
+
+.admin-collapsible-panel-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.admin-collapsible-panel-toggle .card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.45;
+    margin-bottom: 0 !important;
+    gap: 0.5rem;
+}
+
+.admin-collapsible-panel-toggle .card-title > span {
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+}
+
+.admin-collapsible-panel-toggle .feather {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex-shrink: 0;
+}
+
+.admin-collapsible-chevron {
+    transition: transform 0.2s ease;
+    font-size: 1.15rem;
+    opacity: 0.8;
+    margin-top: 0.1rem;
+}
+
+.admin-collapsible-chevron.is-open {
+    transform: rotate(180deg);
+}
+
+/* زر التحديث/الإجراءات: لا يضغط عمودياً */
+.admin-collapsible-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.admin-collapsible-header-actions .btn {
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-collapsible-header-actions .btn .feather {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+/* جسم اللوحة بعد الفتح */
+.admin-collapsible-panel-body .card-body {
+    padding-top: 1.25rem;
+    padding-bottom: 1.35rem;
+}
+
+html[data-textdirection="rtl"] .admin-collapsible-panel-toggle .mr-50 {
+    margin-right: 0 !important;
+    margin-left: 0.5rem !important;
+}
+
+html[data-textdirection="rtl"] .admin-collapsible-panel-toggle .ml-50 {
+    margin-left: 0 !important;
+    margin-right: 0.5rem !important;
+}

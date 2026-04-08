@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\Category;
 use App\Models\GeneralSetting;
 use App\Models\PreferredSector;
+use App\Models\SubscriptionPackage;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UserSeeder;
@@ -34,12 +35,14 @@ class DatabaseSeeder extends Seeder
         Category::truncate();
         User::truncate();
         PreferredSector::truncate();
+        SubscriptionPackage::truncate();
         Schema::enableForeignKeyConstraints();
 
         $this->call([
             PermissionsSeeder::class, // يجب أن يكون أولاً لإنشاء الرولات والـ permissions
             AdminSeeder::class, // بعد PermissionsSeeder لاستخدام الرولات
             GeneralSettingSeeder::class,
+            SubscriptionPackageSeeder::class,
             CategorySeeder::class,
             PreferredSectorSeeder::class,
             UserSeeder::class,

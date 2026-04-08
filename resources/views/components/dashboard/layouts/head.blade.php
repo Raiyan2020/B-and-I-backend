@@ -91,6 +91,7 @@ use App\Models\GeneralSetting;
 
     <!-- Dashboard Core CSS (Extracted from inline styles)-->
     <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/dashboard-core.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/admin-collapsible-panels.css') }}">
 
     <!-- Table Toolkit CSS (Global - For checkbox selection and bulk actions)-->
     <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/shared/table-toolkit.css') }}">

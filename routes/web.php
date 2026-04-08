@@ -5,6 +5,7 @@ use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\Dashboard\PreferredSectorController;
 use App\Http\Controllers\Dashboard\AboutUsItemController;
 use App\Http\Controllers\Dashboard\FeatureController;
+use App\Http\Controllers\Dashboard\SubscriptionPackageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\AuthController;
@@ -93,6 +94,12 @@ Route::group([
             Route::get('features/{feature}/toggle-status', 'toggleStatus')->name('features.toggleStatus');
         });
 
+        Route::controller(SubscriptionPackageController::class)->group(function () {
+            Route::post('subscription-packages/update-settings', 'updateSettings')->name('subscription_packages.updateSettings');
+            Route::post('subscription-packages/destroy-multiple', 'destroyMultiple')->name('subscription_packages.destroyMultiple');
+            Route::get('subscription-packages/{subscription_package}/toggle-status', 'toggleStatus')->name('subscription_packages.toggleStatus');
+        });
+
         Route::resources([
             'admins' => AdminController::class,
             'roles' => RolesController::class,
@@ -100,6 +107,7 @@ Route::group([
             'preferred_sectors' => PreferredSectorController::class,
             'about_us_items' => AboutUsItemController::class,
             'features' => FeatureController::class,
+            'subscription_packages' => SubscriptionPackageController::class,
             'users' => UserController::class,
         ]);
 

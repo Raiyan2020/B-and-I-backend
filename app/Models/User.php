@@ -40,6 +40,7 @@ class User extends Authenticatable
         'available_capital',
         'preferred_sector_id',
         'category_id',
+        'subscription_package_id',
         'experience_level',
         'previous_investments_count',
         'investor_experience',
@@ -171,6 +172,11 @@ class User extends Authenticatable
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function subscriptionPackage()
+    {
+        return $this->belongsTo(SubscriptionPackage::class, 'subscription_package_id');
     }
 
     /**

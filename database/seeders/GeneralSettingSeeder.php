@@ -46,6 +46,10 @@ class GeneralSettingSeeder extends Seeder
             array('key' => 'website_header_title_en', 'value' => 'Where Vision Meets Capital', 'created_at' => now()),
             array('key' => 'website_header_desc_ar', 'value' => 'النظام البيئي الرقمي الحصري لربط أصحاب الأعمال والمستثمرين بخصوصية وأمان.', 'created_at' => now()),
             array('key' => 'website_header_desc_en', 'value' => 'The exclusive digital platform to connect entrepreneurs and investors with the highest level of privacy and transparency.', 'created_at' => now()),
+            array('key' => 'packages_page_title_ar', 'value' => 'اختر مستوى الوصول', 'created_at' => now()),
+            array('key' => 'packages_page_title_en', 'value' => 'Choose your access level', 'created_at' => now()),
+            array('key' => 'packages_page_description_ar', 'value' => 'باقات اشتراك مرنة للوصول إلى مزايا منصة الأعمال والاستثمارات.', 'created_at' => now()),
+            array('key' => 'packages_page_description_en', 'value' => 'Flexible subscription plans to access Business &amp; Investments platform features.', 'created_at' => now()),
         );
         GeneralSetting::insert($general_settings);
     }

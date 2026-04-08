@@ -38,6 +38,7 @@ return [
     'invalid_credentials' => 'بيانات الدخول غير صحيحة',
     'email_not_verified' => 'البريد الإلكتروني غير مفعل',
     'already_verified' => 'تم تفعيل البريد الإلكتروني مسبقاً',
+    'price_per_month' => ':price د.ك / شهر',
     '' => '' ,
     '' => '' ,
     '' => '' ,

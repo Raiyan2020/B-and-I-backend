@@ -69,6 +69,11 @@ class PermissionsSeeder extends Seeder
             ['guard_name' => 'admin', 'name' => 'edit-feature'],
             ['guard_name' => 'admin', 'name' => 'delete-feature'],
 
+            ['guard_name' => 'admin', 'name' => 'subscription-packages'],
+            ['guard_name' => 'admin', 'name' => 'add-subscription-package'],
+            ['guard_name' => 'admin', 'name' => 'edit-subscription-package'],
+            ['guard_name' => 'admin', 'name' => 'delete-subscription-package'],
+
         ];
 
         // إنشاء الرول super_admin

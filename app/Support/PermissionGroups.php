@@ -36,6 +36,7 @@ class PermissionGroups
             'settings' => 5,
             'preferred_sectors' => 6,
             'about_us' => 7,
+            'subscription_packages' => 8,
             'other' => 99,
         ];
         uksort($grouped, function ($a, $b) use ($order) {
@@ -55,6 +56,9 @@ class PermissionGroups
         }
         if (str_contains($permissionName, 'about-us')) {
             return 'about_us';
+        }
+        if (str_contains($permissionName, 'subscription-package')) {
+            return 'subscription_packages';
         }
 
         $category = 'other';
