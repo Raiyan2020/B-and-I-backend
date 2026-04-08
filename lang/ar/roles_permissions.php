@@ -147,4 +147,7 @@ return [
     'show-settings' => 'معاينة الإعدادات',
     'edit-settings' => 'تعديل الإعدادات',
 
+    'opportunities' => 'الإعلانات',
+    'show-opportunity' => 'معاينة الإعلان',
+    'review-opportunity' => 'مراجعة الإعلان',
 ];

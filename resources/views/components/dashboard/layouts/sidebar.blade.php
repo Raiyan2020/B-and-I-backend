@@ -89,6 +89,12 @@
                     <span class="menu-title">{{ __('dashboard.subscription_packages_menu') }}</span></a>
             </li>
 
+            <li class=" nav-item {{ Route::is('admin.opportunities.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.opportunities.index') }}">
+                    <i class="feather icon-briefcase"></i>
+                    <span class="menu-title">{{ __('dashboard.opportunities_menu') }}</span></a>
+            </li>
+
             <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
                 <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>
                     <span class="menu-title" data-i18n="Ecommerce">{{ __('dashboard.general settings') }}</span></a>

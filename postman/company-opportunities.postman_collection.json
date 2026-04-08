@@ -1,0 +1,99 @@
+{
+  "info": {
+    "_postman_id": "7c5674be-2b8d-4e68-baa2-0a280ce78a79",
+    "name": "Company Opportunities",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Opportunity - Request Investment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "ar"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"goal\": \"request_investment\",\n  \"contact_name\": \"Ahmed Mohamed\",\n  \"contact_phone\": \"80808080\",\n  \"contact_email\": \"company@example.com\",\n  \"owner_name\": \"Ahmed Mohamed\",\n  \"admin_company_name\": \"شركة النخبة التجارية\",\n  \"license_number\": \"LIC-123456\",\n  \"company_name\": \"فرصة مطاعم رقم 10\",\n  \"category_id\": 1,\n  \"business_age_years\": 3,\n  \"investment_required\": 65000,\n  \"business_stage\": \"تشغيل فعلي\",\n  \"sale_percentage\": 20,\n  \"legal_entity\": \"شركة ذات مسؤولية محدودة\",\n  \"financial_status\": \"مستقر\",\n  \"investment_reason\": \"توسيع النشاط وفتح فرعين جديدين في مناطق حيوية.\",\n  \"full_description\": \"مشروع مطاعم قائم يحقق أرباح مستقرة مع خطة توسع واضحة خلال 12 شهر.\",\n  \"terms_accepted\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/company/opportunities",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "company",
+            "opportunities"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Opportunity - Sell Business",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "ar"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"goal\": \"sell_business\",\n  \"contact_name\": \"Ahmed Mohamed\",\n  \"contact_phone\": \"80808080\",\n  \"contact_email\": \"company@example.com\",\n  \"owner_name\": \"Ahmed Mohamed\",\n  \"admin_company_name\": \"شركة النخبة التجارية\",\n  \"license_number\": \"LIC-123456\",\n  \"company_name\": \"نشاط تجاري قائم للبيع\",\n  \"category_id\": 1,\n  \"business_age_years\": 5,\n  \"investment_required\": 120000,\n  \"business_stage\": \"تشغيل فعلي\",\n  \"legal_entity\": \"شركة ذات مسؤولية محدودة\",\n  \"financial_status\": \"مستقر\",\n  \"investment_reason\": \"رغبة المالك في التخارج الكامل من النشاط.\",\n  \"full_description\": \"نشاط تجاري قائم بقاعدة عملاء مستقرة ومبيعات منتظمة ومتاح للبيع الكامل.\",\n  \"terms_accepted\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/company/opportunities",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "company",
+            "opportunities"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

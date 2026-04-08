@@ -43,4 +43,8 @@ return [
     'verification_link_invalid' => 'رابط التفعيل غير صالح أو منتهي الصلاحية.',
     'price_per_month' => ':price د.ك / شهر',
 
+    'opportunity_created_successfully' => 'تم إرسال الإعلان وهو الآن قيد المراجعة.',
+    'opportunity_updated_and_sent_for_review' => 'تم تحديث الإعلان وإرساله مرة أخرى للمراجعة.',
+    'opportunity_company_only' => 'إنشاء الإعلانات متاح فقط لحسابات الشركات.',
+    'invalid_opportunity_status_transition' => 'لا يمكن تطبيق حالة المراجعة المطلوبة على الإعلان.',
 ];

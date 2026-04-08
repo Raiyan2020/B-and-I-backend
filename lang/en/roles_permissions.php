@@ -147,4 +147,7 @@ return [
     'show-settings' => 'View Settings',
     'edit-settings' => 'Edit Settings',
 
+    'opportunities' => 'Advertisements',
+    'show-opportunity' => 'View Advertisement',
+    'review-opportunity' => 'Review Advertisement',
 ];

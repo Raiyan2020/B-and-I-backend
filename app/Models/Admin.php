@@ -39,8 +39,10 @@ class Admin extends Authenticatable
 
     public function getImageAttribute()
     {
-        if ($this->attributes['image'] != 'default.png' && $this->attributes['image'] != null) {
-            $image = $this->getImage($this->attributes['image'], self::FOLDER);
+        $imageName = $this->attributes['image'] ?? null;
+
+        if ($imageName != 'default.png' && $imageName != null) {
+            $image = $this->getImage($imageName, self::FOLDER);
         } else {
             $image = $this->defaultImage(self::FOLDER);
         }

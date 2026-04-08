@@ -60,4 +60,8 @@ return [
     '' => '' ,
     '' => '' ,
 
+    'opportunity_created_successfully' => 'The advertisement has been submitted and is now pending review.',
+    'opportunity_updated_and_sent_for_review' => 'The advertisement has been updated and sent back for review.',
+    'opportunity_company_only' => 'Only company accounts can create advertisements.',
+    'invalid_opportunity_status_transition' => 'Invalid advertisement status transition.',
 ];

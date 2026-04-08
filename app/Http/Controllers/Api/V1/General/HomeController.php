@@ -7,11 +7,13 @@ use App\Facades\BaseService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\FeaturesResource;
+use App\Http\Resources\PublicOpportunityResource;
 use App\Http\Resources\WhoWeAreResource;
 use App\Models\AboutUsItem;
 use App\Models\Category;
 use App\Models\Feature;
 use App\Models\GeneralSetting;
+use App\Models\Opportunity;
 use App\Models\User;
 use App\Support\QueryOptions;
 use App\Traits\ResponseTrait;
@@ -98,7 +100,9 @@ class HomeController extends Controller
             ],
             'features' => FeaturesResource::collection($ourFeatures),
             'sections' => CategoryResource::collection($sections), //$sections,
-            'latest_opportunities' => [], // Reserved for listings endpoint;
+            'latest_opportunities' => PublicOpportunityResource::collection(
+                Opportunity::query()->with(['category', 'user'])->where('status', 'approved')->latest()->limit(6)->get()
+            ),
         ];
         return $this->jsonResponse(data: $data);
     }

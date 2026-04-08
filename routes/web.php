@@ -5,6 +5,7 @@ use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\Dashboard\PreferredSectorController;
 use App\Http\Controllers\Dashboard\AboutUsItemController;
 use App\Http\Controllers\Dashboard\FeatureController;
+use App\Http\Controllers\Dashboard\OpportunityController;
 use App\Http\Controllers\Dashboard\SubscriptionPackageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\HomeController;
@@ -100,6 +101,10 @@ Route::group([
             Route::get('subscription-packages/{subscription_package}/toggle-status', 'toggleStatus')->name('subscription_packages.toggleStatus');
         });
 
+        Route::controller(OpportunityController::class)->group(function () {
+            Route::post('opportunities/{opportunity}/review', 'review')->name('opportunities.review');
+        });
+
         Route::resources([
             'admins' => AdminController::class,
             'roles' => RolesController::class,
@@ -110,6 +115,8 @@ Route::group([
             'subscription_packages' => SubscriptionPackageController::class,
             'users' => UserController::class,
         ]);
+
+        Route::resource('opportunities', OpportunityController::class)->only(['index', 'show']);
 
         // Bulk delete routes (destroyAll) - Legacy routes for backward compatibility
         Route::post('roles/destroyAll', [RolesController::class, 'destroyAll'])->name('roles.destroyAll');

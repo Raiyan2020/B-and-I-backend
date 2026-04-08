@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Auth\RegisterAdvertiserController;
 use App\Http\Controllers\Api\V1\Auth\RegisterInvestorController;
 use App\Http\Controllers\Api\V1\Auth\ResendVerificationController;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
+use App\Http\Controllers\Api\V1\Company\OpportunityController as CompanyOpportunityController;
 use App\Http\Controllers\Api\V1\General\CategoryController;
 use App\Http\Controllers\Api\V1\General\ReferenceDataController;
 use App\Http\Controllers\Api\V1\General\HomeController;
@@ -36,5 +37,12 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
     });
     Route::prefix('general')->group(function () {
         include __DIR__.'/guard/general.php';
+    });
+
+    Route::middleware('auth:sanctum')->prefix('company')->group(function () {
+        Route::get('opportunities', [CompanyOpportunityController::class, 'index']);
+        Route::post('opportunities', [CompanyOpportunityController::class, 'store']);
+        Route::get('opportunities/{opportunity}', [CompanyOpportunityController::class, 'show']);
+        Route::put('opportunities/{opportunity}', [CompanyOpportunityController::class, 'update']);
     });
 });

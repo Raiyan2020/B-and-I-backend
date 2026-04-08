@@ -183,6 +183,11 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         return $this->belongsTo(SubscriptionPackage::class, 'subscription_package_id');
     }
 
+    public function opportunities()
+    {
+        return $this->hasMany(Opportunity::class);
+    }
+
     /**
      * Get wallet relationship.
      *
