@@ -61,6 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeCookieRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
             'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'set.locale.from.header' => \App\Http\Middleware\SetLocaleFromHeader::class,
         ]);
 
         $middleware->throttleApi();

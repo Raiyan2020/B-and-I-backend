@@ -51,4 +51,10 @@ return [
     '' => '' ,
     '' => '' ,
 
+    // تغيير اللغة
+    'language_changed' => 'تم تغيير اللغة إلى :language',
+    'language_arabic' => 'العربية',
+    'language_english' => 'الإنجليزية',
+    'invalid_language' => 'يجب اختيار اللغة بشكل صحيح: "ar" (عربي) أو "en" (انجليزي)',
+
 ];

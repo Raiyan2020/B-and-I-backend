@@ -10,7 +10,8 @@ class CategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->getTranslation('name', app()->getLocale()),
+            'name' => $this->name,
+            'opportunities_count' => $this->opportunities_count ?? 0,
         ];
     }
 }

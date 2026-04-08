@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('register/investor', [RegisterInvestorController::class, '__invoke']);
         Route::post('register/advertiser', [RegisterAdvertiserController::class, '__invoke']);
@@ -31,11 +31,6 @@ Route::prefix('v1')->group(function () {
         Route::get('profile', [ProfileController::class, '__invoke'])->middleware('auth:sanctum');
     });
     Route::prefix('general')->group(function () {
-        Route::get('categories', [CategoryController::class, 'index']);
-        Route::get('investor-types', [ReferenceDataController::class, 'investorTypes']);
-        Route::get('investor-experience', [ReferenceDataController::class, 'investorExperience']);
-        Route::get('preferred-sectors', [ReferenceDataController::class, 'preferredSectors']);
-        Route::get('who-we-are', [HomeController::class, 'whoWeAre']);
-        Route::get('home-page', [HomeController::class, 'homePage']);
+        include_once __DIR__.'/guard/general.php';
     });
 });

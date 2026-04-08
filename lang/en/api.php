@@ -49,6 +49,11 @@ return [
     '' => '' ,
     '' => '' ,
     '' => '' ,
-    '' => '' ,
+
+    // Language Change
+    'language_changed' => 'Language changed to :language',
+    'language_arabic' => 'Arabic',
+    'language_english' => 'English',
+    'invalid_language' => 'Language must be either "ar" (Arabic) or "en" (English)',
 
 ];

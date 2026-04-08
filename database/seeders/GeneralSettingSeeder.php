@@ -20,6 +20,10 @@ class GeneralSettingSeeder extends Seeder
         $general_settings = array(
             array('key' => 'website_name_ar', 'value' => 'الأعمال والاستثمارات', 'created_at' => now()),
             array('key' => 'website_name_en', 'value' => 'Business and Investments', 'created_at' => now()),
+            array('key' => 'terms_ar', 'value' => '<p>الشروط والاحكام</p>', 'created_at' => now()),
+            array('key' => 'terms_en', 'value' => '<p>Terms and Conditions</p>', 'created_at' => now()),
+            array('key' => 'privacy_policy_ar', 'value' => '<p> <strong>سياسة</strong> الخصوصية</p>', 'created_at' => now()),
+            array('key' => 'privacy_policy_en', 'value' => '<p>Privacy Policy</p>', 'created_at' => now()),
             array('key' => 'about_us_title_ar', 'value' => 'من نحن', 'created_at' => now()),
             array('key' => 'about_us_title_en', 'value' => 'Who We Are', 'created_at' => now()),
             array('key' => 'about_us_description_ar', 'value' => 'الأعمال والاستثمارات منصة كويتية تربط المستثمرين بأصحاب الفرص بشكل آمن وموثوق، مع أعلى مستوى من الخصوصية وإخفاء الهوية.', 'created_at' => now()),

@@ -139,7 +139,7 @@
                                 @enderror
                             </div>
                         </div>
-                        
+
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="type['website_header_title_ar']">{{ __('dashboard.website header title') . ' ' . __('dashboard.in arabic') }}</label>
