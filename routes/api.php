@@ -31,6 +31,6 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
         Route::get('profile', [ProfileController::class, '__invoke'])->middleware('auth:sanctum');
     });
     Route::prefix('general')->group(function () {
-        include_once __DIR__.'/guard/general.php';
+        include __DIR__.'/guard/general.php';
     });
 });
