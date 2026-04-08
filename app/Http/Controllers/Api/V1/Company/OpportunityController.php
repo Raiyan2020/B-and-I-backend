@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Company;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Opportunities\ListCompanyOpportunitiesRequest;
 use App\Http\Requests\Api\V1\Opportunities\StoreOpportunityRequest;
 use App\Http\Requests\Api\V1\Opportunities\UpdateOpportunityRequest;
+use App\Http\Resources\OpportunityListResource;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
 use App\Services\Opportunity\OpportunityService;
@@ -18,11 +20,19 @@ class OpportunityController extends Controller
 
     public function __construct(private readonly OpportunityService $service) {}
 
-    public function index(): JsonResponse
+    public function index(ListCompanyOpportunitiesRequest $request): JsonResponse
     {
-        return $this->jsonResponse(data: OpportunityResource::collection(
-            $this->service->listForCompany(request()->user())
-        ));
+        $paginator = $this->service->listForCompany($request->user(), $request->validated());
+
+        return $this->jsonResponse(data: [
+            'opportunities' => OpportunityListResource::collection($paginator->items())->resolve(),
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+        ]);
     }
 
     public function store(StoreOpportunityRequest $request): JsonResponse

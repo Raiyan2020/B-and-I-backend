@@ -441,4 +441,5 @@ return [
     'investment_reason' => 'Investment reason',
     'full_description' => 'Full description',
     'review_note' => 'Review note',
+    'completed_deals_commission' => 'Completed deals commission',
 ];

@@ -83,6 +83,17 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label for="type['completed_deals_commission']">{{ __('dashboard.completed_deals_commission') }}</label>
+                                <input type="number" step="0.01" min="0" class="form-control" name="type[completed_deals_commission]"
+                                    value="{{ old('type.completed_deals_commission', GeneralSetting::getValueForKey('completed_deals_commission')) }}"
+                                    placeholder="{{ __('dashboard.completed_deals_commission') }}">
+                                @error('type.completed_deals_commission')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="type['contact_number']">{{ __('home.copy_right') }}</label>

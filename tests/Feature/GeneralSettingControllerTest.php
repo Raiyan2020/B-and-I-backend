@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Admin;
-use App\Models\GeneralSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -22,33 +21,22 @@ class GeneralSettingControllerTest extends TestCase
         Storage::fake('public');
     }
 
-    /**
-     * Seed permissions and roles for testing.
-     */
     protected function seedPermissions(): void
     {
         $superAdminRole = Role::firstOrCreate(
             ['name' => 'super_admin', 'guard_name' => 'admin']
         );
 
-        // Create permissions
-        $permissions = [
-            'show-settings', 'edit-settings'
-        ];
-
-        foreach ($permissions as $permission) {
+        foreach (['show-settings', 'edit-settings'] as $permission) {
             Permission::firstOrCreate([
                 'name' => $permission,
-                'guard_name' => 'admin'
+                'guard_name' => 'admin',
             ]);
         }
 
         $superAdminRole->syncPermissions(Permission::where('guard_name', 'admin')->get());
     }
 
-    /**
-     * Create a super admin user for testing.
-     */
     protected function createSuperAdmin(array $attributes = []): Admin
     {
         $defaults = [
@@ -68,23 +56,17 @@ class GeneralSettingControllerTest extends TestCase
         return $admin;
     }
 
-    /**
-     * Test authenticated admin can view general settings.
-     */
     public function test_authenticated_admin_can_view_general_settings(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $response = $this->get('/en/admin/general_settings/manage');
+        $response = $this->get(route('admin.generalSetting.index'));
 
         $response->assertStatus(200);
         $response->assertViewIs('dashboard.settings.general_settings');
     }
 
-    /**
-     * Test authenticated admin can update general settings.
-     */
     public function test_authenticated_admin_can_update_general_settings(): void
     {
         $admin = $this->createSuperAdmin();
@@ -93,11 +75,12 @@ class GeneralSettingControllerTest extends TestCase
         $logo = UploadedFile::fake()->image('logo.jpg');
         $favicon = UploadedFile::fake()->image('favicon.jpg');
 
-        $response = $this->post('/en/admin/general_settings/store', [
+        $response = $this->post(route('admin.generalSetting.store'), [
             'generalSettings' => true,
             'type' => [
                 'website_name_ar' => 'اسم الموقع',
                 'website_name_en' => 'Website Name',
+                'completed_deals_commission' => '7.5',
                 'commercial_register' => '123456789',
                 'tax_number' => '987654321',
                 'contact_number' => '1234567890',
@@ -119,11 +102,13 @@ class GeneralSettingControllerTest extends TestCase
             'key' => 'website_name_en',
             'value' => 'Website Name',
         ]);
+
+        $this->assertDatabaseHas('general_settings', [
+            'key' => 'completed_deals_commission',
+            'value' => '7.5',
+        ]);
     }
 
-    /**
-     * Project brief fields are persisted when provided with general settings.
-     */
     public function test_general_settings_persists_project_briefs(): void
     {
         $admin = $this->createSuperAdmin();
@@ -132,13 +117,14 @@ class GeneralSettingControllerTest extends TestCase
         $logo = UploadedFile::fake()->image('logo.jpg');
         $favicon = UploadedFile::fake()->image('favicon.jpg');
 
-        $response = $this->post('/en/admin/general_settings/store', [
+        $response = $this->post(route('admin.generalSetting.store'), [
             'generalSettings' => true,
             'type' => [
                 'website_name_ar' => 'اسم الموقع',
                 'website_name_en' => 'Website Name',
                 'project_brief_ar' => 'نبذة بالعربية',
                 'project_brief_en' => 'Brief in English',
+                'completed_deals_commission' => '5',
                 'commercial_register' => '123456789',
                 'tax_number' => '987654321',
                 'contact_number' => '1234567890',
@@ -159,15 +145,12 @@ class GeneralSettingControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * Test general settings update requires valid data.
-     */
     public function test_general_settings_update_requires_valid_data(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $response = $this->post('/en/admin/general_settings/store', [
+        $response = $this->post(route('admin.generalSetting.store'), [
             'generalSettings' => true,
             'type' => [],
         ]);
@@ -175,15 +158,12 @@ class GeneralSettingControllerTest extends TestCase
         $response->assertSessionHasErrors();
     }
 
-    /**
-     * Test authenticated admin can update social media settings.
-     */
     public function test_authenticated_admin_can_update_social_media_settings(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $response = $this->post('/en/admin/general_settings/store', [
+        $response = $this->post(route('admin.generalSetting.store'), [
             'socials' => true,
             'type' => [
                 'facebook' => 'https://facebook.com/test',
@@ -201,15 +181,12 @@ class GeneralSettingControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * Test social media settings require valid URLs.
-     */
     public function test_social_media_settings_require_valid_urls(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $response = $this->post('/en/admin/general_settings/store', [
+        $response = $this->post(route('admin.generalSetting.store'), [
             'socials' => true,
             'type' => [
                 'facebook' => 'invalid-url',
@@ -219,9 +196,6 @@ class GeneralSettingControllerTest extends TestCase
         $response->assertSessionHasErrors();
     }
 
-    /**
-     * Test authenticated admin can update background images.
-     */
     public function test_authenticated_admin_can_update_background_images(): void
     {
         $admin = $this->createSuperAdmin();
@@ -230,7 +204,7 @@ class GeneralSettingControllerTest extends TestCase
         $loginImage = UploadedFile::fake()->image('login.jpg');
         $headerImage = UploadedFile::fake()->image('header.jpg');
 
-        $response = $this->post('/en/admin/general_settings/store', [
+        $response = $this->post(route('admin.generalSetting.store'), [
             'background' => true,
             'login_page_image3' => $loginImage,
             'pages_header_image5' => $headerImage,
@@ -248,15 +222,12 @@ class GeneralSettingControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * Test authenticated admin can update terms and conditions.
-     */
     public function test_authenticated_admin_can_update_terms_and_conditions(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $response = $this->patch('/en/admin/general_settings/terms', [
+        $response = $this->patch(route('admin.generalSetting.terms.update'), [
             'terms_ar' => 'الشروط والأحكام بالعربية',
             'terms_en' => 'Terms and Conditions in English',
         ]);
@@ -275,15 +246,12 @@ class GeneralSettingControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * Test authenticated admin can update privacy policy.
-     */
     public function test_authenticated_admin_can_update_privacy_policy(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $response = $this->patch('/en/admin/general_settings/privacy', [
+        $response = $this->patch(route('admin.generalSetting.privacy.update'), [
             'privacy_policy_ar' => 'سياسة الخصوصية بالعربية',
             'privacy_policy_en' => 'Privacy Policy in English',
         ]);
@@ -302,42 +270,29 @@ class GeneralSettingControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * Test terms update validation.
-     */
     public function test_terms_update_validation(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $response = $this->patch('/en/admin/general_settings/terms', []);
+        $response = $this->patch(route('admin.generalSetting.terms.update'), []);
 
-        // Validation depends on TermsSettingsRequest
-        // This test ensures the endpoint is accessible
-        $response->assertStatus(302); // Redirect with validation errors or success
+        $response->assertStatus(302);
     }
 
-    /**
-     * Test privacy update validation.
-     */
     public function test_privacy_update_validation(): void
     {
         $admin = $this->createSuperAdmin();
         $this->actingAs($admin, 'admin');
 
-        $response = $this->patch('/en/admin/general_settings/privacy', []);
+        $response = $this->patch(route('admin.generalSetting.privacy.update'), []);
 
-        // Validation depends on PrivacySettingsRequest
-        // This test ensures the endpoint is accessible
-        $response->assertStatus(302); // Redirect with validation errors or success
+        $response->assertStatus(302);
     }
 
-    /**
-     * Test unauthenticated admin cannot access settings.
-     */
     public function test_unauthenticated_admin_cannot_access_settings(): void
     {
-        $response = $this->get('/en/admin/general_settings/manage');
+        $response = $this->get(route('admin.generalSetting.index'));
 
         $response->assertRedirect(route('admin.login'));
     }

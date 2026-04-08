@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Models\Category;
+use App\Models\GeneralSetting;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,7 +47,8 @@ class OpportunityApiTest extends TestCase
         ]);
 
         $response->assertCreated()
-            ->assertJsonPath('data.status', OpportunityStatus::PendingReview->value)
+            ->assertJsonPath('data.opportunity_number', 'PROJ-'.now()->format('Y').'-001')
+            ->assertJsonPath('data.status.key', OpportunityStatus::PendingReview->value)
             ->assertJsonPath('data.sale_percentage', 20);
 
         $this->assertDatabaseHas('opportunities', [
@@ -77,6 +79,47 @@ class OpportunityApiTest extends TestCase
         $response->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.company_name', 'Approved Company');
+    }
+
+    public function test_company_can_list_own_opportunities_with_pagination(): void
+    {
+        $company = User::factory()->create([
+            'role' => UserRole::Advertiser,
+        ]);
+
+        Opportunity::factory()->count(3)->create([
+            'user_id' => $company->id,
+            'status' => OpportunityStatus::PendingReview,
+        ]);
+
+        Sanctum::actingAs($company);
+
+        $response = $this->getJson('/api/v1/company/opportunities?per_page=2');
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'data.opportunities')
+            ->assertJsonPath('data.pagination.current_page', 1)
+            ->assertJsonPath('data.pagination.per_page', 2)
+            ->assertJsonPath('data.pagination.total', 3)
+            ->assertJsonStructure([
+                'data' => [
+                    'opportunities' => [
+                        [
+                            'id',
+                            'company_name',
+                            'goal',
+                            'status' => ['key', 'label', 'color', 'is_current'],
+                            'category',
+                            'opportunity_number',
+                            'investment_required',
+                            'sale_percentage',
+                            'created_at',
+                            'created_at_formatted',
+                        ],
+                    ],
+                    'pagination' => ['current_page', 'last_page', 'per_page', 'total'],
+                ],
+            ]);
     }
 
     public function test_sell_business_opportunity_does_not_require_sale_percentage(): void
@@ -110,6 +153,7 @@ class OpportunityApiTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('data.goal', 'sell_business')
+            ->assertJsonPath('data.status.key', OpportunityStatus::PendingReview->value)
             ->assertJsonPath('data.sale_percentage', null);
 
         $this->assertDatabaseHas('opportunities', [
@@ -154,8 +198,36 @@ class OpportunityApiTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('data.status', OpportunityStatus::PendingReview->value)
+            ->assertJsonPath('data.status.key', OpportunityStatus::PendingReview->value)
             ->assertJsonPath('data.review_note', null)
             ->assertJsonPath('data.sale_percentage', null);
+    }
+
+    public function test_company_opportunity_details_return_full_status_objects(): void
+    {
+        GeneralSetting::create([
+            'key' => 'completed_deals_commission',
+            'value' => '8.5',
+        ]);
+
+        $company = User::factory()->create([
+            'role' => UserRole::Advertiser,
+        ]);
+
+        $opportunity = Opportunity::factory()->create([
+            'user_id' => $company->id,
+            'status' => OpportunityStatus::NeedsModification,
+        ]);
+
+        Sanctum::actingAs($company);
+
+        $response = $this->getJson("/api/v1/company/opportunities/{$opportunity->id}");
+
+        $response->assertOk()
+            ->assertJsonPath('data.opportunity_number', $opportunity->fresh()->opportunity_number)
+            ->assertJsonPath('data.completed_deals_commission', 8.5)
+            ->assertJsonPath('data.status.key', OpportunityStatus::NeedsModification->value)
+            ->assertJsonPath('data.status.is_current', true)
+            ->assertJsonCount(3, 'data.statuses');
     }
 }

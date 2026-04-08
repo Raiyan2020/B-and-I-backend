@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Media;
 use App\Models\GeneralSetting;
+use App\Models\Opportunity;
+use App\Observers\OpportunityObserver;
 use App\Services\Auth\AuthService;
 use App\Services\Auth\AuthServiceInterface;
 use App\Services\Core\BaseService;
@@ -47,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Schema::defaultStringLength(191);
+        Opportunity::observe(OpportunityObserver::class);
 
         $siteName = ['ar' => null, 'en' => null];
         try {

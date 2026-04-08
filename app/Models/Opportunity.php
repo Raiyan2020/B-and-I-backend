@@ -14,6 +14,7 @@ class Opportunity extends BaseModel
     use HasFactory, FilterTrait, SoftDeletes;
 
     protected $fillable = [
+        'opportunity_number',
         'user_id',
         'category_id',
         'reviewed_by_admin_id',

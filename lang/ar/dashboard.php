@@ -441,4 +441,5 @@ return [
     'investment_reason' => 'سبب الاستثمار',
     'full_description' => 'الوصف الكامل',
     'review_note' => 'ملاحظة المراجعة',
+    'completed_deals_commission' => 'Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„ØµÙÙ‚Ø§Øª Ø§Ù„Ù…ÙƒØªÙ…Ù„Ø©',
 ];

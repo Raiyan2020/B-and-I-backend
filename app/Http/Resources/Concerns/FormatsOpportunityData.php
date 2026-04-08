@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Http\Resources\Concerns;
+
+use App\Enums\OpportunityStatus;
+use Illuminate\Support\Collection;
+
+trait FormatsOpportunityData
+{
+    protected function categoryPayload(): ?array
+    {
+        if (! $this->category) {
+            return null;
+        }
+
+        return [
+            'id' => $this->category->id,
+            'name' => $this->category->name,
+        ];
+    }
+
+    protected function statusPayload(OpportunityStatus|string|null $status = null): ?array
+    {
+        $statusValue = $status instanceof OpportunityStatus ? $status->value : $status;
+        $statusValue ??= $this->status?->value ?? $this->status;
+
+        if (! $statusValue) {
+            return null;
+        }
+
+        return [
+            'key' => $statusValue,
+            'label' => __("dashboard.opportunity_status_{$statusValue}"),
+            'color' => match ($statusValue) {
+                OpportunityStatus::PendingReview->value => 'warning',
+                OpportunityStatus::Approved->value => 'success',
+                OpportunityStatus::NeedsModification->value => 'danger',
+                default => 'secondary',
+            },
+            'is_current' => ($this->status?->value ?? $this->status) === $statusValue,
+        ];
+    }
+
+    protected function allStatusesPayload(): array
+    {
+        return Collection::make(OpportunityStatus::cases())
+            ->map(fn (OpportunityStatus $status) => $this->statusPayload($status))
+            ->values()
+            ->all();
+    }
+}

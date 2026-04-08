@@ -9,6 +9,7 @@ use App\Models\Admin;
 use App\Models\Opportunity;
 use App\Models\User;
 use App\Support\QueryOptions;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class OpportunityService
@@ -44,12 +45,17 @@ class OpportunityService
         return $opportunity->refresh(['category', 'reviewer', 'user']);
     }
 
-    public function listForCompany(User $user): Collection
+    public function listForCompany(User $user, array $filters = []): LengthAwarePaginator
     {
+        $perPage = (int) ($filters['per_page'] ?? 15);
+
         return $user->opportunities()
             ->with(['category', 'reviewer'])
+            ->when(! empty($filters['status']), fn ($query) => $query->where('status', $filters['status']))
+            ->when(! empty($filters['goal']), fn ($query) => $query->where('goal', $filters['goal']))
             ->latest()
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function showForCompany(User $user, Opportunity $opportunity): Opportunity
