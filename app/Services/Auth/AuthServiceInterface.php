@@ -10,21 +10,19 @@ use App\Models\User;
 interface AuthServiceInterface
 {
     /**
-     * @return array{user: User, token: string}
+     * @return User
      */
-    public function registerInvestor(RegisterInvestorDTO $dto): array;
+    public function registerInvestor(RegisterInvestorDTO $dto): User;
 
     /**
-     * @return array{user: User, token: string}
+     * @return User
      */
-    public function registerAdvertiser(RegisterAdvertiserDTO $dto): array;
+    public function registerAdvertiser(RegisterAdvertiserDTO $dto): User;
 
     /**
-     * @return array{user: User, token: string}
+     * @return array{status: string, user?: User, token?: string}
      */
     public function login(LoginDTO $dto): array;
 
     public function logout(User $user): void;
-
-    public function resendVerification(User $user): void;
 }

@@ -8,20 +8,17 @@ return [
     |--------------------------------------------------------------------------
     |
     | The following language lines are used during authentication for various
-    | messages that we need to display to the user. You are free to modify
-    | these language lines according to your application's requirements.
+    | messages that we need to display to the user.
     |
     */
 
-    'unauthenticated' => 'غير مصرّح بالدخول.',
-    'failed' => 'These credentials do not match our records.',
-    'password' => 'The provided password is incorrect.',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'unauthenticated' => 'غير مصرح بالدخول.',
+    'failed' => 'بيانات الدخول هذه غير مطابقة لسجلاتنا.',
+    'password' => 'كلمة المرور غير صحيحة.',
+    'throttle' => 'عدد كبير جدًا من محاولات الدخول. يرجى المحاولة بعد :seconds ثانية.',
     'login' => 'تسجيل الدخول',
-    'welcome' => 'مرحبا بك من فضلك سجل دخول',
+    'welcome' => 'مرحبًا بك، يرجى تسجيل الدخول إلى حسابك',
     'email' => 'البريد الإلكتروني',
-    'password' => 'الرقم السري',
-    'register_success' => 'لقد أرسلنا رابط التحقق إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد لتفعيل حسابك.',
-
+    'register_success' => 'تم إنشاء حسابك بنجاح. لقد أرسلنا رابط التفعيل إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد لتفعيل حسابك.',
 
 ];

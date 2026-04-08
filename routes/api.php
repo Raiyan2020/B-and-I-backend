@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\RegisterAdvertiserController;
 use App\Http\Controllers\Api\V1\Auth\RegisterInvestorController;
+use App\Http\Controllers\Api\V1\Auth\ResendVerificationController;
+use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\General\CategoryController;
 use App\Http\Controllers\Api\V1\General\ReferenceDataController;
 use App\Http\Controllers\Api\V1\General\HomeController;
@@ -27,6 +29,8 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
         Route::post('register/investor', [RegisterInvestorController::class, '__invoke']);
         Route::post('register/advertiser', [RegisterAdvertiserController::class, '__invoke']);
         Route::post('login', [LoginController::class, '__invoke']);
+        Route::post('email/resend', [ResendVerificationController::class, '__invoke'])->middleware('throttle:6,1');
+        Route::get('email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])->name('api.v1.auth.verification.verify');
         Route::post('logout', [LogoutController::class, '__invoke'])->middleware('auth:sanctum');
         Route::get('profile', [ProfileController::class, '__invoke'])->middleware('auth:sanctum');
     });

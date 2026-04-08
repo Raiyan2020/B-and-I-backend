@@ -19,14 +19,14 @@ class RegisterAdvertiserController extends Controller
 
     public function __invoke(RegisterAdvertiserRequest $request): JsonResponse
     {
-        try{
+        try {
             return DB::transaction(function () use ($request) {
                 $validated = $request->validated();
                 $file = $request->file('company_license');
                 $dto = RegisterAdvertiserDTO::fromRequest($validated, $file);
-                $result = $this->service->registerAdvertiser($dto);
+                $user = $this->service->registerAdvertiser($dto);
                 return $this->jsonResponse(
-                    data: UserResource::make($result['user'])->setToken($result['token']), 
+                    data: UserResource::make($user),
                     code: Response::HTTP_CREATED,
                     msg: __('auth.register_success')
                 );

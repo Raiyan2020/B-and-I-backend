@@ -2,24 +2,22 @@
 
 namespace App\DTO\Auth;
 
-use App\Enums\UserRole;
-
 final class LoginDTO
 {
     public function __construct(
-        public string $email,
-        public string $phone,
-        public UserRole $role,
-        public string $country_code
+        public ?string $email,
+        public ?string $phone,
+        public ?string $country_code,
+        public string $password,
     ) {}
 
     public static function fromRequest(array $v): self
     {
         return new self(
-            email: $v['email'],
-            phone: $v['phone'],
-            role: UserRole::from($v['role']),
-            country_code: $v['country_code']
+            email: $v['email'] ?? null,
+            phone: $v['phone'] ?? null,
+            country_code: $v['country_code'] ?? null,
+            password: $v['password'],
         );
     }
 }

@@ -20,6 +20,22 @@ class LoginController extends Controller
         $dto = LoginDTO::fromRequest($request->validated());
         $result = $this->service->login($dto);
 
+        if ($result['status'] === 'invalid_credentials') {
+            return $this->jsonResponse(
+                msg: __('apis.invalid_credentials'),
+                code: 422,
+                error: true,
+            );
+        }
+
+        if ($result['status'] === 'email_unverified') {
+            return $this->jsonResponse(
+                msg: __('apis.email_verification_required'),
+                code: 403,
+                error: true,
+            );
+        }
+
         return $this->jsonResponse(data: UserResource::make($result['user'])->setToken($result['token']));
     }
 }

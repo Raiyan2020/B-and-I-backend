@@ -108,6 +108,11 @@ return [
         ],
     ],
 
+    'verification' => [
+        'expire' => env('AUTH_VERIFICATION_EXPIRE', 60),
+        'resend_throttle' => env('AUTH_VERIFICATION_RESEND_THROTTLE', 60),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Password Confirmation Timeout

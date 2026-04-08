@@ -5,9 +5,12 @@ namespace Database\Factories;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class UserFactory extends Factory
 {
+    protected static ?string $password = null;
+
     /**
      * Define the model's default state.
      *
@@ -21,10 +24,10 @@ class UserFactory extends Factory
             'last_name' => $this->faker->lastName(),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'phone' => $this->faker->numerify('########'),
-            'country_code' => '+966',
+            'country_code' => '966',
             'lang' => 'ar',
             'is_blocked' => false,
             'is_active' => true,

@@ -23,9 +23,9 @@ class RegisterInvestorController extends Controller
             return DB::transaction(function () use ($request) {
                 $validated = $request->validated();
                 $dto = RegisterInvestorDTO::fromRequest($validated);
-                $result = $this->service->registerInvestor($dto);
+                $user = $this->service->registerInvestor($dto);
                 return $this->jsonResponse(
-                    data: UserResource::make($result['user'])->setToken($result['token']), 
+                    data: UserResource::make($user),
                     code: Response::HTTP_CREATED,
                     msg: __('auth.register_success')
                 );

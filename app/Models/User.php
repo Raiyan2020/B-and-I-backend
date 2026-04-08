@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,9 +18,9 @@ use App\Traits\FilterTrait;
 use App\Traits\UploadTrait;
 use Illuminate\Http\UploadedFile;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmailContract
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, FilterTrait, UploadTrait;
+    use HasApiTokens, HasFactory, MustVerifyEmail, Notifiable, SoftDeletes, FilterTrait, UploadTrait;
 
     const FOLDER = 'users';
 
@@ -201,6 +205,16 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(WalletTransaction::class, Wallet::class, 'walletable_id', 'wallet_id')
             ->where('wallets.walletable_type', static::class);
+    }
+
+    public function preferredLocale(): string
+    {
+        return in_array($this->lang, ['ar', 'en'], true) ? $this->lang : app()->getLocale();
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmailNotification());
     }
 
     /**

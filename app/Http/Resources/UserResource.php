@@ -12,6 +12,8 @@ class UserResource extends JsonResource
     public function setToken($token)
     {
         $this->token = $token;
+
+        return $this;
     }
     public function toArray($request): array
     {

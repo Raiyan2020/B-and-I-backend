@@ -21,6 +21,6 @@ return [
     'welcome' => 'Welcome back, please login to your account',
     'email' => 'E-Mail',
     'password' => 'Password',
-    'register_success' => 'We have sent a verification link to your email. Please check your inbox to activate your account.',
+    'register_success' => 'Your account has been created successfully. We have sent a verification link to your email. Please check your inbox to activate your account.',
 
 ];
