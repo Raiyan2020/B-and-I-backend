@@ -15,7 +15,10 @@ use App\Traits\ResponseTrait;
 class RegisterInvestorController extends Controller
 {
     use ResponseTrait;
-    public function __construct(private AuthServiceInterface $service) {}
+
+    public function __construct(private AuthServiceInterface $service)
+    {
+    }
 
     public function __invoke(RegisterInvestorRequest $request): JsonResponse
     {
@@ -25,9 +28,10 @@ class RegisterInvestorController extends Controller
                 $dto = RegisterInvestorDTO::fromRequest($validated);
                 $user = $this->service->registerInvestor($dto);
                 return $this->jsonResponse(
-                    data: UserResource::make($user),
+                    msg: __('auth.register_success'),
                     code: Response::HTTP_CREATED,
-                    msg: __('auth.register_success')
+                    data: UserResource::make($user),
+                    key: 'need_active'
                 );
             });
         } catch (\Exception $e) {

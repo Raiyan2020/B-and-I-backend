@@ -167,7 +167,6 @@ return Application::configure(basePath: dirname(__DIR__))
                     errors: ['line' => $exception->getLine(), 'file' => $exception->getFile()],
                 );
             }
-
             return null;
         });
 

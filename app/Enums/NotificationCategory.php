@@ -2,19 +2,14 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumRetriever;
+
 enum NotificationCategory: string
 {
-    case Orders = 'orders';
+    use EnumRetriever;
     case Interest = 'interest';
+    case Orders = 'orders';
     case System = 'system';
-
-    /**
-     * @return list<string>
-     */
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 
     public static function normalize(string|self|null $value): self
     {

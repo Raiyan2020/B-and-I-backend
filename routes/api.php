@@ -32,24 +32,33 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('register/investor', [RegisterInvestorController::class, '__invoke']);
         Route::post('register/advertiser', [RegisterAdvertiserController::class, '__invoke']);
+
         Route::post('login', [LoginController::class, '__invoke']);
+
         Route::post('email/resend', [ResendVerificationController::class, '__invoke'])->middleware('throttle:6,1');
         Route::get('email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])->name('api.v1.auth.verification.verify');
-        Route::post('logout', [LogoutController::class, '__invoke'])->middleware('auth:sanctum');
-        Route::get('profile', [ProfileController::class, '__invoke'])->middleware('auth:sanctum');
-        Route::patch('profile', [UpdateProfileController::class, '__invoke'])->middleware('auth:sanctum');
-        Route::patch('password', [ChangePasswordController::class, '__invoke'])->middleware('auth:sanctum');
-        Route::get('notification-settings', [NotificationSettingsController::class, 'show'])->middleware('auth:sanctum');
-        Route::patch('notification-settings', [NotificationSettingsController::class, 'update'])->middleware('auth:sanctum');
     });
     Route::prefix('general')->group(function () {
-        include __DIR__.'/guard/general.php';
+        include __DIR__ . '/guard/general.php';
     });
 
-    Route::middleware('auth:sanctum')->prefix('company')->group(function () {
-        Route::get('opportunities', [CompanyOpportunityController::class, 'index']);
-        Route::post('opportunities', [CompanyOpportunityController::class, 'store']);
-        Route::get('opportunities/{opportunity}', [CompanyOpportunityController::class, 'show']);
-        Route::put('opportunities/{opportunity}', [CompanyOpportunityController::class, 'update']);
+    Route::middleware('auth:sanctum')->group(function () {
+
+        Route::prefix('auth')->group(function () {
+            Route::post('logout', [LogoutController::class, '__invoke']);
+
+            Route::get('profile', [ProfileController::class, '__invoke']);
+            Route::patch('profile', [UpdateProfileController::class, '__invoke']);
+            Route::patch('password', [ChangePasswordController::class, '__invoke']);
+            Route::get('notification-settings', [NotificationSettingsController::class, 'show']);
+            Route::patch('notification-settings', [NotificationSettingsController::class, 'update']);
+        });
+
+        Route::group(['prefix' => 'company/opportunities', 'controller' => CompanyOpportunityController::class], function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/{opportunity}', 'show');
+            Route::put('/{opportunity}', 'update');
+        });
     });
 });

@@ -45,9 +45,9 @@ class HomeController extends Controller
         // Validate language - only ar or en allowed
         if (!in_array($lang, ['ar', 'en'])) {
             return $this->jsonResponse(
-                key: 'fail',
                 msg: __('api.invalid_language'),
-                code: 400
+                code: 400,
+                key: 'fail'
             );
         }
 

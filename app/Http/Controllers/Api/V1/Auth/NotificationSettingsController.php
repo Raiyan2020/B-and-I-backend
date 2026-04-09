@@ -14,7 +14,9 @@ class NotificationSettingsController extends Controller
 {
     use ResponseTrait;
 
-    public function __construct(private readonly NotificationPreferenceService $service) {}
+    public function __construct(private readonly NotificationPreferenceService $service)
+    {
+    }
 
     public function show(Request $request): JsonResponse
     {
@@ -28,8 +30,8 @@ class NotificationSettingsController extends Controller
         $user = $this->service->update($request->user(), $request->validated());
 
         return $this->jsonResponse(
-            data: NotificationSettingsResource::make($user),
             msg: __('apis.notification_settings_updated'),
+            data: NotificationSettingsResource::make($user),
         );
     }
 }

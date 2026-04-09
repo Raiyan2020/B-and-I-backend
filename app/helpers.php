@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 
 if (! function_exists('responseJson')) {
     /**
-     * Unified JSON API response (message, error flag, optional errors array and key).
+     * Unified JSON API response aligned with the application's standard schema.
      *
      * @param  array<string, mixed>|null  $errors
      */
@@ -16,18 +16,17 @@ if (! function_exists('responseJson')) {
         bool $error = false,
         ?array $errors = null,
         ?string $key = null,
-    ): JsonResponse {
-        $data = [
-            'message' => $msg,
-            'error' => $error,
-        ];
-        if ($errors !== null) {
-            $data['errors'] = $errors;
-        }
-        if ($key !== null) {
-            $data['key'] = $key;
-        }
-
-        return response()->json($data, $code);
+    ): JsonResponse
+    {
+        return response()->json([
+            'key' => $key ?? ($error ? 'fail' : 'success'),
+            'msg' => $msg,
+            'code' => $code,
+            'response_status' => [
+                'error' => $error,
+                'validation_errors' => $errors ?? [],
+            ],
+            'data' => null,
+        ], $code);
     }
 }

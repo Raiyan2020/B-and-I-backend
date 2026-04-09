@@ -13,11 +13,11 @@ class NotificationPreferenceService
     public function settingsFor(User $user): array
     {
         return array_map(
-            fn (NotificationCategory $category) => [
-                'key' => $category->value,
-                'label' => __('enums.notification_category.'.$category->value),
+            fn (NotificationCategory $category) => array_merge(
+                NotificationCategory::getFullObj($category->value,'notification_category'),
+                [
                 'enabled' => $this->isPushEnabled($user, $category),
-            ],
+            ]),
             NotificationCategory::cases(),
         );
     }

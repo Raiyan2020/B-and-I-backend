@@ -15,7 +15,10 @@ use Symfony\Component\HttpFoundation\Response;
 class RegisterAdvertiserController extends Controller
 {
     use ResponseTrait;
-    public function __construct(private AuthServiceInterface $service) {}
+
+    public function __construct(private AuthServiceInterface $service)
+    {
+    }
 
     public function __invoke(RegisterAdvertiserRequest $request): JsonResponse
     {
@@ -26,9 +29,10 @@ class RegisterAdvertiserController extends Controller
                 $dto = RegisterAdvertiserDTO::fromRequest($validated, $file);
                 $user = $this->service->registerAdvertiser($dto);
                 return $this->jsonResponse(
-                    data: UserResource::make($user),
+                    msg: __('auth.register_success'),
                     code: Response::HTTP_CREATED,
-                    msg: __('auth.register_success')
+                    data: UserResource::make($user),
+                    key: 'need_active'
                 );
             });
         } catch (\Exception $e) {
