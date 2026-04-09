@@ -2,11 +2,14 @@
 
 
 use App\Http\Controllers\Api\V1\Auth\LoginController;
+use App\Http\Controllers\Api\V1\Auth\ChangePasswordController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
+use App\Http\Controllers\Api\V1\Auth\NotificationSettingsController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\RegisterAdvertiserController;
 use App\Http\Controllers\Api\V1\Auth\RegisterInvestorController;
 use App\Http\Controllers\Api\V1\Auth\ResendVerificationController;
+use App\Http\Controllers\Api\V1\Auth\UpdateProfileController;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\Company\OpportunityController as CompanyOpportunityController;
 use App\Http\Controllers\Api\V1\General\CategoryController;
@@ -34,6 +37,10 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
         Route::get('email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])->name('api.v1.auth.verification.verify');
         Route::post('logout', [LogoutController::class, '__invoke'])->middleware('auth:sanctum');
         Route::get('profile', [ProfileController::class, '__invoke'])->middleware('auth:sanctum');
+        Route::patch('profile', [UpdateProfileController::class, '__invoke'])->middleware('auth:sanctum');
+        Route::patch('password', [ChangePasswordController::class, '__invoke'])->middleware('auth:sanctum');
+        Route::get('notification-settings', [NotificationSettingsController::class, 'show'])->middleware('auth:sanctum');
+        Route::patch('notification-settings', [NotificationSettingsController::class, 'update'])->middleware('auth:sanctum');
     });
     Route::prefix('general')->group(function () {
         include __DIR__.'/guard/general.php';

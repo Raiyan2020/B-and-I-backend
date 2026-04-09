@@ -11,4 +11,9 @@ return [
         'intermediate' => 'Intermediate',
         'expert' => 'Expert',
     ],
+    'notification_category' => [
+        'orders' => 'Order notifications',
+        'interest' => 'Interest notifications',
+        'system' => 'System notifications',
+    ],
 ];

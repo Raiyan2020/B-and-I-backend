@@ -13,11 +13,20 @@ use Illuminate\Http\JsonResponse;
 class CategoryController extends Controller
 {
     use ResponseTrait;
+
     public function index(): JsonResponse
     {
         $options = (new QueryOptions())->latest()->conditions(['status' => true]);
-        $categories = BaseService::setModel(Category::class)->all($options);
+        $categories = BaseService::setModel(Category::class)->limit($options);
 
-        return $this->jsonResponse(data: CategoryResource::collection($categories));
+        return $this->jsonResponse(data: [
+            'categories' => CategoryResource::collection($categories),
+            'pagination' => [
+                'current_page' => $categories->currentPage(),
+                'last_page'    => $categories->lastPage(),
+                'per_page'     => $categories->perPage(),
+                'total'        => $categories->total(),
+            ]
+        ]);
     }
 }

@@ -17,7 +17,7 @@ class InvestorDirectoryController extends Controller
     public function index(ListPublicInvestorsRequest $request): JsonResponse
     {
         $validated = $request->validated();
-        $perPage = (int) ($validated['per_page'] ?? 15);
+        $perPage = (int)($validated['per_page'] ?? 15);
 
         $query = User::query()
             ->where('role', UserRole::Investor)
@@ -26,7 +26,7 @@ class InvestorDirectoryController extends Controller
             ->with(['preferredSector'])
             ->latest('id');
 
-        if (! empty($validated['investor_type'])) {
+        if (!empty($validated['investor_type'])) {
             $query->where('investor_type', $validated['investor_type']);
         }
 
@@ -38,23 +38,23 @@ class InvestorDirectoryController extends Controller
             $query->where('available_capital', '<=', $validated['max_capital']);
         }
 
-        if (! empty($validated['investor_experience'])) {
+        if (!empty($validated['investor_experience'])) {
             $query->where('investor_experience', $validated['investor_experience']);
         }
 
-        if (! empty($validated['preferred_sector_id'])) {
+        if (!empty($validated['preferred_sector_id'])) {
             $query->where('preferred_sector_id', $validated['preferred_sector_id']);
         }
 
         $paginator = $query->paginate($perPage)->withQueryString();
 
         $payload = [
-            'investors' => PublicInvestorResource::collection($paginator->items())->resolve(),
+            'investors'  => PublicInvestorResource::collection($paginator->items())->resolve(),
             'pagination' => [
                 'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
             ],
         ];
 

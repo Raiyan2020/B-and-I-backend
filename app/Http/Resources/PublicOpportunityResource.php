@@ -12,6 +12,7 @@ class PublicOpportunityResource extends JsonResource
         return [
             'id' => $this->id,
             'goal' => $this->goal?->value ?? $this->goal,
+            'image'                => $this->image,
             'company_name' => $this->company_name,
             'category' => $this->category ? [
                 'id' => $this->category->id,

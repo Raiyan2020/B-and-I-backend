@@ -7,27 +7,32 @@ use App\Http\Requests\Dashboard\Users\StoreRequest;
 use App\Http\Requests\Dashboard\Users\UpdateRequest;
 use App\Http\Requests\Dashboard\Users\ChargeWalletRequest;
 use App\Http\Requests\Dashboard\Users\SendNotificationRequest;
+use App\Enums\NotificationCategory;
+use App\Notifications\GeneralNotification;
 use App\Services\Core\BaseService;
+use App\Services\Notifications\GeneralNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class UserController extends AdminBasicController
 {
-    public function __construct()
+    public function __construct(private readonly GeneralNotificationService $generalNotificationService)
     {
+        parent::__construct(
+            model: User::class,
+            storeRequest: StoreRequest::class,
+            updateRequest: UpdateRequest::class,
+            directoryName: 'users',
+            serviceName: new BaseService(User::class),
+            indexScopes: 'search',
+            with: ['wallet', 'walletTransactions', 'orders'],
+        );
+
         $this->middleware('permission:users', ['only' => ['index', 'show']]);
         $this->middleware('permission:add-user', ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-user', ['only' => ['edit', 'update']]);
         $this->middleware('permission:delete-user', ['only' => ['destroy', 'destroyMultiple']]);
         $this->middleware('permission:block-user', ['only' => ['toggleBlock']]);
-
-        $this->model = User::class;
-        $this->serviceName = new BaseService(User::class);
-        $this->storeRequest = StoreRequest::class;
-        $this->updateRequest = UpdateRequest::class;
-        $this->directoryName = 'users';
-        $this->with = ['wallet', 'walletTransactions', 'orders'];
-        $this->indexScopes = 'search';
     }
 
     /**
@@ -123,9 +128,32 @@ class UserController extends AdminBasicController
         try {
             $user = $this->serviceName->find($id);
             $validated = $request->validated();
+            $payload = $validated['payload'] ?? [];
 
-            // TODO: Implement notification sending logic here
-            // You can use Laravel notifications or FCM
+            if (! empty($validated['model_type'])) {
+                $payload['model_type'] = $validated['model_type'];
+            }
+
+            if (! empty($validated['model_id'])) {
+                $payload['model_id'] = $validated['model_id'];
+            }
+
+            $this->generalNotificationService->sendToUser(
+                $user,
+                new GeneralNotification(
+                    title: [
+                        'ar' => $validated['title_ar'],
+                        'en' => $validated['title_en'],
+                    ],
+                    body: [
+                        'ar' => $validated['body_ar'],
+                        'en' => $validated['body_en'],
+                    ],
+                    notificationType: $validated['notification_type'] ?? 'user_notification',
+                    category: $validated['category'] ?? NotificationCategory::System,
+                    payload: $payload,
+                ),
+            );
 
             return response()->json([
                 'key' => 'success',

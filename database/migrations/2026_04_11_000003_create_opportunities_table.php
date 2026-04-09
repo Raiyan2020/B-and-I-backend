@@ -12,6 +12,7 @@ return new class extends Migration
     {
         Schema::create('opportunities', function (Blueprint $table) {
             $table->id();
+            $table->string('image')->nullable();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('category_id')->constrained('categories');
             $table->foreignId('reviewed_by_admin_id')->nullable()->constrained('admins')->nullOnDelete();

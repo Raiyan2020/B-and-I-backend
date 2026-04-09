@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Enums\UserRole;
 use App\Models\Category;
+use App\Models\Device;
 use App\Models\PreferredSector;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
@@ -91,6 +92,8 @@ class AuthEmailVerificationTest extends TestCase
         $response = $this->postJson('/api/v1/auth/login', [
             'email' => 'verified-login@example.com',
             'password' => 'password',
+            'device_token' => 'user-web-token',
+            'device_type' => 'web',
         ]);
 
         $response->assertOk()
@@ -99,6 +102,11 @@ class AuthEmailVerificationTest extends TestCase
             ->assertJsonPath('data.email', 'verified-login@example.com');
 
         self::assertNotNull($response->json('data.token'));
+        $this->assertDatabaseHas('devices', [
+            'user_id' => $user->id,
+            'token' => 'user-web-token',
+            'device_type' => 'web',
+        ]);
     }
 
     public function test_verified_user_can_login_with_phone_country_code_and_password(): void
@@ -219,5 +227,36 @@ class AuthEmailVerificationTest extends TestCase
                 return $notification->toMail($notifiable)->subject === __('mail.verify_email.subject', locale: 'ar');
             }
         );
+    }
+
+    public function test_change_language_updates_current_device_locale_for_authenticated_user(): void
+    {
+        $user = User::factory()->create([
+            'lang' => 'en',
+        ]);
+
+        Device::create([
+            'user_id' => $user->id,
+            'token' => 'current-device-token',
+            'device_type' => 'android',
+            'locale' => 'en',
+        ]);
+
+        $token = $user->createToken('test-device')->plainTextToken;
+
+        $response = $this->withToken($token)->postJson('/api/v1/general/change-lang', [
+            'lang' => 'ar',
+            'device_token' => 'current-device-token',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.lang', 'ar');
+
+        $this->assertDatabaseHas('devices', [
+            'user_id' => $user->id,
+            'token' => 'current-device-token',
+            'locale' => 'ar',
+        ]);
+        $this->assertSame('ar', $user->fresh()->lang);
     }
 }

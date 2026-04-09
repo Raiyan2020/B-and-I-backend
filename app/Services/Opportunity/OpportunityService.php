@@ -36,10 +36,10 @@ class OpportunityService
         $data = $this->normalizeGoalSpecificFields($data);
 
         $opportunity->update(array_merge($data, [
-            'status' => OpportunityStatus::PendingReview,
-            'review_note' => null,
+            'status'               => OpportunityStatus::PendingReview,
+            'review_note'          => null,
             'reviewed_by_admin_id' => null,
-            'reviewed_at' => null,
+            'reviewed_at'          => null,
         ]));
 
         return $opportunity->refresh(['category', 'reviewer', 'user']);
@@ -47,12 +47,12 @@ class OpportunityService
 
     public function listForCompany(User $user, array $filters = []): LengthAwarePaginator
     {
-        $perPage = (int) ($filters['per_page'] ?? 15);
+        $perPage = (int)($filters['per_page'] ?? 15);
 
         return $user->opportunities()
             ->with(['category', 'reviewer'])
-            ->when(! empty($filters['status']), fn ($query) => $query->where('status', $filters['status']))
-            ->when(! empty($filters['goal']), fn ($query) => $query->where('goal', $filters['goal']))
+            ->when(!empty($filters['status']), fn($query) => $query->where('status', $filters['status']))
+            ->when(!empty($filters['goal']), fn($query) => $query->where('goal', $filters['goal']))
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
@@ -71,21 +71,21 @@ class OpportunityService
             ->with(['category', 'user'])
             ->where('status', OpportunityStatus::Approved)
             ->latest()
-            ->when($options->paginateNum > 0, fn ($query) => $query->limit($options->paginateNum))
+            ->when($options->paginateNum > 0, fn($query) => $query->limit($options->paginateNum))
             ->get();
     }
 
     public function reviewByAdmin(Admin $admin, Opportunity $opportunity, OpportunityStatus $status, ?string $reviewNote): Opportunity
     {
-        if (! in_array($status, [OpportunityStatus::Approved, OpportunityStatus::NeedsModification], true)) {
+        if (!in_array($status, [OpportunityStatus::Approved, OpportunityStatus::NeedsModification], true)) {
             throw new \InvalidArgumentException(__('apis.invalid_opportunity_status_transition'));
         }
 
         $opportunity->update([
-            'status' => $status,
-            'review_note' => $reviewNote,
+            'status'               => $status,
+            'review_note'          => $reviewNote,
             'reviewed_by_admin_id' => $admin->id,
-            'reviewed_at' => now(),
+            'reviewed_at'          => now(),
         ]);
 
         return $opportunity->refresh(['category', 'reviewer', 'user']);
@@ -95,7 +95,7 @@ class OpportunityService
     {
         return Opportunity::query()
             ->with(['category', 'user', 'reviewer'])
-            ->when($options->conditions, fn ($query) => $query->where($options->conditions))
+            ->when($options->conditions, fn($query) => $query->where($options->conditions))
             ->latest()
             ->search(request()->filters ?? [])
             ->get();

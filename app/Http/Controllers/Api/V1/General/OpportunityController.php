@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\General;
 
+use App\Enums\OpportunityStatus;
+use App\Facades\BaseService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PublicOpportunityResource;
 use App\Models\Opportunity;
@@ -14,13 +16,26 @@ class OpportunityController extends Controller
 {
     use ResponseTrait;
 
-    public function __construct(private readonly OpportunityService $service) {}
+    public function __construct(private readonly OpportunityService $service)
+    {
+    }
 
     public function index(): JsonResponse
     {
-        return $this->jsonResponse(data: PublicOpportunityResource::collection(
-            $this->service->listApproved((new QueryOptions())->paginateNum(12))
-        ));
+        $options = (new QueryOptions())
+            ->with(['category', 'user'])
+            ->latest()
+            ->conditions(['status' => OpportunityStatus::Approved]);
+        $opportunities = BaseService::setModel(Opportunity::class)->limit($options);
+        return $this->jsonResponse(data: [
+            'opportunities' => PublicOpportunityResource::collection($opportunities),
+            'pagination'    => [
+                'current_page' => $opportunities->currentPage(),
+                'last_page'    => $opportunities->lastPage(),
+                'per_page'     => $opportunities->perPage(),
+                'total'        => $opportunities->total(),
+            ]
+        ]);
     }
 
     public function show(Opportunity $opportunity): JsonResponse

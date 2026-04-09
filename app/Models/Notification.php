@@ -14,6 +14,11 @@ class  Notification extends Model
     protected $appends=['title','body'];
     protected $guarded = [''];
 
+    protected $casts = [
+        'payload' => 'array',
+        'seen' => 'boolean',
+    ];
+
     public function getTitleAttribute(){
         $title = app()->getLocale() == 'ar' ? $this->title_ar : $this->title_en;
         return $title;
@@ -21,5 +26,10 @@ class  Notification extends Model
     public function getBodyAttribute(){
         $body = app()->getLocale() == 'ar' ? $this->body_ar : $this->body_en;
         return $body;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

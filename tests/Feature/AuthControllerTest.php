@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Device;
 use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -69,10 +70,17 @@ class AuthControllerTest extends TestCase
         $response = $this->post('/en/admin', [
             'email' => $admin->email,
             'password' => 'password123',
+            'device_token' => 'admin-login-token',
+            'device_type' => 'web',
         ]);
 
         $response->assertRedirect(route('admin.home'));
         $this->assertAuthenticatedAs($admin, 'admin');
+        $this->assertDatabaseHas('devices', [
+            'admin_id' => $admin->id,
+            'token' => 'admin-login-token',
+            'device_type' => 'web',
+        ]);
     }
 
     /**

@@ -9,6 +9,8 @@ final class LoginDTO
         public ?string $phone,
         public ?string $country_code,
         public string $password,
+        public ?string $device_token,
+        public ?string $device_type,
     ) {}
 
     public static function fromRequest(array $v): self
@@ -18,6 +20,8 @@ final class LoginDTO
             phone: $v['phone'] ?? null,
             country_code: $v['country_code'] ?? null,
             password: $v['password'],
+            device_token: $v['device_token'] ?? null,
+            device_type: $v['device_type'] ?? null,
         );
     }
 }

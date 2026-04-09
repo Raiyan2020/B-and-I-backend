@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Admin;
-use App\Models\FcmToken;
+use App\Models\Device;
 use App\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
@@ -106,7 +106,7 @@ class NotificationsControllerTest extends TestCase
     }
 
     /**
-     * Test authenticated admin can update FCM token.
+     * Test authenticated admin can update device token.
      */
     public function test_authenticated_admin_can_update_fcm_token(): void
     {
@@ -122,9 +122,10 @@ class NotificationsControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
 
-        $this->assertDatabaseHas('fcm_tokens', [
+        $this->assertDatabaseHas('devices', [
             'admin_id' => $admin->id,
-            'tokens' => $token,
+            'token' => $token,
+            'device_type' => 'web',
         ]);
     }
 
@@ -138,8 +139,8 @@ class NotificationsControllerTest extends TestCase
 
         $token = 'new-fcm-token-12345';
 
-        $this->assertDatabaseMissing('fcm_tokens', [
-            'tokens' => $token,
+        $this->assertDatabaseMissing('devices', [
+            'token' => $token,
         ]);
 
         $response = $this->patchJson('/en/admin/fcm-token', [
@@ -147,40 +148,38 @@ class NotificationsControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        $this->assertDatabaseHas('fcm_tokens', [
+        $this->assertDatabaseHas('devices', [
             'admin_id' => $admin->id,
-            'tokens' => $token,
+            'token' => $token,
         ]);
     }
 
     /**
-     * Test FCM token update updates existing record.
+     * Test FCM token update reassigns existing token to current admin.
      */
     public function test_fcm_token_update_updates_existing_record(): void
     {
-        $admin = $this->createSuperAdmin();
-        $this->actingAs($admin, 'admin');
+        $oldAdmin = $this->createSuperAdmin(['email' => 'old-admin@test.com']);
+        $newAdmin = $this->createSuperAdmin(['email' => 'new-admin@test.com']);
+        $this->actingAs($newAdmin, 'admin');
 
-        $oldToken = 'old-fcm-token-12345';
-        $newToken = 'new-fcm-token-12345';
+        $sharedToken = 'shared-fcm-token-12345';
 
-        FcmToken::create([
-            'admin_id' => $admin->id,
-            'tokens' => $oldToken,
+        Device::create([
+            'admin_id' => $oldAdmin->id,
+            'token' => $sharedToken,
+            'device_type' => 'web',
+            'locale' => 'en',
         ]);
 
         $response = $this->patchJson('/en/admin/fcm-token', [
-            'token' => $newToken,
+            'token' => $sharedToken,
         ]);
 
         $response->assertStatus(200);
-        $this->assertDatabaseHas('fcm_tokens', [
-            'admin_id' => $admin->id,
-            'tokens' => $newToken,
-        ]);
-
-        $this->assertDatabaseMissing('fcm_tokens', [
-            'tokens' => $oldToken,
+        $this->assertDatabaseHas('devices', [
+            'admin_id' => $newAdmin->id,
+            'token' => $sharedToken,
         ]);
     }
 

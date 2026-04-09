@@ -24,5 +24,16 @@ interface AuthServiceInterface
      */
     public function login(LoginDTO $dto): array;
 
-    public function logout(User $user): void;
+    public function logout(User $user, ?string $deviceToken = null): void;
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array{user: User, email_verification_sent: bool}
+     */
+    public function updateProfile(User $user, array $data): array;
+
+    /**
+     * @return array{status: string}
+     */
+    public function changePassword(User $user, string $currentPassword, string $newPassword): array;
 }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Dashboard\Users;
 
+use App\Enums\NotificationCategory;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SendNotificationRequest extends FormRequest
 {
@@ -28,6 +30,11 @@ class SendNotificationRequest extends FormRequest
             'title_en' => ['required', 'string', 'max:255'],
             'body_ar' => ['required', 'string'],
             'body_en' => ['required', 'string'],
+            'category' => ['nullable', Rule::in(NotificationCategory::values())],
+            'notification_type' => ['nullable', 'string', 'max:100'],
+            'model_type' => ['nullable', 'string', 'max:100'],
+            'model_id' => ['nullable', 'integer'],
+            'payload' => ['nullable', 'array'],
         ];
     }
 

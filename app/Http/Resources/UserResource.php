@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\UserRole;
+use App\Services\Notifications\NotificationPreferenceService;
 use BackedEnum;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,13 +21,19 @@ class UserResource extends JsonResource
         $data = [
             'id' => $this->id,
             'role' => $this->role->value,
+            'name' => $this->name,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
+            'display_name' => $this->display_name ?: $this->name,
+            'image' => $this->image,
+            'bio' => $this->bio,
+            'short_description' => $this->short_description,
             'email' => $this->email,
             'country_code' => $this->country_code,
             'phone' => $this->phone,
             'email_verified' => (bool) $this->email_verified_at,
             'lang' => $this->lang,
+            'notification_settings' => app(NotificationPreferenceService::class)->settingsFor($this->resource),
             'token' => $this->token ?? null,
         ];
 
@@ -42,6 +49,14 @@ class UserResource extends JsonResource
                 'investor_type' => $investorTypeValue,
                 'preferred_sector_id' => $preferredSectorId,
                 'category_id' => $categoryId,
+                'preferred_sector' => $this->preferredSector ? [
+                    'id' => $this->preferredSector->id,
+                    'name' => $this->preferredSector->name,
+                ] : null,
+                'category' => $this->category ? [
+                    'id' => $this->category->id,
+                    'name' => $this->category->name,
+                ] : null,
                 'capital' => $this->capital,
                 'available_capital' => $this->available_capital,
                 'previous_investments' => $this->previous_investments_count,

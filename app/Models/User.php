@@ -10,6 +10,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Enums\InvestorExperience;
 use App\Enums\InvestorType;
@@ -33,6 +34,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'role',
         'first_name',
         'last_name',
+        'display_name',
         'country_code',
         'phone',
         'email',
@@ -50,9 +52,14 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'investor_experience',
 
         'image',
+        'bio',
+        'short_description',
         'lang',
         'is_blocked',
         'is_active',
+        'order_notifications_enabled',
+        'interest_notifications_enabled',
+        'system_notifications_enabled',
     ];
 
     /**
@@ -75,6 +82,9 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'password' => 'hashed',
         'is_blocked' => 'boolean',
         'is_active' => 'boolean',
+        'order_notifications_enabled' => 'boolean',
+        'interest_notifications_enabled' => 'boolean',
+        'system_notifications_enabled' => 'boolean',
         'role' => UserRole::class,
         'investor_type' => InvestorType::class,
         'investor_experience' => InvestorExperience::class,
@@ -104,8 +114,10 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      */
     public function getImageAttribute()
     {
-        if ($this->attributes['image'] != 'default.png' && $this->attributes['image'] != null) {
-            $image = $this->getImage($this->attributes['image'], self::FOLDER);
+        $imageName = $this->attributes['image'] ?? null;
+
+        if ($imageName != 'default.png' && $imageName != null) {
+            $image = $this->getImage($imageName, self::FOLDER);
         } else {
             $image = $this->defaultImage(self::FOLDER);
         }
@@ -165,7 +177,12 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      */
     public function notifications()
     {
-        return $this->hasMany(Notification::class);
+        return $this->hasMany(Notification::class)->latest();
+    }
+
+    public function devices(): HasMany
+    {
+        return $this->hasMany(Device::class);
     }
 
     public function preferredSector()

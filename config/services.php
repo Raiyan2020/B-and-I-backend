@@ -30,4 +30,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'credentials_path' => env('FIREBASE_CREDENTIALS_PATH'),
+        'credentials_json' => env('FIREBASE_CREDENTIALS_JSON'),
+        'legacy_server_key' => env('FIREBASE_LEGACY_SERVER_KEY'),
+        'timeout' => env('FIREBASE_TIMEOUT', 10),
+    ],
+
 ];

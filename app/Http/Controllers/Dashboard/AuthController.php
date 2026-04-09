@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientRequest;
+use App\Enums\DeviceType;
 use App\Models\Admin;
+use App\Services\Devices\DeviceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +14,7 @@ use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
+    public function __construct(private readonly DeviceService $deviceService) {}
 
     public function index(){
         return view('dashboard.auth.login');
@@ -21,7 +24,9 @@ class AuthController extends Controller
 
         $rules=[
             'email' => ['required','email',Rule::exists('admins','email')],
-            'password' => ['required', 'min:6' ,'max:100']
+            'password' => ['required', 'min:6' ,'max:100'],
+            'device_token' => ['nullable', 'string', 'max:2048'],
+            'device_type' => ['nullable', Rule::in(DeviceType::values())],
         ];
 
         $messages_ar = [
@@ -39,12 +44,24 @@ class AuthController extends Controller
         if($validator->fails()){
             return back()->withErrors($validator);
         }
-        if(auth('admin')->attempt($validator->validated())){
+        $credentials = $validator->safe()->only(['email', 'password']);
+
+        if(auth('admin')->attempt($credentials)){
             if(!auth('admin')->user()->hasRole('super_admin')){
                 auth('admin')->logout();
                 abort(403);
             }
             session()->regenerate();
+
+            if ($request->filled('device_token')) {
+                $this->deviceService->syncAdminDevice(
+                    auth('admin')->user(),
+                    $request->string('device_token')->toString(),
+                    $request->input('device_type', DeviceType::Web->value),
+                    app()->getLocale(),
+                );
+            }
+
             return redirect()->route('admin.home')->with('alert','hello');
         }
         return back()->with(['error'=>__('dashboard.email or password or both are wrong')]);

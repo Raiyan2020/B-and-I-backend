@@ -47,4 +47,10 @@ return [
     'opportunity_updated_and_sent_for_review' => 'تم تحديث الإعلان وإرساله مرة أخرى للمراجعة.',
     'opportunity_company_only' => 'إنشاء الإعلانات متاح فقط لحسابات الشركات.',
     'invalid_opportunity_status_transition' => 'لا يمكن تطبيق حالة المراجعة المطلوبة على الإعلان.',
+    'profile_updated_successfully' => 'تم تحديث الحساب بنجاح.',
+    'profile_updated_verification_required' => 'تم تحديث الحساب بنجاح. يرجى تأكيد بريدك الإلكتروني الجديد.',
+    'password_updated_successfully' => 'تم تغيير كلمة المرور بنجاح.',
+    'current_password_incorrect' => 'كلمة المرور الحالية غير صحيحة.',
+    'logged_out_successfully' => 'تم تسجيل الخروج بنجاح.',
+    'notification_settings_updated' => 'تم تحديث إعدادات الإشعارات بنجاح.',
 ];

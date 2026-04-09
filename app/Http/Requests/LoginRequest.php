@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\DeviceType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class LoginRequest extends FormRequest
 {
@@ -18,6 +20,8 @@ class LoginRequest extends FormRequest
             'phone' => ['nullable', 'regex:/^[4569]\d{7}$/', 'required_without:email'],
             'country_code' => ['nullable', 'string', 'digits_between:1,5', 'required_with:phone'],
             'password' => ['required', 'string'],
+            'device_token' => ['nullable', 'string', 'max:2048'],
+            'device_type' => ['nullable', Rule::in(DeviceType::values()), 'required_with:device_token'],
         ];
     }
 

@@ -18,7 +18,9 @@ class OpportunityController extends Controller
 {
     use ResponseTrait;
 
-    public function __construct(private readonly OpportunityService $service) {}
+    public function __construct(private readonly OpportunityService $service)
+    {
+    }
 
     public function index(ListCompanyOpportunitiesRequest $request): JsonResponse
     {
@@ -26,11 +28,11 @@ class OpportunityController extends Controller
 
         return $this->jsonResponse(data: [
             'opportunities' => OpportunityListResource::collection($paginator->items())->resolve(),
-            'pagination' => [
+            'pagination'    => [
                 'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
             ],
         ]);
     }
@@ -40,9 +42,9 @@ class OpportunityController extends Controller
         $opportunity = $this->service->createForCompany($request->user(), $request->validated());
 
         return $this->jsonResponse(
-            data: OpportunityResource::make($opportunity->load('category')),
             msg: __('apis.opportunity_created_successfully'),
             code: Response::HTTP_CREATED,
+            data: OpportunityResource::make($opportunity->load('category')),
         );
     }
 
@@ -58,8 +60,8 @@ class OpportunityController extends Controller
         $opportunity = $this->service->updateForCompany($request->user(), $opportunity, $request->validated());
 
         return $this->jsonResponse(
-            data: OpportunityResource::make($opportunity),
             msg: __('apis.opportunity_updated_and_sent_for_review'),
+            data: OpportunityResource::make($opportunity),
         );
     }
 }

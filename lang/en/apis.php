@@ -64,4 +64,10 @@ return [
     'opportunity_updated_and_sent_for_review' => 'The advertisement has been updated and sent back for review.',
     'opportunity_company_only' => 'Only company accounts can create advertisements.',
     'invalid_opportunity_status_transition' => 'Invalid advertisement status transition.',
+    'profile_updated_successfully' => 'Profile updated successfully.',
+    'profile_updated_verification_required' => 'Profile updated successfully. Please verify your new email address.',
+    'password_updated_successfully' => 'Password updated successfully.',
+    'current_password_incorrect' => 'The current password is incorrect.',
+    'logged_out_successfully' => 'You have been logged out successfully.',
+    'notification_settings_updated' => 'Notification settings updated successfully.',
 ];

@@ -7,7 +7,6 @@ use Intervention\Image\ImageManager;
 
 trait UploadTrait
 {
-
     public function uploadAllTypes($file, $directory, $width = null, $height = null)
     {
         $this->ensureDirectoryExists('storage/images/' . $directory);
@@ -211,7 +210,7 @@ trait UploadTrait
     public function gettingFileType($file, $isFile = false)
     {
         $needle = $isFile ? $file->getClientOriginalExtension() : explode('.', $file)[1];
-        return  match (true) {
+        return match (true) {
             in_array($needle, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'ico', 'bmp', 'tiff', 'tif', 'heic', 'heif']) => 'image',
             in_array($needle, ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp', 'zip', 'rtf']) => 'document',
             in_array($needle, ['mp3', 'mp4', 'wav', 'ogg', 'webm', '3gpp', '3gpp2', 'm4a', 'aac']) => 'audio',

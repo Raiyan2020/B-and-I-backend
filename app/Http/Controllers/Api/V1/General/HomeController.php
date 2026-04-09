@@ -15,6 +15,7 @@ use App\Models\Feature;
 use App\Models\GeneralSetting;
 use App\Models\Opportunity;
 use App\Models\User;
+use App\Services\Devices\DeviceService;
 use App\Support\QueryOptions;
 use App\Traits\ResponseTrait;
 use Faker\Provider\Base;
@@ -26,14 +27,20 @@ class HomeController extends Controller
 {
     use ResponseTrait;
 
+    public function __construct(private readonly DeviceService $deviceService)
+    {
+    }
+
     /**
      * Change application language (ar/en only)
      */
     public function changeLang(Request $request): JsonResponse
     {
-        $lang = $request->input('lang')
+        $lang = strtolower(substr((string)(
+            $request->input('lang')
             ?? $request->headers->get('Accept-Language')
-            ?? $request->query('lang');
+            ?? $request->query('lang')
+        ), 0, 2));
 
         // Validate language - only ar or en allowed
         if (!in_array($lang, ['ar', 'en'])) {
@@ -45,6 +52,16 @@ class HomeController extends Controller
         }
 
         app()->setLocale($lang);
+
+        /** @var User|null $user */
+        $user = auth('sanctum')->user();
+        if ($user instanceof User) {
+            $user->update(['lang' => $lang]);
+
+            if ($request->filled('device_token')) {
+                $this->deviceService->updateUserDeviceLocale($user, $request->string('device_token')->toString(), $lang);
+            }
+        }
 
         $langName = $lang === 'ar' ? __('api.language_arabic') : __('api.language_english');
 
@@ -59,7 +76,7 @@ class HomeController extends Controller
         $lang = app()->getLocale() ?? request()->headers->get('Accept-Language', 'en');
         $whoWeAre = GeneralSetting::where('key', 'like', "about_us_%_{$lang}")->get();
         $whoWeAreSettings = [
-            'title' => $whoWeAre->firstWhere('key', "about_us_title_{$lang}")?->value,
+            'title'       => $whoWeAre->firstWhere('key', "about_us_title_{$lang}")?->value,
             'description' => $whoWeAre->firstWhere('key', "about_us_description_{$lang}")?->value,
         ];
         $options = (new QueryOptions())->conditions(['status' => true])->latest();
@@ -67,7 +84,7 @@ class HomeController extends Controller
 
         return $this->jsonResponse(data: [
             'whoWeAreSettings' => $whoWeAreSettings,
-            'items' => WhoWeAreResource::collection($whoWeAreItems),
+            'items'            => WhoWeAreResource::collection($whoWeAreItems),
         ]);
     }
 
@@ -85,21 +102,22 @@ class HomeController extends Controller
         $websiteHeaderDesc = GeneralSetting::getValueForKey("website_header_desc_{$lang}");
         $ourFeatures = BaseService::setModel(Feature::class)->all((new QueryOptions())->conditions(['status' => true])->latest());
         $sections = BaseService::setModel(Category::class)
-            ->limit((new QueryOptions())
+            ->limit(
+                (new QueryOptions())
                     ->latest()
                     ->conditions(['status' => true])
-                // ->withCount('opportunities')
+                    ->withCount(['opportunities'])
             );
         $data = [
-            'website_name' => $websiteName ?? '',
-            'project_brief' => $projectBrief ?? '',
-            'logo_url' => $logo ? asset('Site/assets/images/logo/' . $logo) : null,
-            'website_header' => [
-                'title' => $websiteHeaderTitle ?? '',
+            'website_name'         => $websiteName ?? '',
+            'project_brief'        => $projectBrief ?? '',
+            'logo_url'             => $logo ? asset('Site/assets/images/logo/' . $logo) : null,
+            'website_header'       => [
+                'title'       => $websiteHeaderTitle ?? '',
                 'description' => $websiteHeaderDesc ?? '',
             ],
-            'features' => FeaturesResource::collection($ourFeatures),
-            'sections' => CategoryResource::collection($sections), //$sections,
+            'features'             => FeaturesResource::collection($ourFeatures),
+            'sections'             => CategoryResource::collection($sections), //$sections,
             'latest_opportunities' => PublicOpportunityResource::collection(
                 Opportunity::query()->with(['category', 'user'])->where('status', 'approved')->latest()->limit(6)->get()
             ),
