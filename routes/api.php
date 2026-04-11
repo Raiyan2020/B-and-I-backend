@@ -35,8 +35,8 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
 
         Route::post('login', [LoginController::class, '__invoke']);
 
-        Route::post('email/resend', [ResendVerificationController::class, '__invoke'])->middleware('throttle:6,1');
-        Route::get('email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])->name('api.v1.auth.verification.verify');
+        Route::post('resend-code', [ResendVerificationController::class, '__invoke'])->middleware('throttle:6,1');
+        Route::post('verify-code', [VerifyEmailController::class, '__invoke']);
     });
     Route::prefix('general')->group(function () {
         include __DIR__ . '/guard/general.php';

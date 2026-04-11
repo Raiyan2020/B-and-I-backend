@@ -60,6 +60,8 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'order_notifications_enabled',
         'interest_notifications_enabled',
         'system_notifications_enabled',
+        'otp',
+        'otp_expires_at'
     ];
 
     /**
@@ -70,6 +72,8 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     protected $hidden = [
         'password',
         'remember_token',
+        'otp',
+        'otp_expires_at',
     ];
 
     /**
@@ -79,6 +83,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'otp_expires_at' => 'datetime',
         'password' => 'hashed',
         'is_blocked' => 'boolean',
         'is_active' => 'boolean',
@@ -106,7 +111,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      */
     public function getNameAttribute(): string
     {
-        return trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
+        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
     }
 
     /**

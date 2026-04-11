@@ -19,6 +19,7 @@ class ResendVerificationController extends Controller
     {
         $result = $this->service->resendForRole(
             $request->validated('email'),
+            $request->validated('password'),
             UserRole::from($request->validated('role')),
         );
 
@@ -34,6 +35,6 @@ class ResendVerificationController extends Controller
             );
         }
 
-        return $this->jsonResponse(msg: __('apis.verification_email_sent'));
+        return $this->jsonResponse(msg: __('apis.verification_email_sent'), key: 'need_active', data: $result['data']);
     }
 }

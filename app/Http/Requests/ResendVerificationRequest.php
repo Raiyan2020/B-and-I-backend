@@ -18,6 +18,7 @@ class ResendVerificationRequest extends FormRequest
         return [
             'email' => ['required', 'email'],
             'role' => ['required', new Enum(UserRole::class)],
+            'password' => ['required', 'string'],
         ];
     }
 }

@@ -54,7 +54,7 @@ class AuthService implements AuthServiceInterface
 
     public function registerAdvertiser(RegisterAdvertiserDTO $dto): User
     {
-        
+
         $user = User::create([
             'role' => UserRole::Advertiser,
             'first_name' => $dto->first_name,
@@ -94,28 +94,37 @@ class AuthService implements AuthServiceInterface
         }
 
         if (! $user->hasVerifiedEmail()) {
-            $this->emailVerificationService->resendAfterBlockedLogin($user);
+            $this->emailVerificationService->resendAfterBlockedLogin($user, $dto->password);
 
-            return ['status' => 'email_unverified'];
+            return ['status' => 'email_unverified','data' => ['email' => $user->email,'password' => $dto->password]];
         }
 
-        $tokenName = $dto->device_token
-            ? $user->role->value.'-'.substr(hash('sha256', $dto->device_token), 0, 24)
+        return [
+            'status' => 'authenticated',
+            'user' => $user,
+            'token' => $this->issueTokenForUser($user, $dto->device_token, $dto->device_type),
+        ];
+    }
+
+    public function issueTokenForUser(User $user, ?string $deviceToken = null, ?string $deviceType = null): string
+    {
+        $tokenName = $deviceToken
+            ? $user->role->value.'-'.substr(hash('sha256', $deviceToken), 0, 24)
             : $user->role->value.'-'.Str::uuid();
 
         $user->tokens()->where('name', $tokenName)->delete();
         $token = $user->createToken($tokenName)->plainTextToken;
 
-        if ($dto->device_token) {
+        if ($deviceToken) {
             $this->deviceService->syncUserDevice(
                 $user,
-                $dto->device_token,
-                $dto->device_type,
+                $deviceToken,
+                $deviceType,
                 $user->lang ?: app()->getLocale(),
             );
         }
 
-        return ['status' => 'authenticated', 'user' => $user, 'token' => $token];
+        return $token;
     }
 
     public function logout(User $user, ?string $deviceToken = null): void
@@ -151,6 +160,8 @@ class AuthService implements AuthServiceInterface
         if ($emailChanged) {
             $user->forceFill([
                 'email_verified_at' => null,
+                'otp' => null,
+                'otp_expires_at' => null,
             ]);
         }
 

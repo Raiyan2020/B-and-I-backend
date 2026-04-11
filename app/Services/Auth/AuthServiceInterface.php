@@ -24,6 +24,8 @@ interface AuthServiceInterface
      */
     public function login(LoginDTO $dto): array;
 
+    public function issueTokenForUser(User $user, ?string $deviceToken = null, ?string $deviceType = null): string;
+
     public function logout(User $user, ?string $deviceToken = null): void;
 
     /**

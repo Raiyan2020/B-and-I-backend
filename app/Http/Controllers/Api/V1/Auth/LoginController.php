@@ -33,7 +33,8 @@ class LoginController extends Controller
                 msg: __('apis.email_verification_required'),
                 code: 403,
                 error: true,
-                key: 'need_active'
+                key: 'need_active',
+                data: $result['data'],
             );
         }
 

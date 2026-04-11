@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class AuthEmailVerificationTest extends TestCase
@@ -46,7 +45,7 @@ class AuthEmailVerificationTest extends TestCase
         ]);
 
         $response->assertCreated()
-            ->assertJsonPath('key', 'success')
+            ->assertJsonPath('key', 'need_active')
             ->assertJsonPath('data.email', 'investor@gmail.com')
             ->assertJsonPath('data.email_verified', false)
             ->assertJsonPath('data.token', null);
@@ -55,6 +54,8 @@ class AuthEmailVerificationTest extends TestCase
 
         self::assertNull($user->email_verified_at);
         self::assertSame('en', $user->lang);
+        self::assertMatchesRegularExpression('/^\d{6}$/', (string) $user->otp);
+        self::assertNotNull($user->otp_expires_at);
 
         Notification::assertSentTo($user, VerifyEmailNotification::class);
     }
@@ -77,9 +78,10 @@ class AuthEmailVerificationTest extends TestCase
         ]);
 
         $response->assertForbidden()
-            ->assertJsonPath('key', 'fail')
+            ->assertJsonPath('key', 'need_active')
             ->assertJsonPath('msg', __('apis.email_verification_required'));
 
+        self::assertMatchesRegularExpression('/^\d{6}$/', (string) $user->fresh()->otp);
         Notification::assertSentTo($user, VerifyEmailNotification::class);
     }
 
@@ -154,32 +156,42 @@ class AuthEmailVerificationTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', __('apis.the_given_data_was_invalid'))
-            ->assertJsonValidationErrors(['email', 'phone']);
+            ->assertJsonPath('key', 'fail')
+            ->assertJsonPath('msg', __('apis.the_given_data_was_invalid'))
+            ->assertJsonPath('response_status.validation_errors.email.0', 'The email field is required when phone is not present.')
+            ->assertJsonPath('response_status.validation_errors.phone.0', 'The phone field is required when email is not present.');
     }
 
-    public function test_verification_endpoint_marks_email_as_verified(): void
+    public function test_verification_endpoint_marks_email_as_verified_and_logs_user_in(): void
     {
         $user = User::factory()->unverified()->create([
             'email' => 'verify@example.com',
+            'otp' => '123456',
+            'otp_expires_at' => now()->addMinutes(30),
         ]);
 
-        $url = URL::temporarySignedRoute(
-            'api.v1.auth.verification.verify',
-            now()->addMinutes(config('auth.verification.expire')),
-            [
-                'id' => $user->id,
-                'hash' => sha1($user->email),
-            ],
-        );
-
-        $response = $this->getJson($url);
+        $response = $this->postJson('/api/v1/auth/email/verify', [
+            'email' => 'verify@example.com',
+            'password' => 'password',
+            'otp' => '123456',
+            'device_token' => 'verify-device-token',
+            'device_type' => 'android',
+        ]);
 
         $response->assertOk()
             ->assertJsonPath('key', 'success')
-            ->assertJsonPath('msg', __('apis.email_verified_successfully'));
+            ->assertJsonPath('msg', __('apis.email_verified_successfully'))
+            ->assertJsonPath('data.id', $user->id)
+            ->assertJsonPath('data.email_verified', true);
 
         self::assertNotNull($user->fresh()->email_verified_at);
+        self::assertNull($user->fresh()->email_verification_otp);
+        self::assertNotNull($response->json('data.token'));
+        $this->assertDatabaseHas('devices', [
+            'user_id' => $user->id,
+            'token' => 'verify-device-token',
+            'device_type' => 'android',
+        ]);
     }
 
     public function test_resend_endpoint_returns_already_verified_message_for_verified_users(): void
@@ -193,6 +205,7 @@ class AuthEmailVerificationTest extends TestCase
 
         $response = $this->postJson('/api/v1/auth/email/resend', [
             'email' => 'verified@example.com',
+            'password' => 'password',
             'role' => UserRole::Investor->value,
         ]);
 
@@ -215,6 +228,7 @@ class AuthEmailVerificationTest extends TestCase
 
         $response = $this->postJson('/api/v1/auth/email/resend', [
             'email' => 'locale@example.com',
+            'password' => 'password',
             'role' => UserRole::Investor->value,
         ]);
 
@@ -227,6 +241,69 @@ class AuthEmailVerificationTest extends TestCase
                 return $notification->toMail($notifiable)->subject === __('mail.verify_email.subject', locale: 'ar');
             }
         );
+    }
+
+    public function test_verification_endpoint_rejects_invalid_or_expired_otp(): void
+    {
+        User::factory()->unverified()->create([
+            'email' => 'invalid-otp@example.com',
+            'otp' => '654321',
+            'otp_expires_at' => now()->subMinute(),
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/email/verify', [
+            'email' => 'invalid-otp@example.com',
+            'password' => 'password',
+            'otp' => '654321',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('key', 'fail')
+            ->assertJsonPath('msg', __('apis.verification_code_invalid'));
+    }
+
+    public function test_resend_does_not_send_verification_code_when_password_is_wrong(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->unverified()->create([
+            'role' => UserRole::Investor,
+            'email' => 'resend-check@example.com',
+            'otp' => '111111',
+            'otp_expires_at' => now()->addMinutes(30),
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/email/resend', [
+            'email' => 'resend-check@example.com',
+            'password' => 'wrong-password',
+            'role' => UserRole::Investor->value,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('key', 'success')
+            ->assertJsonPath('msg', __('apis.verification_email_sent'));
+
+        $this->assertSame('111111', $user->fresh()->otp);
+        Notification::assertNothingSent();
+    }
+
+    public function test_verification_endpoint_rejects_wrong_password_even_with_valid_otp(): void
+    {
+        User::factory()->unverified()->create([
+            'email' => 'otp-password-check@example.com',
+            'otp' => '222222',
+            'otp_expires_at' => now()->addMinutes(30),
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/email/verify', [
+            'email' => 'otp-password-check@example.com',
+            'password' => 'wrong-password',
+            'otp' => '222222',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('key', 'fail')
+            ->assertJsonPath('msg', __('apis.invalid_credentials'));
     }
 
     public function test_change_language_updates_current_device_locale_for_authenticated_user(): void

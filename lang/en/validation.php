@@ -167,6 +167,10 @@ return [
         'title_en' => 'Role name (English)',
         'title.ar' => 'Role name (Arabic)',
         'title.en' => 'Role name (English)',
+        'otp' => 'OTP',
+        'otp_code' => 'OTP code',
+        'verification_code' => 'Verification code',
+        'code' => 'Code',
     ],
 
 ];

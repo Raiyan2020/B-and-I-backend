@@ -3,28 +3,22 @@
 namespace App\Notifications;
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Notifications\Notification;
 
-class VerifyEmailNotification extends VerifyEmail
+class VerifyEmailNotification extends Notification
 {
-    protected function verificationUrl($notifiable): string
+    use Queueable;
+
+    public function via(object $notifiable): array
     {
-        return URL::temporarySignedRoute(
-            'api.v1.auth.verification.verify',
-            now()->addMinutes((int) config('auth.verification.expire', 60)),
-            [
-                'id' => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
-            ],
-        );
+        return ['mail'];
     }
 
     public function toMail($notifiable): MailMessage
     {
         /** @var User $notifiable */
-        $url = $this->verificationUrl($notifiable);
         $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
         $originalLocale = app()->getLocale();
         app()->setLocale($locale);
@@ -32,8 +26,9 @@ class VerifyEmailNotification extends VerifyEmail
         $message = (new MailMessage)
             ->subject(__('mail.verify_email.subject'))
             ->markdown('emails.verify-email', [
-                'actionUrl' => $url,
                 'user' => $notifiable,
+                'otp' => $notifiable->otp,
+                'expiresAt' => $notifiable->otp_expires_at,
             ]);
 
         app()->setLocale($originalLocale);
