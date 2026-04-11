@@ -51,6 +51,7 @@ return [
     'profile_updated_successfully' => 'تم تحديث الحساب بنجاح.',
     'profile_updated_verification_required' => 'تم تحديث الحساب بنجاح. يرجى تأكيد بريدك الإلكتروني الجديد.',
     'password_updated_successfully' => 'تم تغيير كلمة المرور بنجاح.',
+    'password_updated_logged_out_all_devices' => 'تم تغيير كلمة المرور بنجاح. لقد قمنا بتسجيل خروجك من جميع الأجهزة المرتبطة حفاظًا على أمان حسابك.',
     'current_password_incorrect' => 'كلمة المرور الحالية غير صحيحة.',
     'logged_out_successfully' => 'تم تسجيل الخروج بنجاح.',
     'notification_settings_updated' => 'تم تحديث إعدادات الإشعارات بنجاح.',

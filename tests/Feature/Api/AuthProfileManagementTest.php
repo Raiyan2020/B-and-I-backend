@@ -7,6 +7,7 @@ use App\Enums\InvestorType;
 use App\Enums\UserRole;
 use App\Jobs\SendEmailVerificationJob;
 use App\Models\Category;
+use App\Models\Device;
 use App\Models\PreferredSector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -108,6 +109,23 @@ class AuthProfileManagementTest extends TestCase
             'password' => 'oldpassword',
         ]);
 
+        Device::create([
+            'user_id' => $user->id,
+            'token' => 'device-token-1',
+            'device_type' => 'android',
+            'locale' => 'en',
+        ]);
+
+        Device::create([
+            'user_id' => $user->id,
+            'token' => 'device-token-2',
+            'device_type' => 'ios',
+            'locale' => 'ar',
+        ]);
+
+        $user->createToken('device-session-1');
+        $user->createToken('device-session-2');
+
         Sanctum::actingAs($user);
 
         $response = $this->patchJson('/api/v1/auth/password', [
@@ -116,8 +134,20 @@ class AuthProfileManagementTest extends TestCase
             'password_confirmation' => 'newpassword123',
         ]);
 
-        $response->assertOk();
+        $response->assertOk()
+            ->assertJsonPath('key', 'success')
+            ->assertJsonPath('msg', __('apis.password_updated_logged_out_all_devices'));
+
         $this->assertTrue(Hash::check('newpassword123', $user->fresh()->password));
+        $this->assertSame(0, PersonalAccessToken::query()->where('tokenable_id', $user->id)->count());
+        $this->assertDatabaseMissing('devices', [
+            'user_id' => $user->id,
+            'token' => 'device-token-1',
+        ]);
+        $this->assertDatabaseMissing('devices', [
+            'user_id' => $user->id,
+            'token' => 'device-token-2',
+        ]);
     }
 
     public function test_change_password_fails_with_wrong_current_password(): void

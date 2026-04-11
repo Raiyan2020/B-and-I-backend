@@ -188,6 +188,9 @@ class AuthService implements AuthServiceInterface
             'password' => $newPassword,
         ]);
 
-        return ['status' => 'updated'];
+        $user->tokens()->delete();
+        $this->deviceService->forgetAllUserDevices($user);
+
+        return ['status' => 'updated_logged_out_everywhere'];
     }
 }

@@ -64,6 +64,13 @@ class DeviceService
             ->delete();
     }
 
+    public function forgetAllUserDevices(User $user): void
+    {
+        Device::query()
+            ->where('user_id', $user->id)
+            ->delete();
+    }
+
     public function forgetAdminDevice(Admin $admin, ?string $token): void
     {
         if (blank($token)) {

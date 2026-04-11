@@ -68,6 +68,7 @@ return [
     'profile_updated_successfully' => 'Profile updated successfully.',
     'profile_updated_verification_required' => 'Profile updated successfully. Please verify your new email address.',
     'password_updated_successfully' => 'Password updated successfully.',
+    'password_updated_logged_out_all_devices' => 'Password updated successfully. We logged you out from all linked devices for your security.',
     'current_password_incorrect' => 'The current password is incorrect.',
     'logged_out_successfully' => 'You have been logged out successfully.',
     'notification_settings_updated' => 'Notification settings updated successfully.',

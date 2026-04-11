@@ -31,7 +31,7 @@ class ChangePasswordController extends Controller
         }
 
         return $this->jsonResponse(
-            msg: __('apis.password_updated_successfully'),
+            msg: __('apis.password_updated_logged_out_all_devices'),
         );
     }
 }

@@ -29,6 +29,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
+
+    Route::prefix('general')->group(function () {
+        include __DIR__ . '/guard/general.php';
+    });
+    
     Route::prefix('auth')->group(function () {
         Route::post('register/investor', [RegisterInvestorController::class, '__invoke']);
         Route::post('register/advertiser', [RegisterAdvertiserController::class, '__invoke']);
@@ -37,9 +42,6 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
 
         Route::post('resend-code', [ResendVerificationController::class, '__invoke'])->middleware('throttle:6,1');
         Route::post('verify-code', [VerifyEmailController::class, '__invoke']);
-    });
-    Route::prefix('general')->group(function () {
-        include __DIR__ . '/guard/general.php';
     });
 
     Route::middleware('auth:sanctum')->group(function () {
