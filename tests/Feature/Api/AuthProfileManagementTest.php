@@ -5,14 +5,14 @@ namespace Tests\Feature\Api;
 use App\Enums\InvestorExperience;
 use App\Enums\InvestorType;
 use App\Enums\UserRole;
-use App\Jobs\SendEmailVerificationJob;
 use App\Models\Category;
 use App\Models\Device;
 use App\Models\PreferredSector;
 use App\Models\User;
+use App\Notifications\EmailOtpNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\PersonalAccessToken;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -67,10 +67,8 @@ class AuthProfileManagementTest extends TestCase
         ]);
     }
 
-    public function test_advertiser_can_update_profile_and_email_becomes_unverified(): void
+    public function test_profile_update_cannot_change_email_directly(): void
     {
-        Queue::fake();
-
         $advertiser = User::factory()->create([
             'role' => UserRole::Advertiser,
             'email' => 'old@example.com',
@@ -87,19 +85,112 @@ class AuthProfileManagementTest extends TestCase
             'email' => 'new@gmail.com',
         ]);
 
-        $response->assertOk()
-            ->assertJsonPath('data.display_name', 'Company Display Name')
-            ->assertJsonPath('data.email', 'new@gmail.com')
-            ->assertJsonPath('data.email_verified', false);
+        $response->assertStatus(422)
+            ->assertJsonPath('key', 'fail');
 
-        $this->assertDatabaseHas('users', [
-            'id' => $advertiser->id,
-            'display_name' => 'Company Display Name',
+        $this->assertSame('old@example.com', $advertiser->fresh()->email);
+    }
+
+    public function test_user_can_change_email_through_old_and_new_email_verification_cycle(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'role' => UserRole::Advertiser,
+            'email' => 'old@example.com',
+            'password' => 'password123',
+            'email_verified_at' => now(),
+        ]);
+
+        Device::create([
+            'user_id' => $user->id,
+            'token' => 'change-email-device-1',
+            'device_type' => 'android',
+            'locale' => 'en',
+        ]);
+
+        Device::create([
+            'user_id' => $user->id,
+            'token' => 'change-email-device-2',
+            'device_type' => 'ios',
+            'locale' => 'ar',
+        ]);
+
+        $user->createToken('change-email-token-1');
+        $user->createToken('change-email-token-2');
+
+        Sanctum::actingAs($user);
+
+        $requestCurrentResponse = $this->postJson('/api/v1/auth/email-change/request-current', [
+            'current_password' => 'password123',
+        ]);
+
+        $requestCurrentResponse->assertOk()
+            ->assertJsonPath('key', 'success')
+            ->assertJsonPath('msg', __('apis.current_email_change_code_sent'));
+
+        $user = $user->fresh();
+        $oldOtp = $user->email_change_old_otp;
+
+        Notification::assertSentOnDemand(
+            EmailOtpNotification::class,
+            function (EmailOtpNotification $notification, array $channels, object $notifiable) use ($user): bool {
+                return in_array('mail', $channels, true)
+                    && ($notifiable->routes['mail'] ?? null) === $user->email;
+            }
+        );
+
+        $verifyCurrentResponse = $this->postJson('/api/v1/auth/email-change/verify-current', [
+            'otp' => $oldOtp,
+        ]);
+
+        $verifyCurrentResponse->assertOk()
+            ->assertJsonPath('key', 'success')
+            ->assertJsonPath('msg', __('apis.current_email_verified_for_change'));
+
+        $requestNewResponse = $this->postJson('/api/v1/auth/email-change/request-new', [
             'email' => 'new@gmail.com',
         ]);
 
-        $this->assertNull($advertiser->fresh()->email_verified_at);
-        Queue::assertPushed(SendEmailVerificationJob::class);
+        $requestNewResponse->assertOk()
+            ->assertJsonPath('key', 'success')
+            ->assertJsonPath('msg', __('apis.new_email_change_code_sent'));
+
+        $user = $user->fresh();
+        $newOtp = $user->email_change_new_otp;
+
+        Notification::assertSentOnDemand(
+            EmailOtpNotification::class,
+            function (EmailOtpNotification $notification, array $channels, object $notifiable): bool {
+                return in_array('mail', $channels, true)
+                    && ($notifiable->routes['mail'] ?? null) === 'new@gmail.com';
+            }
+        );
+
+        $verifyNewResponse = $this->postJson('/api/v1/auth/email-change/verify-new', [
+            'email' => 'new@gmail.com',
+            'otp' => $newOtp,
+        ]);
+
+        $verifyNewResponse->assertOk()
+            ->assertJsonPath('key', 'success')
+            ->assertJsonPath('msg', __('apis.email_changed_successfully_logged_out'));
+
+        $user = $user->fresh();
+
+        $this->assertSame('new@gmail.com', $user->email);
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertNull($user->email_change_new_email);
+        $this->assertNull($user->email_change_old_verified_at);
+        $this->assertSame(0, PersonalAccessToken::query()->where('tokenable_id', $user->id)->count());
+        $this->assertDatabaseMissing('devices', [
+            'user_id' => $user->id,
+            'token' => 'change-email-device-1',
+        ]);
+        $this->assertDatabaseMissing('devices', [
+            'user_id' => $user->id,
+            'token' => 'change-email-device-2',
+        ]);
     }
 
     public function test_user_can_change_password(): void

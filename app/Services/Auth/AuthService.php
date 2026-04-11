@@ -44,7 +44,7 @@ class AuthService implements AuthServiceInterface
 
                 DB::afterCommit(fn () => $this->emailVerificationService->sendAfterRegistration($user));
 
-                return $user;
+                return $this->loadUserWithRelations($user);
             });
         }
         catch (\Exception $e) {
@@ -69,12 +69,12 @@ class AuthService implements AuthServiceInterface
 
         DB::afterCommit(fn () => $this->emailVerificationService->sendAfterRegistration($user));
 
-        return $user;
+        return $this->loadUserWithRelations($user);
     }
 
     public function login(LoginDTO $dto): array
     {
-        $query = User::query();
+        $query = User::query()->with(['preferredSector', 'category']);
 
         if ($dto->email !== null) {
             $query->where('email', $dto->email);
@@ -135,10 +135,6 @@ class AuthService implements AuthServiceInterface
 
     public function updateProfile(User $user, array $data): array
     {
-        $emailChanged = array_key_exists('email', $data)
-            && $data['email'] !== null
-            && $data['email'] !== $user->email;
-
         if ($user->role !== UserRole::Investor) {
             unset(
                 $data['available_capital'],
@@ -156,25 +152,12 @@ class AuthService implements AuthServiceInterface
         }
 
         $user->fill($data);
-
-        if ($emailChanged) {
-            $user->forceFill([
-                'email_verified_at' => null,
-                'otp' => null,
-                'otp_expires_at' => null,
-            ]);
-        }
-
         $user->save();
-        $user->refresh()->loadMissing(['preferredSector', 'category']);
-
-        if ($emailChanged) {
-            $this->emailVerificationService->resendForUser($user, false);
-        }
+        $user = $this->loadUserWithRelations($user);
 
         return [
             'user' => $user,
-            'email_verification_sent' => $emailChanged,
+            'email_verification_sent' => false,
         ];
     }
 
@@ -192,5 +175,12 @@ class AuthService implements AuthServiceInterface
         $this->deviceService->forgetAllUserDevices($user);
 
         return ['status' => 'updated_logged_out_everywhere'];
+    }
+
+    private function loadUserWithRelations(User $user): User
+    {
+        return User::query()
+            ->with(['preferredSector', 'category'])
+            ->findOrFail($user->id);
     }
 }

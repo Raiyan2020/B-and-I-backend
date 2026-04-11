@@ -42,6 +42,12 @@ return [
     'email_verified_successfully' => 'تم تأكيد بريدك الإلكتروني بنجاح وتم تسجيل دخولك.',
     'verification_link_invalid' => 'رابط التفعيل غير صالح أو منتهي الصلاحية.',
     'verification_code_invalid' => 'رمز التحقق غير صالح أو منتهي الصلاحية.',
+    'current_email_change_code_sent' => 'تم إرسال رمز تحقق إلى بريدك الإلكتروني الحالي.',
+    'current_email_verified_for_change' => 'تم التحقق من بريدك الإلكتروني الحالي. يمكنك الآن التحقق من بريدك الإلكتروني الجديد.',
+    'new_email_change_code_sent' => 'تم إرسال رمز تحقق إلى بريدك الإلكتروني الجديد.',
+    'email_change_current_verification_required' => 'يرجى التحقق من بريدك الإلكتروني الحالي أولًا قبل إضافة بريد جديد.',
+    'email_change_same_email' => 'يجب أن يكون البريد الإلكتروني الجديد مختلفًا عن بريدك الإلكتروني الحالي.',
+    'email_changed_successfully_logged_out' => 'تم تغيير بريدك الإلكتروني بنجاح. لقد قمنا بتسجيل خروجك من جميع الأجهزة المرتبطة حفاظًا على أمان حسابك.',
     'price_per_month' => ':price د.ك / شهر',
 
     'opportunity_created_successfully' => 'تم إرسال الإعلان وهو الآن قيد المراجعة.',

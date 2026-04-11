@@ -26,9 +26,9 @@ class VerifyEmailNotification extends Notification
         $message = (new MailMessage)
             ->subject(__('mail.verify_email.subject'))
             ->markdown('emails.verify-email', [
-                'user' => $notifiable,
+                'mailSection' => 'verify_email',
+                'userName' => $notifiable->name ?: __('mail.verify_email.user_fallback'),
                 'otp' => $notifiable->otp,
-                'expiresAt' => $notifiable->otp_expires_at,
             ]);
 
         app()->setLocale($originalLocale);

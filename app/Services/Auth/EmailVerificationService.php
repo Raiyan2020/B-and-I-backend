@@ -62,7 +62,10 @@ class EmailVerificationService
 
     public function verifyOtp(string $email, string $password, string $otp): array
     {
-        $user = User::query()->where('email', $email)->first();
+        $user = User::query()
+            ->with(['preferredSector', 'category'])
+            ->where('email', $email)
+            ->first();
 
         if (! $user || ! Hash::check($password, $user->password)) {
             return ['status' => 'invalid_credentials'];
@@ -88,8 +91,11 @@ class EmailVerificationService
         ])->save();
 
         event(new Verified($user));
+        $user =User::query()
+            ->with(['preferredSector', 'category'])
+            ->findOrFail($user->id);
 
-        return ['status' => 'verified', 'user' => $user->fresh()];
+        return ['status' => 'verified', 'user' => $user];
     }
 
     protected function throttleKey(User $user): string

@@ -49,11 +49,11 @@ class UserResource extends JsonResource
                 'investor_type' => $investorTypeValue,
                 'preferred_sector_id' => $preferredSectorId,
                 'category_id' => $categoryId,
-                'preferred_sector' => $this->preferredSector ? [
+                'preferred_sector' => $this->relationLoaded('preferredSector') && $this->preferredSector ? [
                     'id' => $this->preferredSector->id,
                     'name' => $this->preferredSector->name,
                 ] : null,
-                'category' => $this->category ? [
+                'category' => $this->relationLoaded('category') && $this->category ? [
                     'id' => $this->category->id,
                     'name' => $this->category->name,
                 ] : null,

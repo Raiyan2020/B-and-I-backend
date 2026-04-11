@@ -37,13 +37,7 @@ class UpdateProfileRequest extends FormRequest
             'bio' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'short_description' => ['sometimes', 'nullable', 'string', 'max:500'],
             'image' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-            'email' => [
-                'sometimes',
-                'email:dns,rfc',
-                Rule::unique('users', 'email')
-                    ->ignore($user?->id)
-                    ->whereNull('deleted_at'),
-            ],
+            'email' => ['prohibited'],
             'phone' => [
                 'sometimes',
                 'regex:/^[4569]\d{7}$/',

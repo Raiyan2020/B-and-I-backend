@@ -185,7 +185,7 @@ class AuthEmailVerificationTest extends TestCase
             ->assertJsonPath('data.email_verified', true);
 
         self::assertNotNull($user->fresh()->email_verified_at);
-        self::assertNull($user->fresh()->email_verification_otp);
+        self::assertNull($user->fresh()->otp);
         self::assertNotNull($response->json('data.token'));
         $this->assertDatabaseHas('devices', [
             'user_id' => $user->id,
