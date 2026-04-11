@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
 
+// general routes - no auth required
     Route::prefix('general')->group(function () {
         include __DIR__ . '/guard/general.php';
     });
