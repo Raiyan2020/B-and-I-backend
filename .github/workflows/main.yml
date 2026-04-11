@@ -3,23 +3,23 @@ on:
     branches:
       - main
 
-name: 🚀 Deploy website on push
+name: 🚀 Deploy via SFTP
 
 jobs:
-  web-deploy:
-    name: 🎉 Deploy
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🚚 Get latest code
-        uses: actions/checkout@v2
+      - name: 🚚 Checkout
+        uses: actions/checkout@v4
 
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      - name: 📂 Upload via SFTP
+        uses: pressidium/lftp-mirror-action@v1
         with:
-          local-dir: ./
-          server: 57.129.140.1
-          username: ${{ secrets.ftp_username }}
-          password: ${{ secrets.ftp_password }}
+          host: 57.129.140.1
           port: 22
-          server-dir: /bni/
+          user: ${{ secrets.ftp_username }}
+          pass: ${{ secrets.ftp_password }}
+          localDir: "./"
+          remoteDir: "/bni"
+          reverse: true
