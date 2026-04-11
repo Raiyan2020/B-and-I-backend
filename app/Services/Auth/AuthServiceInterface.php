@@ -38,4 +38,19 @@ interface AuthServiceInterface
      * @return array{status: string}
      */
     public function changePassword(User $user, string $currentPassword, string $newPassword): array;
+
+    /**
+     * @return array{status: string}
+     */
+    public function requestForgotPasswordOtp(string $email): array;
+
+    /**
+     * @return array{status: string}
+     */
+    public function verifyForgotPasswordOtp(string $email, string $otp): array;
+
+    /**
+     * @return array{status: string}
+     */
+    public function resetForgottenPassword(string $email, string $newPassword): array;
 }

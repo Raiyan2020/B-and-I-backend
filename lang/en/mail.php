@@ -37,4 +37,16 @@ return [
         'ignore' => 'If you did not request this change, you can safely ignore this email.',
         'signature' => 'Regards,',
     ],
+    'forgot_password' => [
+        'subject' => 'Reset Your Password',
+        'heading' => 'Reset Your Password',
+        'greeting' => 'Hello :name,',
+        'user_fallback' => 'there',
+        'intro' => 'We received a request to reset the password for your account.',
+        'description' => 'Use the verification code below to confirm the request and continue setting a new password.',
+        'otp_label' => 'Your verification code',
+        'expiry_notice' => 'This code expires in :minutes minutes.',
+        'ignore' => 'If you did not request a password reset, you can safely ignore this email.',
+        'signature' => 'Regards,',
+    ],
 ];

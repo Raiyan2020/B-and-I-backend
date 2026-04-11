@@ -61,4 +61,9 @@ return [
     'current_password_incorrect' => 'كلمة المرور الحالية غير صحيحة.',
     'logged_out_successfully' => 'تم تسجيل الخروج بنجاح.',
     'notification_settings_updated' => 'تم تحديث إعدادات الإشعارات بنجاح.',
+    'forgot_password_code_sent' => 'إذا كان الحساب موجودًا، فقد أرسلنا رمز تحقق إلى بريدك الإلكتروني.',
+    'forgot_password_code_verified' => 'تم تأكيد رمز التحقق بنجاح. يمكنك الآن تعيين كلمة مرور جديدة.',
+    'forgot_password_verification_required' => 'يرجى تأكيد رمز التحقق المرسل إلى بريدك الإلكتروني قبل تعيين كلمة مرور جديدة.',
+    'password_reset_successfully_login_again' => 'تمت إعادة تعيين كلمة المرور بنجاح. يرجى تسجيل الدخول مرة أخرى باستخدام كلمة المرور الجديدة.',
+    'account_not_found' => 'لا يوجد حساب مرتبط بهذا البريد الإلكتروني.',
 ];

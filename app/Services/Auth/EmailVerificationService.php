@@ -118,7 +118,6 @@ class EmailVerificationService
 
     protected function generateOtp(): string
     {
-       // TODO::generate a fixed OTP for testing purposes
-        return 123456 ?? str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
 }
