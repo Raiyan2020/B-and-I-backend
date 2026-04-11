@@ -22,22 +22,10 @@ jobs:
           port: 22
           user: ${{ secrets.ftp_username }}
           pass: ${{ secrets.ftp_password }}
-          localDir: "./"
-          remoteDir: "/public_html/test-deploy"
+          onlyNewer: true
+          settings: 'sftp:auto-confirm=yes'
+          localDir: './'
+          remoteDir: '/public_html/test-deploy'
           reverse: true
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/vendor/**
-            **/public/**
-            **/.env
-            **/.env.*
-            **/storage/logs/**
-            **/storage/framework/cache/**
-            **/storage/framework/sessions/**
-            **/storage/framework/views/**
-            **/tests/**
-            **/README.md
-            **/package-lock.json
-            **/yarn.lock
+          ignoreFile: '.lftp_ignore'
+          options: '--verbose'
