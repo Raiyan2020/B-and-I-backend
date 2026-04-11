@@ -3,7 +3,7 @@ on:
     branches:
       - main
 
-name: 🚀 Deploy via SFTP
+name: Deploy via SFTP
 
 jobs:
   deploy:
@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: 🚚 Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: 📂 Upload via SFTP
         uses: pressidium/lftp-mirror-action@v1
@@ -21,5 +23,21 @@ jobs:
           user: ${{ secrets.ftp_username }}
           pass: ${{ secrets.ftp_password }}
           localDir: "./"
-          remoteDir: "/bni"
+          remoteDir: "/public_html/test-deploy"
           reverse: true
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/vendor/**
+            **/public/**
+            **/.env
+            **/.env.*
+            **/storage/logs/**
+            **/storage/framework/cache/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/**
+            **/tests/**
+            **/README.md
+            **/package-lock.json
+            **/yarn.lock
