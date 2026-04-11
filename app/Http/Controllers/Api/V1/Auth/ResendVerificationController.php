@@ -35,6 +35,6 @@ class ResendVerificationController extends Controller
             );
         }
 
-        return $this->jsonResponse(msg: __('apis.verification_email_sent'), key: 'need_active', data: $result['data']);
+        return $this->jsonResponse(msg: __('apis.verification_email_sent'));
     }
 }

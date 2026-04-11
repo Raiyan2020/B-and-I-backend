@@ -32,7 +32,7 @@ return [
     ],
     'boolean' => 'The :attribute field must be true or false.',
     'confirmed' => 'The :attribute confirmation does not match.',
-    'current_password' => 'The password is incorrect.',
+    'current_password' => 'The current password field is required.',
     'date' => 'The :attribute is not a valid date.',
     'date_equals' => 'The :attribute must be a date equal to :date.',
     'date_format' => 'The :attribute does not match the format :format.',
@@ -171,6 +171,11 @@ return [
         'otp_code' => 'OTP code',
         'verification_code' => 'Verification code',
         'code' => 'Code',
+        'new_email' => 'New email',
+        'current_email' => 'Current email',
+        'email_change_token' => 'Email change token',
+        'email_verification_code' => 'Email verification code',
+        'change_email_code' => 'Change email code',
     ],
 
 ];

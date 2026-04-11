@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Enums\InvestorExperience;
 use App\Enums\InvestorType;
@@ -61,7 +62,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'interest_notifications_enabled',
         'system_notifications_enabled',
         'otp',
-        'otp_expires_at'
+        'otp_expires_at',
     ];
 
     /**
@@ -188,6 +189,11 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     public function devices(): HasMany
     {
         return $this->hasMany(Device::class);
+    }
+
+    public function authUpdates(): MorphMany
+    {
+        return $this->morphMany(AuthUpdate::class, 'auth_updateable');
     }
 
     public function preferredSector()

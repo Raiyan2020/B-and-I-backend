@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Enums\InvestorExperience;
 use App\Enums\InvestorType;
 use App\Enums\UserRole;
+use App\Models\AuthUpdate;
 use App\Models\Category;
 use App\Models\Device;
 use App\Models\PreferredSector;
@@ -129,8 +130,16 @@ class AuthProfileManagementTest extends TestCase
             ->assertJsonPath('key', 'success')
             ->assertJsonPath('msg', __('apis.current_email_change_code_sent'));
 
-        $user = $user->fresh();
-        $oldOtp = $user->email_change_old_otp;
+        $oldEmailUpdate = AuthUpdate::query()
+            ->where('auth_updateable_type', User::class)
+            ->where('auth_updateable_id', $user->id)
+            ->where('type', 'email')
+            ->where('sub_type', 'old_email')
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($oldEmailUpdate);
+        $oldOtp = $oldEmailUpdate->code;
 
         Notification::assertSentOnDemand(
             EmailOtpNotification::class,
@@ -148,6 +157,9 @@ class AuthProfileManagementTest extends TestCase
             ->assertJsonPath('key', 'success')
             ->assertJsonPath('msg', __('apis.current_email_verified_for_change'));
 
+        $this->assertNull($oldEmailUpdate->fresh()->code);
+        $this->assertNotNull($oldEmailUpdate->fresh()->verified_at);
+
         $requestNewResponse = $this->postJson('/api/v1/auth/email-change/request-new', [
             'email' => 'new@gmail.com',
         ]);
@@ -156,8 +168,17 @@ class AuthProfileManagementTest extends TestCase
             ->assertJsonPath('key', 'success')
             ->assertJsonPath('msg', __('apis.new_email_change_code_sent'));
 
-        $user = $user->fresh();
-        $newOtp = $user->email_change_new_otp;
+        $newEmailUpdate = AuthUpdate::query()
+            ->where('auth_updateable_type', User::class)
+            ->where('auth_updateable_id', $user->id)
+            ->where('type', 'email')
+            ->where('sub_type', 'new_email')
+            ->where('attribute', 'new@gmail.com')
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($newEmailUpdate);
+        $newOtp = $newEmailUpdate->code;
 
         Notification::assertSentOnDemand(
             EmailOtpNotification::class,
@@ -180,8 +201,12 @@ class AuthProfileManagementTest extends TestCase
 
         $this->assertSame('new@gmail.com', $user->email);
         $this->assertNotNull($user->email_verified_at);
-        $this->assertNull($user->email_change_new_email);
-        $this->assertNull($user->email_change_old_verified_at);
+        $this->assertDatabaseMissing('auth_updates', [
+            'id' => $oldEmailUpdate->id,
+        ]);
+        $this->assertDatabaseMissing('auth_updates', [
+            'id' => $newEmailUpdate->id,
+        ]);
         $this->assertSame(0, PersonalAccessToken::query()->where('tokenable_id', $user->id)->count());
         $this->assertDatabaseMissing('devices', [
             'user_id' => $user->id,
@@ -191,6 +216,66 @@ class AuthProfileManagementTest extends TestCase
             'user_id' => $user->id,
             'token' => 'change-email-device-2',
         ]);
+    }
+
+    public function test_resending_new_email_otp_updates_existing_auth_update_record(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'role' => UserRole::Advertiser,
+            'email' => 'old@example.com',
+            'password' => 'password123',
+            'email_verified_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/v1/auth/email-change/request-current', [
+            'current_password' => 'password123',
+        ])->assertOk();
+
+        $oldEmailUpdate = AuthUpdate::query()
+            ->where('auth_updateable_type', User::class)
+            ->where('auth_updateable_id', $user->id)
+            ->where('type', 'email')
+            ->where('sub_type', 'old_email')
+            ->latest('id')
+            ->firstOrFail();
+
+        $this->postJson('/api/v1/auth/email-change/verify-current', [
+            'otp' => $oldEmailUpdate->code,
+        ])->assertOk();
+
+        $this->postJson('/api/v1/auth/email-change/request-new', [
+            'email' => 'new@gmail.com',
+        ])->assertOk();
+
+        $firstNewEmailUpdate = AuthUpdate::query()
+            ->where('auth_updateable_type', User::class)
+            ->where('auth_updateable_id', $user->id)
+            ->where('type', 'email')
+            ->where('sub_type', 'new_email')
+            ->firstOrFail();
+
+        $this->postJson('/api/v1/auth/email-change/request-new', [
+            'email' => 'new@gmail.com',
+        ])->assertOk();
+
+        $this->assertSame(1, AuthUpdate::query()
+            ->where('auth_updateable_type', User::class)
+            ->where('auth_updateable_id', $user->id)
+            ->where('type', 'email')
+            ->where('sub_type', 'new_email')
+            ->count());
+
+        $this->assertSame($firstNewEmailUpdate->id, AuthUpdate::query()
+            ->where('auth_updateable_type', User::class)
+            ->where('auth_updateable_id', $user->id)
+            ->where('type', 'email')
+            ->where('sub_type', 'new_email')
+            ->firstOrFail()
+            ->id);
     }
 
     public function test_user_can_change_password(): void

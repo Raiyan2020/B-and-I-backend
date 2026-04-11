@@ -8,13 +8,13 @@ use App\Services\Auth\AuthServiceInterface;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 
-class ChangePasswordController extends Controller
+class UserPasswordController extends Controller
 {
     use ResponseTrait;
 
     public function __construct(private readonly AuthServiceInterface $service) {}
 
-    public function __invoke(ChangePasswordRequest $request): JsonResponse
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
         $result = $this->service->changePassword(
             $request->user(),

@@ -2,19 +2,15 @@
 
 
 use App\Http\Controllers\Api\V1\Auth\LoginController;
-use App\Http\Controllers\Api\V1\Auth\ChangePasswordController;
+use App\Http\Controllers\Api\V1\Auth\UserPasswordController;
+use App\Http\Controllers\Api\V1\Auth\ChangeEmailController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\NotificationSettingsController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
-use App\Http\Controllers\Api\V1\Auth\RegisterAdvertiserController;
-use App\Http\Controllers\Api\V1\Auth\RegisterInvestorController;
+use App\Http\Controllers\Api\V1\Auth\UserRegisterController;
 use App\Http\Controllers\Api\V1\Auth\ResendVerificationController;
-use App\Http\Controllers\Api\V1\Auth\UpdateProfileController;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
-use App\Http\Controllers\Api\V1\Company\OpportunityController as CompanyOpportunityController;
-use App\Http\Controllers\Api\V1\General\CategoryController;
-use App\Http\Controllers\Api\V1\General\ReferenceDataController;
-use App\Http\Controllers\Api\V1\General\HomeController;
+use App\Http\Controllers\Api\V1\Company\OpportunityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,10 +29,13 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
     Route::prefix('general')->group(function () {
         include __DIR__ . '/guard/general.php';
     });
-    
+
     Route::prefix('auth')->group(function () {
-        Route::post('register/investor', [RegisterInvestorController::class, '__invoke']);
-        Route::post('register/advertiser', [RegisterAdvertiserController::class, '__invoke']);
+
+        Route::group(['prefix' => 'register', 'controller' => UserRegisterController::class], function () {
+            Route::post('/investor', 'investorRegister');
+            Route::post('/advertiser', 'advertiserRegister');
+        });
 
         Route::post('login', [LoginController::class, '__invoke']);
 
@@ -49,14 +48,27 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
         Route::prefix('auth')->group(function () {
             Route::post('logout', [LogoutController::class, '__invoke']);
 
-            Route::get('profile', [ProfileController::class, '__invoke']);
-            Route::patch('profile', [UpdateProfileController::class, '__invoke']);
-            Route::patch('password', [ChangePasswordController::class, '__invoke']);
-            Route::get('notification-settings', [NotificationSettingsController::class, 'show']);
-            Route::patch('notification-settings', [NotificationSettingsController::class, 'update']);
+            Route::group(['prefix' => 'profile', 'controller' => ProfileController::class], function () {
+                Route::get('/', '__invoke');
+                Route::patch('/', 'update');
+            });
+
+            Route::group(['prefix' => 'email-change', 'controller' => ChangeEmailController::class], function () {
+                Route::post('request-current', 'requestCurrent')->middleware('throttle:6,1');
+                Route::post('verify-current', 'verifyCurrent');
+                Route::post('request-new', 'requestNew')->middleware('throttle:6,1');
+                Route::post('verify-new', 'verifyNew');
+            });
+
+            Route::patch('password', [UserPasswordController::class, 'changePassword']);
+
+            Route::group(['prefix' => 'notification-settings', 'controller' => NotificationSettingsController::class], function () {
+                Route::get('/', 'show');
+                Route::patch('/', 'update');
+            });
         });
 
-        Route::group(['prefix' => 'company/opportunities', 'controller' => CompanyOpportunityController::class], function () {
+        Route::group(['prefix' => 'company/opportunities', 'controller' => OpportunityController::class], function () {
             Route::get('/', 'index');
             Route::post('/', 'store');
             Route::get('/{opportunity}', 'show');

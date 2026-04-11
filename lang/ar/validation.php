@@ -32,7 +32,7 @@ return [
     ],
     'boolean' => 'يجب أن تكون قيمة :attribute نعم أو لا.',
     'confirmed' => 'تأكيد :attribute غير متطابق.',
-    'current_password' => 'The password is incorrect.',
+    'current_password' => 'حقل كلمة المرور الحالية مطلوب.',
     'date' => 'The :attribute is not a valid date.',
     'date_equals' => 'The :attribute must be a date equal to :date.',
     'date_format' => ' :attribute لا يتطابق مع التنسيق :format.',
@@ -194,6 +194,13 @@ return [
         'otp_code' => 'كود التحقق',
         'verification_code' => 'رمز التحقق',
         'code' => 'الرمز',
+        'new_email' => 'البريد الإلكتروني الجديد',
+        'current_email' => 'البريد الإلكتروني الحالي',
+        'email_change_token' => 'رمز تغيير البريد الإلكتروني',
+        'email_verification_code' => 'رمز التحقق من البريد الإلكتروني',
+        'change_email_code' => 'رمز تغيير البريد الإلكتروني',
+        'current_password' => 'كلمة المرور الحالية',
+        'password' => 'كلمة المرور'
     ],
 
 ];
