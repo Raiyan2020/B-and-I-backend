@@ -15,7 +15,7 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           local-dir: ./
-          server: 57.129.140.1
+          server: ftp.57.129.140.1
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
           server-dir: /bni/
