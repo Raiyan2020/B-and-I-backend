@@ -3,7 +3,7 @@ on:
     branches:
       - main
 
-name: Deploy via SFTP
+name: 🚀 Deploy via SFTP
 
 jobs:
   deploy:
@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: 🚚 Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: 📂 Upload via SFTP
         uses: pressidium/lftp-mirror-action@v1
@@ -22,10 +20,6 @@ jobs:
           port: 22
           user: ${{ secrets.ftp_username }}
           pass: ${{ secrets.ftp_password }}
-          onlyNewer: true
-          settings: 'sftp:auto-confirm=yes'
-          localDir: './'
-          remoteDir: '/public_html/test-deploy'
+          localDir: "./"
+          remoteDir: "/bni"
           reverse: true
-          ignoreFile: '.lftp_ignore'
-          options: '--verbose'
