@@ -14,6 +14,7 @@ use App\Http\Controllers\Dashboard\PreferredSectorController;
 use App\Http\Controllers\Dashboard\RolesController;
 use App\Http\Controllers\Dashboard\SubscriptionPackageController;
 use App\Http\Controllers\Dashboard\UserController;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -27,6 +28,14 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('send-mail', function () {
+    Mail::raw('Test Mail', function ($message) {
+        $message->to('ahmedelhefny@gmail.com')
+            ->subject('Test');
+    });
+    return 'sent';
+});
 
 Route::get('/', function () {
     return redirect()->route('admin.login');
