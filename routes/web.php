@@ -1,21 +1,21 @@
 <?php
 
 
-use App\Http\Controllers\Dashboard\CategoryController;
-use App\Http\Controllers\Dashboard\PreferredSectorController;
 use App\Http\Controllers\Dashboard\AboutUsItemController;
-use App\Http\Controllers\Dashboard\FeatureController;
-use App\Http\Controllers\Dashboard\OpportunityController;
-use App\Http\Controllers\Dashboard\SubscriptionPackageController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\HomeController;
-use App\Http\Controllers\Dashboard\AuthController;
-use App\Http\Controllers\Dashboard\UserController;
-use App\Http\Controllers\Dashboard\RolesController;
-use App\Http\Controllers\Dashboard\NotificationsController;
-use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
-use App\Http\Controllers\Dashboard\GeneralSettingController;
 use App\Http\Controllers\Dashboard\AdminController;
+use App\Http\Controllers\Dashboard\AuthController;
+use App\Http\Controllers\Dashboard\CategoryController;
+use App\Http\Controllers\Dashboard\FeatureController;
+use App\Http\Controllers\Dashboard\GeneralSettingController;
+use App\Http\Controllers\Dashboard\HomeController;
+use App\Http\Controllers\Dashboard\NotificationsController;
+use App\Http\Controllers\Dashboard\OpportunityController;
+use App\Http\Controllers\Dashboard\PreferredSectorController;
+use App\Http\Controllers\Dashboard\RolesController;
+use App\Http\Controllers\Dashboard\SubscriptionPackageController;
+use App\Http\Controllers\Dashboard\UserController;
+use Illuminate\Support\Facades\Route;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 /*
 |--------------------------------------------------------------------------

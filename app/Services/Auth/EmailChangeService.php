@@ -183,6 +183,6 @@ class EmailChangeService
 
     private function generateOtp(): string
     {
-        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        return 123456??str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
 }

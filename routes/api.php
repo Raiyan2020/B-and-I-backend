@@ -39,6 +39,7 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
         });
 
         Route::post('login', [LoginController::class, '__invoke']);
+        
         Route::group(['prefix' => 'password/forgot', 'controller' => UserPasswordController::class], function () {
             Route::post('request-code', 'requestForgotPasswordOtp')->middleware('throttle:6,1');
             Route::post('verify-code', 'verifyForgotPasswordOtp');
