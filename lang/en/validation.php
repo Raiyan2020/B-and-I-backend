@@ -176,6 +176,7 @@ return [
         'email_change_token' => 'Email change token',
         'email_verification_code' => 'Email verification code',
         'change_email_code' => 'Change email code',
+        'status' => 'Status',
     ],
 
 ];

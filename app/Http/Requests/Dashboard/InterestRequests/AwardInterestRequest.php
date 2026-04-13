@@ -20,6 +20,7 @@ class AwardInterestRequest extends FormRequest
                 'required',
                 'string',
                 Rule::in([
+                    OpportunityStatus::Published->value,
                     OpportunityStatus::Reserved->value,
                     OpportunityStatus::Completed->value,
                 ]),

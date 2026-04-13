@@ -137,7 +137,7 @@ class OpportunityService
         InterestRequest $interestRequest,
         OpportunityStatus $status,
     ): Opportunity {
-        if (! in_array($status, [OpportunityStatus::Reserved, OpportunityStatus::Completed], true)) {
+        if (! in_array($status, [OpportunityStatus::Reserved, OpportunityStatus::Completed, OpportunityStatus::Published], true)) {
             throw ValidationException::withMessages([
                 'status' => [__('dashboard.invalid_award_status')],
             ]);
@@ -188,7 +188,7 @@ class OpportunityService
         }
 
         // TODO:: Handle payment processing here before creating the seat
-        
+
         $seat = DB::transaction(function () use ($user, $opportunity, $seatPrice) {
             return InvestmentSeat::query()->create([
                 'user_id' => $user->id,

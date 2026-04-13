@@ -200,7 +200,8 @@ return [
         'email_verification_code' => 'رمز التحقق من البريد الإلكتروني',
         'change_email_code' => 'رمز تغيير البريد الإلكتروني',
         'current_password' => 'كلمة المرور الحالية',
-        'password' => 'كلمة المرور'
+        'password' => 'كلمة المرور',
+        'status' => 'الحالة',
     ],
 
 ];
