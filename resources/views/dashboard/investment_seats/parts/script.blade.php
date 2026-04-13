@@ -1,11 +1,19 @@
 <script>
     $(document).ready(function() {
         const opportunityShowRouteTemplate = '{{ route('admin.opportunities.show', ':id') }}';
+        const opportunityId = @json($opportunityId);
 
         $('#investment-seats-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('admin.investment-seats.index') }}",
+            ajax: {
+                url: "{{ route('admin.investment-seats.index') }}",
+                data: function(d) {
+                    if (opportunityId) {
+                        d.opportunity_id = opportunityId;
+                    }
+                }
+            },
             columns: [
                 {data: 'id', name: 'id'},
                 {

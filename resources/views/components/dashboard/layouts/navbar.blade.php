@@ -19,13 +19,13 @@
                         <li class="dropdown dropdown-language nav-item">
                             <a class="dropdown-toggle nav-link" id="dropdown-flag" href="#" data-toggle="dropdown"
                                aria-haspopup="true" aria-expanded="false"><i
-                                    class="flag-icon {{app()->getLocale() == 'ar'?'flag-icon-sa':'flag-icon-us'}}"></i><span
+                                    class="flag-icon {{app()->getLocale() == 'ar'?'flag-icon-kw':'flag-icon-us'}}"></i><span
                                     class="selected-language">{{app()->getLocale() == 'ar'?'العربية':'English'}}</span></a>
                             <div class="dropdown-menu" aria-labelledby="dropdown-flag">
                                 <a class="dropdown-item" href="{{ LaravelLocalization::getLocalizedURL('en') }}"
                                    data-language="en"><i class="flag-icon flag-icon-us"></i> English</a>
                                 <a class="dropdown-item" href="{{ LaravelLocalization::getLocalizedURL('ar') }}"
-                                   data-language="fr"><i class="flag-icon flag-icon-sa"></i> العربية</a>
+                                   data-language="fr"><i class="flag-icon flag-icon-kw"></i> العربية</a>
                             </div>
                         </li>
                     </ul>

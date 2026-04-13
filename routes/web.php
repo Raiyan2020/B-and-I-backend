@@ -116,6 +116,10 @@ Route::group([
             Route::post('opportunities/{opportunity}/review', 'review')->name('opportunities.review');
         });
 
+        Route::controller(InterestRequestController::class)->group(function () {
+            Route::post('interest-requests/{interestRequest}/award', 'award')->name('interest-requests.award');
+        });
+
         Route::resources([
             'admins' => AdminController::class,
             'roles' => RolesController::class,

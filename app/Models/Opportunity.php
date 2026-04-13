@@ -21,6 +21,7 @@ class Opportunity extends BaseModel
         'user_id',
         'category_id',
         'reviewed_by_admin_id',
+        'investor_id',
         'goal',
         'status',
         'contact_name',
@@ -64,6 +65,11 @@ class Opportunity extends BaseModel
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'reviewed_by_admin_id');
+    }
+
+    public function investor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'investor_id');
     }
 
     public function investmentSeats(): HasMany

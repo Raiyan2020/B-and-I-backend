@@ -21,6 +21,9 @@ class InvestmentSeatController extends Controller
             $query = InvestmentSeat::query()
                 ->with(['opportunity.user', 'user'])
                 ->select('investment_seats.*')
+                ->when(request()->filled('opportunity_id'), function ($builder) {
+                    $builder->where('opportunity_id', request()->integer('opportunity_id'));
+                })
                 ->latest('id');
 
             return DataTables::eloquent($query)
@@ -53,7 +56,9 @@ class InvestmentSeatController extends Controller
                 ->make(true);
         }
 
-        return view('dashboard.investment_seats.index');
+        return view('dashboard.investment_seats.index', [
+            'opportunityId' => request('opportunity_id'),
+        ]);
     }
 
     public function show(InvestmentSeat $investmentSeat): View

@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Enums\OpportunityStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\InterestRequests\AwardInterestRequest;
 use App\Models\InterestRequest;
+use App\Services\Opportunity\OpportunityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
 class InterestRequestController extends Controller
 {
-    public function __construct()
+    public function __construct(private readonly OpportunityService $opportunityService)
     {
         // $this->middleware('permission:interest-requests', ['only' => ['index', 'show']]);
     }
@@ -21,9 +24,15 @@ class InterestRequestController extends Controller
             $query = InterestRequest::query()
                 ->with(['opportunity.user', 'user', 'investmentSeat'])
                 ->select('interest_requests.*')
+                ->when(request()->filled('opportunity_id'), function ($builder) {
+                    $builder->where('opportunity_id', request()->integer('opportunity_id'));
+                })
                 ->latest('id');
 
             return DataTables::eloquent($query)
+                ->addColumn('opportunity_id', function (InterestRequest $interestRequest): int|string {
+                    return $interestRequest->opportunity_id ?? '';
+                })
                 ->addColumn('opportunity_name', function (InterestRequest $interestRequest): string {
                     return $interestRequest->opportunity?->company_name ?? '-';
                 })
@@ -47,7 +56,9 @@ class InterestRequestController extends Controller
                 ->make(true);
         }
 
-        return view('dashboard.interest_requests.index');
+        return view('dashboard.interest_requests.index', [
+            'opportunityId' => request('opportunity_id'),
+        ]);
     }
 
     public function show(InterestRequest $interestRequest): View
@@ -55,12 +66,33 @@ class InterestRequestController extends Controller
         $interestRequest->load([
             'opportunity.user',
             'opportunity.category',
+            'opportunity.investor',
             'user',
-            'investmentSeat',
+            'investmentSeat.user',
+            'investmentSeat.opportunity',
         ]);
 
         return view('dashboard.interest_requests.show', [
             'row' => $interestRequest,
+            'awardStatuses' => [
+                OpportunityStatus::Reserved->value => __('dashboard.opportunity_status_reserved'),
+                OpportunityStatus::Completed->value => __('dashboard.opportunity_status_completed'),
+            ],
+        ]);
+    }
+
+    public function award(AwardInterestRequest $request, InterestRequest $interestRequest): JsonResponse
+    {
+        $this->opportunityService->awardInterestRequest(
+            admin: auth('admin')->user(),
+            interestRequest: $interestRequest,
+            status: OpportunityStatus::from($request->validated('status')),
+        );
+
+        return response()->json([
+            'key' => 'success',
+            'msg' => __('dashboard.opportunity_awarded_successfully'),
+            'url' => route('admin.interest-requests.show', $interestRequest),
         ]);
     }
 }

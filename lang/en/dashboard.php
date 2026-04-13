@@ -460,4 +460,12 @@ return [
     'submitted_at' => 'Submitted at',
     'linked_interest_requests' => 'Linked interest requests',
     'opportunity_reference' => 'Advertisement',
+    'investment_seats_count' => 'Investment seats',
+    'interest_requests_count' => 'Interest requests',
+    'award_status' => 'Award status',
+    'award_investment' => 'Award investment to this investor',
+    'current_awarded_investor' => 'Current awarded investor',
+    'opportunity_awarded_successfully' => 'Investment was awarded successfully',
+    'invalid_award_status' => 'Invalid award status',
+    'invalid_interest_request_award' => 'This interest request cannot be awarded because its data is inconsistent',
 ];

@@ -105,4 +105,69 @@ class MarketplaceAdminDashboardTest extends TestCase
             ->assertOk()
             ->assertViewIs('dashboard.interest_requests.show');
     }
+
+    public function test_admin_can_award_interest_request_and_set_opportunity_investor(): void
+    {
+        $admin = $this->createSuperAdmin();
+        $records = $this->createMarketplaceRecords();
+
+        $this->actingAs($admin, 'admin');
+
+        $this->post(route('admin.interest-requests.award', $records['interestRequest']), [
+            'status' => OpportunityStatus::Reserved->value,
+        ])->assertOk();
+
+        $records['interestRequest']->opportunity->refresh();
+
+        $this->assertSame(OpportunityStatus::Reserved, $records['interestRequest']->opportunity->status);
+        $this->assertSame($records['interestRequest']->user_id, $records['interestRequest']->opportunity->investor_id);
+    }
+
+    public function test_opportunity_observer_clears_investor_when_status_returns_to_published(): void
+    {
+        $records = $this->createMarketplaceRecords();
+
+        $opportunity = $records['interestRequest']->opportunity;
+
+        $opportunity->update([
+            'status' => OpportunityStatus::Reserved,
+            'investor_id' => $records['interestRequest']->user_id,
+        ]);
+
+        $opportunity->update([
+            'status' => OpportunityStatus::Published,
+        ]);
+
+        $opportunity->refresh();
+
+        $this->assertSame(OpportunityStatus::Published, $opportunity->status);
+        $this->assertNull($opportunity->investor_id);
+    }
+
+    public function test_admin_can_filter_marketplace_lists_by_opportunity(): void
+    {
+        $admin = $this->createSuperAdmin();
+        $first = $this->createMarketplaceRecords();
+        $second = $this->createMarketplaceRecords();
+
+        $this->actingAs($admin, 'admin');
+
+        $this->getJson(route('admin.investment-seats.index', [
+            'opportunity_id' => $first['interestRequest']->opportunity_id,
+        ]), [
+            'X-Requested-With' => 'XMLHttpRequest',
+        ])->assertOk()
+            ->assertJsonPath('recordsFiltered', 1)
+            ->assertJsonPath('data.0.id', $first['seat']->id)
+            ->assertJsonPath('data.0.opportunity_id', $first['interestRequest']->opportunity_id);
+
+        $this->getJson(route('admin.interest-requests.index', [
+            'opportunity_id' => $first['interestRequest']->opportunity_id,
+        ]), [
+            'X-Requested-With' => 'XMLHttpRequest',
+        ])->assertOk()
+            ->assertJsonPath('recordsFiltered', 1)
+            ->assertJsonPath('data.0.id', $first['interestRequest']->id)
+            ->assertJsonPath('data.0.opportunity_id', $first['interestRequest']->opportunity_id);
+    }
 }

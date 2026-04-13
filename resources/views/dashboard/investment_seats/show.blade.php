@@ -11,12 +11,12 @@
 
             <div class="row">
                 <div class="col-12">
-                    <div class="card">
+                    <div class="card pb-1">
                         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                             <div class="d-flex align-items-center flex-wrap">
                                 <h4 class="card-title mb-0 mr-1">{{ __('dashboard.opportunity_details') }}</h4>
                                 @if($row->opportunity)
-                                    <span class="badge badge-primary badge-pill px-2 py-1">
+                                    <span class="badge badge-light-primary badge-pill px-2 py-1">
                                         #{{ $row->opportunity->opportunity_number ?? $row->opportunity->id }}
                                     </span>
                                 @endif

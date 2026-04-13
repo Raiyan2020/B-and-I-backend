@@ -463,4 +463,12 @@ return [
     'submitted_at' => 'تاريخ التقديم',
     'linked_interest_requests' => 'طلبات الاهتمام المرتبطة',
     'opportunity_reference' => 'مرجع الإعلان',
+    'award_status' => 'حالة الاختيار',
+    'award_investment' => 'منح الاستثمار للمستثمر',
+    'current_awarded_investor' => 'المستثمر المختار حالياً',
+    'opportunity_awarded_successfully' => 'تم منح الاستثمار بنجاح',
+    'invalid_award_status' => 'حالة الاختيار غير صحيحة',
+    'invalid_interest_request_award' => 'لا يمكن قبول هذا الطلب لأن بياناته غير متطابقة',
+    'investment_seats_count' => 'عدد كراسات الاستثمار',
+    'interest_requests_count' => 'عدد طلبات الاهتمام',
 ];

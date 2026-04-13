@@ -1,5 +1,8 @@
 <script>
     $(document).ready(function() {
+        const investmentSeatsRouteTemplate = '{{ route('admin.investment-seats.index') }}';
+        const interestRequestsRouteTemplate = '{{ route('admin.interest-requests.index') }}';
+
         let table = $('#opportunities-table').DataTable({
             processing: true,
             serverSide: true,
@@ -38,16 +41,46 @@
                     data: 'status',
                     render: function(data) {
                         const map = {
-                            pending_review: 'warning',
-                            approved: 'success',
-                            needs_modification: 'danger'
+                            pending: 'warning',
+                            needs_revision: 'danger',
+                            published: 'success',
+                            reserved: 'info',
+                            completed: 'secondary'
                         };
                         const labels = {
-                            pending_review: '{{ __('dashboard.opportunity_status_pending_review') }}',
-                            approved: '{{ __('dashboard.opportunity_status_approved') }}',
-                            needs_modification: '{{ __('dashboard.opportunity_status_needs_modification') }}'
+                            pending: '{{ __('dashboard.opportunity_status_pending') }}',
+                            needs_revision: '{{ __('dashboard.opportunity_status_needs_revision') }}',
+                            published: '{{ __('dashboard.opportunity_status_published') }}',
+                            reserved: '{{ __('dashboard.opportunity_status_reserved') }}',
+                            completed: '{{ __('dashboard.opportunity_status_completed') }}'
                         };
                         return `<span class="badge badge-${map[data] || 'secondary'}">${labels[data] || data}</span>`;
+                    }
+                },
+                {
+                    data: 'investment_seats_count',
+                    name: 'investment_seats_count',
+                    searchable: false,
+                    render: function(data, type, row) {
+                        if (type !== 'display') {
+                            return data;
+                        }
+
+                        const url = `${investmentSeatsRouteTemplate}?opportunity_id=${row.id}`;
+                        return `<a href="${url}" class="badge badge-light-primary">${data ?? 0}</a>`;
+                    }
+                },
+                {
+                    data: 'interest_requests_count',
+                    name: 'interest_requests_count',
+                    searchable: false,
+                    render: function(data, type, row) {
+                        if (type !== 'display') {
+                            return data;
+                        }
+
+                        const url = `${interestRequestsRouteTemplate}?opportunity_id=${row.id}`;
+                        return `<a href="${url}" class="badge badge-light-info">${data ?? 0}</a>`;
                     }
                 },
                 {data: 'created_at', name: 'created_at'},

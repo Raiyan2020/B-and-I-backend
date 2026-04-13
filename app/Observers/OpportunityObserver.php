@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\OpportunityStatus;
 use App\Models\Opportunity;
 
 class OpportunityObserver
@@ -18,5 +19,20 @@ class OpportunityObserver
         $opportunity->forceFill([
             'opportunity_number' => "PROJ-{$year}-{$sequence}",
         ])->saveQuietly();
+    }
+
+    public function updating(Opportunity $opportunity): void
+    {
+        if (! $opportunity->isDirty('status')) {
+            return;
+        }
+
+        $nextStatus = $opportunity->status instanceof OpportunityStatus
+            ? $opportunity->status
+            : OpportunityStatus::tryFrom((string) $opportunity->status);
+
+        if ($nextStatus === OpportunityStatus::Published && ! empty($opportunity->investor_id)) {
+            $opportunity->investor_id = null;
+        }
     }
 }

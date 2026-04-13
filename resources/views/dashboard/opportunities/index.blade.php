@@ -29,6 +29,8 @@
                                                             <th>{{ __('dashboard.goal') }}</th>
                                                             <th>{{ __('dashboard.category') }}</th>
                                                             <th>{{ __('dashboard.table status') }}</th>
+                                                            <th>{{ __('dashboard.investment_seats_count') }}</th>
+                                                            <th>{{ __('dashboard.interest_requests_count') }}</th>
                                                             <th>{{ __('dashboard.table create date') }}</th>
                                                             <th>{{ __('dashboard.actions') }}</th>
                                                         </tr>

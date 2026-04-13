@@ -115,6 +115,7 @@ class OpportunityService
     {
         return Opportunity::query()
             ->with(['category', 'user', 'reviewer'])
+            ->withCount(['investmentSeats', 'interestRequests'])
             ->when($options->conditions, fn($query) => $query->where($options->conditions))
             ->latest()
             ->search(request()->filters ?? [])
@@ -124,8 +125,45 @@ class OpportunityService
     public function findForDashboard(int $id): Opportunity
     {
         return Opportunity::query()
-            ->with(['category', 'user', 'reviewer'])
+            ->with(['category', 'user', 'reviewer', 'investor'])
             ->findOrFail($id);
+    }
+
+    public function awardInterestRequest(
+        Admin $admin,
+        InterestRequest $interestRequest,
+        OpportunityStatus $status,
+    ): Opportunity {
+        if (! in_array($status, [OpportunityStatus::Reserved, OpportunityStatus::Completed], true)) {
+            throw ValidationException::withMessages([
+                'status' => [__('dashboard.invalid_award_status')],
+            ]);
+        }
+
+        $interestRequest->loadMissing(['opportunity', 'investmentSeat', 'user']);
+
+        if (
+            ! $interestRequest->investmentSeat
+            || $interestRequest->investmentSeat->opportunity_id !== $interestRequest->opportunity_id
+            || $interestRequest->investmentSeat->user_id !== $interestRequest->user_id
+        ) {
+            throw ValidationException::withMessages([
+                'interest_request' => [__('dashboard.invalid_interest_request_award')],
+            ]);
+        }
+
+        return DB::transaction(function () use ($admin, $interestRequest, $status) {
+            $opportunity = $interestRequest->opportunity;
+
+            $opportunity->update([
+                'status' => $status,
+                'investor_id' => $interestRequest->user_id,
+                'reviewed_by_admin_id' => $admin->id,
+                'reviewed_at' => now(),
+            ]);
+
+            return $opportunity->fresh(['category', 'user', 'reviewer', 'investor']);
+        });
     }
 
     public function purchaseSeat(User $user, Opportunity $opportunity): InvestmentSeat

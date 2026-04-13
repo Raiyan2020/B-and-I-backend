@@ -216,6 +216,11 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         return $this->hasMany(Opportunity::class);
     }
 
+    public function awardedOpportunities(): HasMany
+    {
+        return $this->hasMany(Opportunity::class, 'investor_id');
+    }
+
     public function investmentSeats(): HasMany
     {
         return $this->hasMany(InvestmentSeat::class);
