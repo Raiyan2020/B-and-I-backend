@@ -49,8 +49,8 @@ class OpportunityController extends AdminBasicController
         return view('dashboard.opportunities.show', [
             'row' => $this->opportunityService->findForDashboard((int) $id),
             'reviewStatuses' => [
-                OpportunityStatus::Approved->value => __('dashboard.opportunity_status_approved'),
-                OpportunityStatus::NeedsModification->value => __('dashboard.opportunity_status_needs_modification'),
+                OpportunityStatus::Published->value => __('dashboard.opportunity_status_published'),
+                OpportunityStatus::NeedsRevision->value => __('dashboard.opportunity_status_needs_revision'),
             ],
         ]);
     }

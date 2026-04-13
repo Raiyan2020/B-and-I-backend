@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
 
-// general routes - no auth required
+    // general routes - no auth required
     Route::prefix('general')->group(function () {
         include __DIR__ . '/guard/general.php';
     });
@@ -39,7 +39,7 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
         });
 
         Route::post('login', [LoginController::class, '__invoke']);
-        
+
         Route::group(['prefix' => 'password/forgot', 'controller' => UserPasswordController::class], function () {
             Route::post('request-code', 'requestForgotPasswordOtp')->middleware('throttle:6,1');
             Route::post('verify-code', 'verifyForgotPasswordOtp');
@@ -81,5 +81,7 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
             Route::get('/{opportunity}', 'show');
             Route::put('/{opportunity}', 'update');
         });
+
+        
     });
 });

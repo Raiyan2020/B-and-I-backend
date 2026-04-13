@@ -85,6 +85,17 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
+                                <label for="type['seat_price']">{{ __('dashboard.seat_price') }}</label>
+                                <input type="number" step="0.01" min="0" class="form-control" name="type[seat_price]"
+                                    value="{{ old('type.seat_price', GeneralSetting::getValueForKey('seat_price')) }}"
+                                    placeholder="{{ __('dashboard.seat_price') }}" required>
+                                @error('type.seat_price')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
                                 <label for="type['completed_deals_commission']">{{ __('dashboard.completed_deals_commission') }}</label>
                                 <input type="number" step="0.01" min="0" class="form-control" name="type[completed_deals_commission]"
                                     value="{{ old('type.completed_deals_commission', GeneralSetting::getValueForKey('completed_deals_commission')) }}"

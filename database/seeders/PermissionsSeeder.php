@@ -73,6 +73,8 @@ class PermissionsSeeder extends Seeder
             ['guard_name' => 'admin', 'name' => 'add-subscription-package'],
             ['guard_name' => 'admin', 'name' => 'edit-subscription-package'],
             ['guard_name' => 'admin', 'name' => 'delete-subscription-package'],
+            ['guard_name' => 'admin', 'name' => 'investment-seats'],
+            ['guard_name' => 'admin', 'name' => 'interest-requests'],
 
         ];
 

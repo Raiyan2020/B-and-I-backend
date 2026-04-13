@@ -10,14 +10,17 @@ class PreferredSectorSeeder extends Seeder
     public function run(): void
     {
         $rows = [
-            ['name' => ['ar' => 'العقارات', 'en' => 'Real Estate']],
-            ['name' => ['ar' => 'التقنية', 'en' => 'Technology']],
-            ['name' => ['ar' => 'التجارة', 'en' => 'Commerce']],
-            ['name' => ['ar' => 'الطاقة', 'en' => 'Energy']],
+            ['name' => ['ar' => 'التقنية', 'en' => 'Technology'], 'status' => true],
+            ['name' => ['ar' => 'الأغذية والمشروبات', 'en' => 'Food & Beverage'], 'status' => true],
+            ['name' => ['ar' => 'الخدمات اللوجستية', 'en' => 'Logistics'], 'status' => true],
+            ['name' => ['ar' => 'الرعاية الصحية', 'en' => 'Healthcare'], 'status' => true],
+            ['name' => ['ar' => 'التعليم', 'en' => 'Education'], 'status' => true],
+            ['name' => ['ar' => 'الصناعة', 'en' => 'Industrial'], 'status' => true],
+            ['name' => ['ar' => 'العقار', 'en' => 'Real Estate'], 'status' => true],
         ];
 
         foreach ($rows as $row) {
-            PreferredSector::create(array_merge($row, ['status' => true]));
+            PreferredSector::query()->create($row);
         }
     }
 }

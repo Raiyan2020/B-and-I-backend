@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Api\V1\General;
 use App\Enums\UserRole;
 use App\Facades\BaseService;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AdResource;
+use App\Http\Resources\AdLightResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\FeaturesResource;
-use App\Http\Resources\PublicOpportunityResource;
 use App\Http\Resources\WhoWeAreResource;
 use App\Models\AboutUsItem;
 use App\Models\Category;
@@ -95,6 +96,7 @@ class HomeController extends Controller
     public function homePage(): JsonResponse
     {
         $lang = app()->getLocale() ?? request()->headers->get('Accept-Language', 'en');
+        request()->attributes->set('seat_price', GeneralSetting::getValueForKey('seat_price'));
         $logo = GeneralSetting::getValueForKey('logo1');
         $websiteName = GeneralSetting::getValueForKey("website_name_{$lang}");
         $projectBrief = GeneralSetting::getValueForKey("project_brief_{$lang}");
@@ -118,8 +120,16 @@ class HomeController extends Controller
             ],
             'features'             => FeaturesResource::collection($ourFeatures),
             'sections'             => CategoryResource::collection($sections), //$sections,
-            'latest_opportunities' => PublicOpportunityResource::collection(
-                Opportunity::query()->with(['category', 'user'])->where('status', 'approved')->latest()->limit(6)->get()
+            'latest_opportunities' => AdLightResource::collection(
+                Opportunity::query()
+                    ->with('category')
+                    ->whereIn('status', [
+                        \App\Enums\OpportunityStatus::Published->value,
+                        \App\Enums\OpportunityStatus::Reserved->value,
+                    ])
+                    ->latest()
+                    ->limit(6)
+                    ->get()
             ),
         ];
         return $this->jsonResponse(data: $data);

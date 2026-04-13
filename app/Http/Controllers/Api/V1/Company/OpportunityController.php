@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Opportunities\ListCompanyOpportunitiesRequest;
 use App\Http\Requests\Api\V1\Opportunities\StoreOpportunityRequest;
 use App\Http\Requests\Api\V1\Opportunities\UpdateOpportunityRequest;
+use App\Http\Resources\AdResource;
 use App\Http\Resources\OpportunityListResource;
 use App\Http\Resources\OpportunityResource;
+use App\Models\GeneralSetting;
 use App\Models\Opportunity;
 use App\Services\Opportunity\OpportunityService;
 use App\Traits\ResponseTrait;
@@ -39,6 +41,7 @@ class OpportunityController extends Controller
 
     public function store(StoreOpportunityRequest $request): JsonResponse
     {
+        $this->authorize('create', Opportunity::class);
         $opportunity = $this->service->createForCompany($request->user(), $request->validated());
 
         return $this->jsonResponse(
@@ -57,11 +60,14 @@ class OpportunityController extends Controller
 
     public function update(UpdateOpportunityRequest $request, Opportunity $opportunity): JsonResponse
     {
+        $this->authorize('update', $opportunity);
+
         $opportunity = $this->service->updateForCompany($request->user(), $opportunity, $request->validated());
+        $request->attributes->set('seat_price', GeneralSetting::getValueForKey('seat_price'));
 
         return $this->jsonResponse(
             msg: __('apis.opportunity_updated_and_sent_for_review'),
-            data: OpportunityResource::make($opportunity),
+            data: (new AdResource($opportunity->load('category')))->includeSectionB(),
         );
     }
 }

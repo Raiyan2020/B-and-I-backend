@@ -16,4 +16,11 @@ return [
         'Orders' => 'Interest notifications',
         'System' => 'System notifications',
     ],
+    'opportunity_status' => [
+        'Pending' => 'Pending',
+        'NeedsRevision' => 'Needs Revision',
+        'Published' => 'Published',
+        'Reserved' => 'Reserved',
+        'Completed' => 'Completed',
+    ],
 ];

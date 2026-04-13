@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Support\QueryOptions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class OpportunityService
 {
@@ -24,7 +25,7 @@ class OpportunityService
         $data = $this->normalizeGoalSpecificFields($data);
 
         return $user->opportunities()->create(array_merge($data, [
-            'status' => OpportunityStatus::PendingReview,
+            'status' => OpportunityStatus::Pending,
         ]));
     }
 
@@ -32,11 +33,17 @@ class OpportunityService
     {
         $this->assertOwnership($user, $opportunity);
 
+        if (($opportunity->status?->value ?? $opportunity->status) !== OpportunityStatus::NeedsRevision->value) {
+            throw ValidationException::withMessages([
+                'status' => [__('apis.ad_edit_requires_needs_revision')],
+            ]);
+        }
+
         unset($data['terms_accepted']);
         $data = $this->normalizeGoalSpecificFields($data);
 
         $opportunity->update(array_merge($data, [
-            'status'               => OpportunityStatus::PendingReview,
+            'status'               => OpportunityStatus::Pending,
             'review_note'          => null,
             'reviewed_by_admin_id' => null,
             'reviewed_at'          => null,
@@ -69,7 +76,10 @@ class OpportunityService
     {
         return Opportunity::query()
             ->with(['category', 'user'])
-            ->where('status', OpportunityStatus::Approved)
+            ->whereIn('status', [
+                OpportunityStatus::Published,
+                OpportunityStatus::Reserved,
+            ])
             ->latest()
             ->when($options->paginateNum > 0, fn($query) => $query->limit($options->paginateNum))
             ->get();
@@ -77,7 +87,7 @@ class OpportunityService
 
     public function reviewByAdmin(Admin $admin, Opportunity $opportunity, OpportunityStatus $status, ?string $reviewNote): Opportunity
     {
-        if (!in_array($status, [OpportunityStatus::Approved, OpportunityStatus::NeedsModification], true)) {
+        if (!in_array($status, [OpportunityStatus::Published, OpportunityStatus::NeedsRevision], true)) {
             throw new \InvalidArgumentException(__('apis.invalid_opportunity_status_transition'));
         }
 

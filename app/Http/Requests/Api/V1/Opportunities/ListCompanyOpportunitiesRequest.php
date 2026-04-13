@@ -16,7 +16,7 @@ class ListCompanyOpportunitiesRequest extends FormRequest
     {
         return [
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
-            'status' => ['nullable', 'string', 'in:pending_review,approved,needs_modification'],
+            'status' => ['nullable', 'string', 'in:pending,needs_revision,published,reserved,completed'],
             'goal' => ['nullable', 'string', 'in:sell_business,request_investment'],
         ];
     }

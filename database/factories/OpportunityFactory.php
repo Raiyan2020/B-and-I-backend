@@ -19,7 +19,7 @@ class OpportunityFactory extends Factory
             'user_id' => User::factory(),
             'category_id' => Category::factory(),
             'goal' => OpportunityGoal::RequestInvestment,
-            'status' => OpportunityStatus::PendingReview,
+            'status' => OpportunityStatus::Pending,
             'contact_name' => $this->faker->name(),
             'contact_phone' => '80808080',
             'contact_email' => $this->faker->safeEmail(),

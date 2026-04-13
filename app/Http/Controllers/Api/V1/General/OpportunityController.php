@@ -3,32 +3,47 @@
 namespace App\Http\Controllers\Api\V1\General;
 
 use App\Enums\OpportunityStatus;
-use App\Facades\BaseService;
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PublicOpportunityResource;
+use App\Http\Resources\AdResource;
+use App\Http\Resources\AdLightResource;
+use App\Models\GeneralSetting;
 use App\Models\Opportunity;
-use App\Services\Opportunity\OpportunityService;
-use App\Support\QueryOptions;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class OpportunityController extends Controller
 {
     use ResponseTrait;
 
-    public function __construct(private readonly OpportunityService $service)
+    public function index(Request $request): JsonResponse
     {
-    }
+        $request->attributes->set('seat_price', GeneralSetting::getValueForKey('seat_price'));
 
-    public function index(): JsonResponse
-    {
-        $options = (new QueryOptions())
-            ->with(['category', 'user'])
+        $user = $request->user('sanctum') ?? auth('sanctum')->user();
+
+        $opportunities = Opportunity::query()
+            ->with('category')
+            ->whereIn('status', [
+                OpportunityStatus::Published->value,
+                OpportunityStatus::Reserved->value,
+            ])
+            ->when($user?->role === UserRole::Investor, function ($query) use ($user) {
+                $query->with([
+                    'investmentSeats' => fn ($seatQuery) => $seatQuery
+                        ->select(['id', 'opportunity_id', 'user_id'])
+                        ->where('user_id', $user->id),
+                    'interestRequests' => fn ($interestQuery) => $interestQuery
+                        ->select(['id', 'opportunity_id', 'user_id', 'investment_seat_id'])
+                        ->where('user_id', $user->id),
+                ]);
+            })
             ->latest()
-            ->conditions(['status' => OpportunityStatus::Approved]);
-        $opportunities = BaseService::setModel(Opportunity::class)->limit($options);
+            ->paginate(15);
+
         return $this->jsonResponse(data: [
-            'opportunities' => PublicOpportunityResource::collection($opportunities),
+            'opportunities' => AdLightResource::collection($opportunities->items())->resolve($request),
             'pagination'    => [
                 'current_page' => $opportunities->currentPage(),
                 'last_page'    => $opportunities->lastPage(),
@@ -38,10 +53,33 @@ class OpportunityController extends Controller
         ]);
     }
 
-    public function show(Opportunity $opportunity): JsonResponse
+    public function show(Request $request, Opportunity $opportunity): JsonResponse
     {
-        abort_unless(($opportunity->status?->value ?? $opportunity->status) === 'approved', 404);
+        $request->attributes->set('seat_price', GeneralSetting::getValueForKey('seat_price'));
 
-        return $this->jsonResponse(data: PublicOpportunityResource::make($opportunity->load(['category', 'user'])));
+        abort_unless(
+            in_array(($opportunity->status?->value ?? $opportunity->status), [
+                OpportunityStatus::Published->value,
+                OpportunityStatus::Reserved->value,
+            ], true),
+            404
+        );
+
+        $user = $request->user('sanctum') ?? auth('sanctum')->user();
+
+        $opportunity->load('category');
+
+        if ($user?->role === UserRole::Investor) {
+            $opportunity->load([
+                'investmentSeats' => fn ($seatQuery) => $seatQuery
+                    ->select(['id', 'opportunity_id', 'user_id'])
+                    ->where('user_id', $user->id),
+                'interestRequests' => fn ($interestQuery) => $interestQuery
+                    ->select(['id', 'opportunity_id', 'user_id', 'investment_seat_id'])
+                    ->where('user_id', $user->id),
+            ]);
+        }
+
+        return $this->jsonResponse(data: AdResource::make($opportunity));
     }
 }

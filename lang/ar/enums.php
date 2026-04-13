@@ -16,4 +16,11 @@ return [
         'Orders' => 'إشعارات الطلبات',
         'System' => 'إشعارات النظام',
     ],
+    'opportunity_status' => [
+        'Pending' => 'قيد الانتظار',
+        'NeedsRevision' => 'قيد المراجعة',
+        'Published' => 'منشورة',
+        'Reserved' => 'محجوزة',
+        'Completed' => 'مكتملة',
+    ],
 ];

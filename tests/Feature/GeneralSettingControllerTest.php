@@ -80,6 +80,7 @@ class GeneralSettingControllerTest extends TestCase
             'type' => [
                 'website_name_ar' => 'اسم الموقع',
                 'website_name_en' => 'Website Name',
+                'seat_price' => '2500.00',
                 'completed_deals_commission' => '7.5',
                 'commercial_register' => '123456789',
                 'tax_number' => '987654321',
@@ -107,6 +108,11 @@ class GeneralSettingControllerTest extends TestCase
             'key' => 'completed_deals_commission',
             'value' => '7.5',
         ]);
+
+        $this->assertDatabaseHas('general_settings', [
+            'key' => 'seat_price',
+            'value' => '2500.00',
+        ]);
     }
 
     public function test_general_settings_persists_project_briefs(): void
@@ -124,6 +130,7 @@ class GeneralSettingControllerTest extends TestCase
                 'website_name_en' => 'Website Name',
                 'project_brief_ar' => 'نبذة بالعربية',
                 'project_brief_en' => 'Brief in English',
+                'seat_price' => '2500.00',
                 'completed_deals_commission' => '5',
                 'commercial_register' => '123456789',
                 'tax_number' => '987654321',

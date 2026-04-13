@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('reviewed_by_admin_id')->nullable()->constrained('admins')->nullOnDelete();
 
             $table->enum('goal', OpportunityGoal::values());
-            $table->enum('status', OpportunityStatus::values())->default(OpportunityStatus::PendingReview->value);
+            $table->enum('status', OpportunityStatus::values())->default(OpportunityStatus::Pending->value);
 
             $table->string('contact_name');
             $table->string('contact_phone', 20);

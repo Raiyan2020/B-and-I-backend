@@ -16,7 +16,7 @@ class OpportunityApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_company_can_create_opportunity_in_pending_review_status(): void
+    public function test_company_can_create_opportunity_in_pending_status(): void
     {
         $company = User::factory()->create([
             'role' => UserRole::Advertiser,
@@ -48,37 +48,44 @@ class OpportunityApiTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('data.opportunity_number', 'PROJ-'.now()->format('Y').'-001')
-            ->assertJsonPath('data.status.key', OpportunityStatus::PendingReview->value)
+            ->assertJsonPath('data.status.key', OpportunityStatus::Pending->value)
             ->assertJsonPath('data.sale_percentage', 20);
 
         $this->assertDatabaseHas('opportunities', [
             'user_id' => $company->id,
-            'status' => OpportunityStatus::PendingReview->value,
+            'status' => OpportunityStatus::Pending->value,
             'company_name' => 'Restaurant Opportunity No. 10',
         ]);
     }
 
-    public function test_only_approved_opportunities_are_visible_publicly(): void
+    public function test_only_published_and_reserved_opportunities_are_visible_publicly(): void
     {
         $category = Category::factory()->create(['status' => true]);
 
         Opportunity::factory()->create([
             'category_id' => $category->id,
-            'status' => OpportunityStatus::PendingReview,
+            'status' => OpportunityStatus::Pending,
             'company_name' => 'Pending Company',
         ]);
 
         Opportunity::factory()->create([
             'category_id' => $category->id,
-            'status' => OpportunityStatus::Approved,
-            'company_name' => 'Approved Company',
+            'status' => OpportunityStatus::Published,
+            'company_name' => 'Published Company',
+        ]);
+
+        Opportunity::factory()->create([
+            'category_id' => $category->id,
+            'status' => OpportunityStatus::Reserved,
+            'company_name' => 'Reserved Company',
         ]);
 
         $response = $this->getJson('/api/v1/general/opportunities');
 
         $response->assertOk()
-            ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.company_name', 'Approved Company');
+            ->assertJsonCount(2, 'data.opportunities')
+            ->assertJsonFragment(['company_name' => 'Reserved Company'])
+            ->assertJsonFragment(['company_name' => 'Published Company']);
     }
 
     public function test_company_can_list_own_opportunities_with_pagination(): void
@@ -89,7 +96,7 @@ class OpportunityApiTest extends TestCase
 
         Opportunity::factory()->count(3)->create([
             'user_id' => $company->id,
-            'status' => OpportunityStatus::PendingReview,
+            'status' => OpportunityStatus::Pending,
         ]);
 
         Sanctum::actingAs($company);
@@ -153,7 +160,7 @@ class OpportunityApiTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('data.goal', 'sell_business')
-            ->assertJsonPath('data.status.key', OpportunityStatus::PendingReview->value)
+            ->assertJsonPath('data.status.key', OpportunityStatus::Pending->value)
             ->assertJsonPath('data.sale_percentage', null);
 
         $this->assertDatabaseHas('opportunities', [
@@ -163,7 +170,7 @@ class OpportunityApiTest extends TestCase
         ]);
     }
 
-    public function test_company_update_resets_opportunity_to_pending_review(): void
+    public function test_company_update_resets_opportunity_to_pending(): void
     {
         $company = User::factory()->create([
             'role' => UserRole::Advertiser,
@@ -173,7 +180,7 @@ class OpportunityApiTest extends TestCase
 
         $opportunity = Opportunity::factory()->create([
             'user_id' => $company->id,
-            'status' => OpportunityStatus::NeedsModification,
+            'status' => OpportunityStatus::NeedsRevision,
             'review_note' => 'Please update the description.',
         ]);
 
@@ -198,7 +205,7 @@ class OpportunityApiTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('data.status.key', OpportunityStatus::PendingReview->value)
+            ->assertJsonPath('data.status', OpportunityStatus::Pending->value)
             ->assertJsonPath('data.review_note', null)
             ->assertJsonPath('data.sale_percentage', null);
     }
@@ -216,7 +223,7 @@ class OpportunityApiTest extends TestCase
 
         $opportunity = Opportunity::factory()->create([
             'user_id' => $company->id,
-            'status' => OpportunityStatus::NeedsModification,
+            'status' => OpportunityStatus::NeedsRevision,
         ]);
 
         Sanctum::actingAs($company);
@@ -226,8 +233,8 @@ class OpportunityApiTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.opportunity_number', $opportunity->fresh()->opportunity_number)
             ->assertJsonPath('data.completed_deals_commission', 8.5)
-            ->assertJsonPath('data.status.key', OpportunityStatus::NeedsModification->value)
+            ->assertJsonPath('data.status.key', OpportunityStatus::NeedsRevision->value)
             ->assertJsonPath('data.status.is_current', true)
-            ->assertJsonCount(3, 'data.statuses');
+            ->assertJsonCount(5, 'data.statuses');
     }
 }

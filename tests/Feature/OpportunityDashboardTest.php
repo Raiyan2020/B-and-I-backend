@@ -52,11 +52,11 @@ class OpportunityDashboardTest extends TestCase
         $this->actingAs($admin, 'admin');
 
         $opportunity = Opportunity::factory()->create([
-            'status' => OpportunityStatus::PendingReview,
+            'status' => OpportunityStatus::Pending,
         ]);
 
         $response = $this->postJson(route('admin.opportunities.review', $opportunity), [
-            'status' => OpportunityStatus::Approved->value,
+            'status' => OpportunityStatus::Published->value,
             'review_note' => 'Looks good.',
         ]);
 
@@ -65,7 +65,7 @@ class OpportunityDashboardTest extends TestCase
 
         $this->assertDatabaseHas('opportunities', [
             'id' => $opportunity->id,
-            'status' => OpportunityStatus::Approved->value,
+            'status' => OpportunityStatus::Published->value,
             'review_note' => 'Looks good.',
             'reviewed_by_admin_id' => $admin->id,
         ]);

@@ -8,7 +8,9 @@ enum OpportunityStatus: string
 {
     use EnumRetriever;
 
-    case PendingReview = 'pending_review';
-    case Approved = 'approved';
-    case NeedsModification = 'needs_modification';
+    case Pending = 'pending';
+    case NeedsRevision = 'needs_revision';
+    case Published = 'published';
+    case Reserved = 'reserved';
+    case Completed = 'completed';
 }

@@ -8,6 +8,8 @@ use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\Dashboard\FeatureController;
 use App\Http\Controllers\Dashboard\GeneralSettingController;
 use App\Http\Controllers\Dashboard\HomeController;
+use App\Http\Controllers\Dashboard\InterestRequestController;
+use App\Http\Controllers\Dashboard\InvestmentSeatController;
 use App\Http\Controllers\Dashboard\NotificationsController;
 use App\Http\Controllers\Dashboard\OpportunityController;
 use App\Http\Controllers\Dashboard\PreferredSectorController;
@@ -126,6 +128,8 @@ Route::group([
         ]);
 
         Route::resource('opportunities', OpportunityController::class)->only(['index', 'show']);
+        Route::resource('investment-seats', InvestmentSeatController::class)->only(['index', 'show']);
+        Route::resource('interest-requests', InterestRequestController::class)->only(['index', 'show']);
 
         // Bulk delete routes (destroyAll) - Legacy routes for backward compatibility
         Route::post('roles/destroyAll', [RolesController::class, 'destroyAll'])->name('roles.destroyAll');

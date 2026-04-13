@@ -8,6 +8,7 @@ use App\Traits\FilterTrait;
 use App\Traits\UploadTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Opportunity extends BaseModel
@@ -63,5 +64,15 @@ class Opportunity extends BaseModel
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'reviewed_by_admin_id');
+    }
+
+    public function investmentSeats(): HasMany
+    {
+        return $this->hasMany(InvestmentSeat::class);
+    }
+
+    public function interestRequests(): HasMany
+    {
+        return $this->hasMany(InterestRequest::class);
     }
 }

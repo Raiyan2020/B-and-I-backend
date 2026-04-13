@@ -95,6 +95,18 @@
                     <span class="menu-title">{{ __('dashboard.opportunities_menu') }}</span></a>
             </li>
 
+            <li class=" nav-item {{ Route::is('admin.investment-seats.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.investment-seats.index') }}">
+                    <i class="feather icon-file-text"></i>
+                    <span class="menu-title">{{ __('dashboard.investment_seats_menu') }}</span></a>
+            </li>
+
+            <li class=" nav-item {{ Route::is('admin.interest-requests.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.interest-requests.index') }}">
+                    <i class="feather icon-mail"></i>
+                    <span class="menu-title">{{ __('dashboard.interest_requests_menu') }}</span></a>
+            </li>
+
             <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
                 <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>
                     <span class="menu-title" data-i18n="Ecommerce">{{ __('dashboard.general settings') }}</span></a>

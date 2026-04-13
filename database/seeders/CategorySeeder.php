@@ -4,82 +4,24 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
-        Schema::disableForeignKeyConstraints();
-        Category::truncate();
-        Schema::enableForeignKeyConstraints();
-
         $categories = [
-            [
-                'name' => [
-                    'ar' => 'ملابس',
-                    'en' => 'Clothing'
-                ],
-                'status' => 1,
-            ],
-            [
-                'name' => [
-                    'ar' => 'إلكترونيات',
-                    'en' => 'Electronics'
-                ],
-                'status' => 1,
-            ],
-            [
-                'name' => [
-                    'ar' => 'أجهزة منزلية',
-                    'en' => 'Home Appliances'
-                ],
-                'status' => 1,
-            ],
-            [
-                'name' => [
-                    'ar' => 'أثاث',
-                    'en' => 'Furniture'
-                ],
-                'status' => 1,
-            ],
-            [
-                'name' => [
-                    'ar' => 'ألعاب',
-                    'en' => 'Toys'
-                ],
-                'status' => 1,
-            ],
-            [
-                'name' => [
-                    'ar' => 'كتب',
-                    'en' => 'Books'
-                ],
-                'status' => 1,
-            ],
-            [
-                'name' => [
-                    'ar' => 'مستحضرات تجميل',
-                    'en' => 'Cosmetics'
-                ],
-                'status' => 1,
-            ],
-            [
-                'name' => [
-                    'ar' => 'أطعمة ومشروبات',
-                    'en' => 'Food & Beverages'
-                ],
-                'status' => 1,
-            ],
+            ['name' => ['ar' => 'المطاعم والمقاهي', 'en' => 'Food & Beverage'], 'order' => 1, 'status' => true],
+            ['name' => ['ar' => 'التقنية والبرمجيات', 'en' => 'Technology & SaaS'], 'order' => 2, 'status' => true],
+            ['name' => ['ar' => 'الخدمات اللوجستية', 'en' => 'Logistics'], 'order' => 3, 'status' => true],
+            ['name' => ['ar' => 'الرعاية الصحية', 'en' => 'Healthcare'], 'order' => 4, 'status' => true],
+            ['name' => ['ar' => 'التعليم والتدريب', 'en' => 'Education'], 'order' => 5, 'status' => true],
+            ['name' => ['ar' => 'التصنيع الخفيف', 'en' => 'Light Manufacturing'], 'order' => 6, 'status' => true],
+            ['name' => ['ar' => 'التجزئة المتخصصة', 'en' => 'Specialty Retail'], 'order' => 7, 'status' => true],
+            ['name' => ['ar' => 'العقار والخدمات المساندة', 'en' => 'Real Estate Services'], 'order' => 8, 'status' => true],
         ];
 
         foreach ($categories as $category) {
-            Category::create($category);
+            Category::query()->create($category);
         }
     }
 }

@@ -21,3 +21,5 @@ Route::get('opportunities/{opportunity}', [OpportunityController::class, 'show']
 Route::get('privacy-policy', [HomeController::class, 'privacyPolicy']);
 Route::get('terms-and-conditions', [HomeController::class, 'termsAndConditions']);
 Route::match(['get', 'post'], 'change-lang',[HomeController::class,'changeLang']);
+
+

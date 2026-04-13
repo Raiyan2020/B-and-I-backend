@@ -20,7 +20,7 @@ class OpportunityResource extends JsonResource
             'opportunity_number' => $this->opportunity_number,
             'goal' => $this->goal?->value ?? $this->goal,
             'status' => $this->statusPayload(),
-//            'statuses' => $this->allStatusesPayload(),
+            'statuses' => $this->allStatusesPayload(),
             'completed_deals_commission' => $completedDealsCommission !== null
                 ? (float) $completedDealsCommission
                 : null,
