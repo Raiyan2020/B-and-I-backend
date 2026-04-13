@@ -12,7 +12,7 @@ class InterestRequestController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:interest-requests', ['only' => ['index', 'show']]);
+        // $this->middleware('permission:interest-requests', ['only' => ['index', 'show']]);
     }
 
     public function index(): View|JsonResponse

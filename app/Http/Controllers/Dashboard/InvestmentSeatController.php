@@ -12,7 +12,7 @@ class InvestmentSeatController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:investment-seats', ['only' => ['index', 'show']]);
+        // $this->middleware('permission:investment-seats', ['only' => ['index', 'show']]);
     }
 
     public function index(): View|JsonResponse
@@ -24,8 +24,13 @@ class InvestmentSeatController extends Controller
                 ->latest('id');
 
             return DataTables::eloquent($query)
-                ->addColumn('opportunity_name', function (InvestmentSeat $seat): string {
-                    return $seat->opportunity?->company_name ?? '-';
+                ->addColumn('opportunity_id', function (InvestmentSeat $seat): int|string {
+                    return $seat->opportunity_id ?? '';
+                })
+                ->addColumn('opportunity_reference', function (InvestmentSeat $seat): string {
+                    $reference = $seat->opportunity?->opportunity_number ?? $seat->opportunity_id;
+
+                    return $reference ? '#' . $reference : '-';
                 })
                 ->addColumn('advertiser_name', function (InvestmentSeat $seat): string {
                     return $seat->opportunity?->user?->name ?: '-';

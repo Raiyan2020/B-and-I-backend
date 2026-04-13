@@ -1,12 +1,27 @@
 <script>
     $(document).ready(function() {
+        const opportunityShowRouteTemplate = '{{ route('admin.opportunities.show', ':id') }}';
+
         $('#investment-seats-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('admin.investment-seats.index') }}",
             columns: [
                 {data: 'id', name: 'id'},
-                {data: 'opportunity_name', name: 'opportunity.company_name', defaultContent: '-'},
+                {
+                    data: 'opportunity_reference',
+                    name: 'opportunity.opportunity_number',
+                    defaultContent: '-',
+                    render: function(data, type, row) {
+                        if (type !== 'display' || !row.opportunity_id || data === '-') {
+                            return data ?? '-';
+                        }
+
+                        const showRoute = opportunityShowRouteTemplate.replace(':id', row.opportunity_id);
+
+                        return `<a href="${showRoute}" class="text-primary fw-semibold">${data}</a>`;
+                    }
+                },
                 {data: 'advertiser_name', name: 'opportunity.user.first_name', defaultContent: '-'},
                 {data: 'investor_name', name: 'user.first_name', defaultContent: '-'},
                 {data: 'price_paid', name: 'price_paid'},
