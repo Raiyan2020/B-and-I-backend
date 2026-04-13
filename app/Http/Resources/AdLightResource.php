@@ -14,6 +14,7 @@ class AdLightResource extends JsonResource
     {
         $user = $request->user('sanctum') ?? auth('sanctum')->user();
         $isInvestor = $user?->role === UserRole::Investor;
+        $isOwner = $user?->id === $this->user_id;
         $hasSeat = $user
             ? ($this->relationLoaded('investmentSeats') ? $this->investmentSeats->isNotEmpty() : false)
             : null;
@@ -44,12 +45,13 @@ class AdLightResource extends JsonResource
             'investment_required' => $this->investment_required !== null ? (float) $this->investment_required : null,
             'sale_percentage' => $this->sale_percentage !== null ? (float) $this->sale_percentage : null,
             'seat_price' => $seatPrice !== null ? (float) $seatPrice : null,
+            'is_owner' => $isOwner,
             'has_seat' => $hasSeat,
             'can_buy_seat' => $user
-                ? ($isInvestor && ! $hasSeat && $status !== OpportunityStatus::Reserved->value)
+                ? (! $isOwner && $isInvestor && ! $hasSeat && $status !== OpportunityStatus::Reserved->value)
                 : null,
             'can_submit_interest' => $user
-                ? ($isInvestor && $hasSeat && ! $hasSubmittedInterest)
+                ? (! $isOwner && $isInvestor && $hasSeat && ! $hasSubmittedInterest)
                 : null,
             'has_submitted_interest' => $hasSubmittedInterest,
         ];

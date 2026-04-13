@@ -1,16 +1,17 @@
 <?php
 
 
-use App\Http\Controllers\Api\V1\Auth\LoginController;
-use App\Http\Controllers\Api\V1\Auth\UserPasswordController;
 use App\Http\Controllers\Api\V1\Auth\ChangeEmailController;
+use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\NotificationSettingsController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
-use App\Http\Controllers\Api\V1\Auth\UserRegisterController;
 use App\Http\Controllers\Api\V1\Auth\ResendVerificationController;
+use App\Http\Controllers\Api\V1\Auth\UserPasswordController;
+use App\Http\Controllers\Api\V1\Auth\UserRegisterController;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\Company\OpportunityController;
+use App\Http\Controllers\Api\V1\General\OpportunityController as GeneralOpportunityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -82,6 +83,7 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
             Route::put('/{opportunity}', 'update');
         });
 
-        
+        Route::post('opportunities/{opportunity}/seats', [GeneralOpportunityController::class, 'purchaseSeat']);
+        Route::post('opportunities/{opportunity}/interest-requests', [GeneralOpportunityController::class, 'submitInterest']);
     });
 });

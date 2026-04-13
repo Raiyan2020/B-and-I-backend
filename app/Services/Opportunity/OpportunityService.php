@@ -4,17 +4,27 @@ namespace App\Services\Opportunity;
 
 use App\Enums\OpportunityStatus;
 use App\Enums\OpportunityGoal;
+use App\Enums\NotificationCategory;
 use App\Enums\UserRole;
 use App\Models\Admin;
+use App\Models\GeneralSetting;
+use App\Models\InterestRequest;
+use App\Models\InvestmentSeat;
 use App\Models\Opportunity;
 use App\Models\User;
+use App\Notifications\GeneralNotification;
 use App\Support\QueryOptions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class OpportunityService
 {
+    public function __construct(
+        private readonly ?\App\Services\Notifications\GeneralNotificationService $notificationService = null,
+    ) {}
+
     public function createForCompany(User $user, array $data): Opportunity
     {
         if ($user->role !== UserRole::Advertiser) {
@@ -118,11 +128,169 @@ class OpportunityService
             ->findOrFail($id);
     }
 
+    public function purchaseSeat(User $user, Opportunity $opportunity): InvestmentSeat
+    {
+        $this->assertOpportunityAvailableForSeatPurchase($opportunity);
+
+        if ($opportunity->investmentSeats()->where('user_id', $user->id)->exists()) {
+            throw ValidationException::withMessages([
+                'seat' => [__('apis.seat_already_purchased')],
+            ]);
+        }
+
+        $seatPrice = GeneralSetting::getValueForKey('seat_price');
+
+        if ($seatPrice === null || ! is_numeric($seatPrice)) {
+            throw ValidationException::withMessages([
+                'seat_price' => [__('apis.seat_price_not_configured')],
+            ]);
+        }
+
+        // TODO:: Handle payment processing here before creating the seat
+        
+        $seat = DB::transaction(function () use ($user, $opportunity, $seatPrice) {
+            return InvestmentSeat::query()->create([
+                'user_id' => $user->id,
+                'opportunity_id' => $opportunity->id,
+                'price_paid' => (float) $seatPrice,
+                'purchased_at' => now(),
+            ]);
+        });
+
+        $this->notifyAdminsAboutSeatPurchase($user, $opportunity, $seat);
+
+        return $seat->refresh();
+    }
+
+    public function submitInterest(User $user, Opportunity $opportunity): InterestRequest
+    {
+        $this->assertOpportunityAvailableForInterest($opportunity);
+
+        $seat = $opportunity->investmentSeats()
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (! $seat) {
+            throw ValidationException::withMessages([
+                'seat' => [__('apis.interest_requires_seat_purchase')],
+            ]);
+        }
+
+        if ($opportunity->interestRequests()->where('user_id', $user->id)->exists()) {
+            throw ValidationException::withMessages([
+                'interest' => [__('apis.interest_already_submitted')],
+            ]);
+        }
+
+        $interestRequest = DB::transaction(function () use ($user, $opportunity, $seat) {
+            return InterestRequest::query()->create([
+                'user_id' => $user->id,
+                'opportunity_id' => $opportunity->id,
+                'investment_seat_id' => $seat->id,
+            ]);
+        });
+
+        $this->notifyAdminsAboutInterest($user, $opportunity, $interestRequest);
+
+        return $interestRequest->refresh();
+    }
+
     protected function assertOwnership(User $user, Opportunity $opportunity): void
     {
         if ($opportunity->user_id !== $user->id) {
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException(__('apis.have_no_permission'));
         }
+    }
+
+
+    protected function assertOpportunityAvailableForSeatPurchase(Opportunity $opportunity): void
+    {
+        $status = $opportunity->status?->value ?? $opportunity->status;
+
+        if (! in_array($status, [
+            OpportunityStatus::Published->value,
+            OpportunityStatus::Reserved->value,
+        ], true)) {
+            throw ValidationException::withMessages([
+                'opportunity' => [__('apis.seat_purchase_unavailable_for_opportunity')],
+            ]);
+        }
+
+        if ($status === OpportunityStatus::Reserved->value) {
+            throw ValidationException::withMessages([
+                'opportunity' => [__('apis.reserved_ads_block_new_seat_purchases')],
+            ]);
+        }
+    }
+
+    protected function assertOpportunityAvailableForInterest(Opportunity $opportunity): void
+    {
+        $status = $opportunity->status?->value ?? $opportunity->status;
+
+        if (! in_array($status, [
+            OpportunityStatus::Published->value,
+            OpportunityStatus::Reserved->value,
+        ], true)) {
+            throw ValidationException::withMessages([
+                'opportunity' => [__('apis.interest_submission_unavailable_for_opportunity')],
+            ]);
+        }
+    }
+
+    protected function notifyAdminsAboutSeatPurchase(User $user, Opportunity $opportunity, InvestmentSeat $seat): void
+    {
+        if (! $this->notificationService) {
+            return;
+        }
+
+        $admins = collect();
+
+        $this->notificationService->sendToUsers($admins, new GeneralNotification(
+            title: [
+                'ar' => 'تم شراء كراسة استثمار',
+                'en' => 'Investment seat purchased',
+            ],
+            body: [
+                'ar' => "قام {$user->name} بشراء كراسة للإعلان {$opportunity->company_name}",
+                'en' => "{$user->name} purchased a seat for {$opportunity->company_name}",
+            ],
+            notificationType: 'investment_seat_purchased',
+            category: NotificationCategory::Interest,
+            model: $seat,
+            payload: [
+                'opportunity_id' => $opportunity->id,
+                'opportunity_name' => $opportunity->company_name,
+                'investor_id' => $user->id,
+            ],
+        ));
+    }
+
+    protected function notifyAdminsAboutInterest(User $user, Opportunity $opportunity, InterestRequest $interestRequest): void
+    {
+        if (! $this->notificationService) {
+            return;
+        }
+
+        $admins = collect();
+
+        $this->notificationService->sendToUsers($admins, new GeneralNotification(
+            title: [
+                'ar' => 'تم تسجيل اهتمام جديد',
+                'en' => 'New interest registered',
+            ],
+            body: [
+                'ar' => "قام {$user->name} بتسجيل اهتمامه بالإعلان {$opportunity->company_name}",
+                'en' => "{$user->name} registered interest in {$opportunity->company_name}",
+            ],
+            notificationType: 'interest_request_created',
+            category: NotificationCategory::Interest,
+            model: $interestRequest,
+            payload: [
+                'opportunity_id' => $opportunity->id,
+                'opportunity_name' => $opportunity->company_name,
+                'investor_id' => $user->id,
+            ],
+        ));
     }
 
     protected function normalizeGoalSpecificFields(array $data): array
