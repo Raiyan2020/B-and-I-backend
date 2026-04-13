@@ -10,12 +10,31 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header"><h4 class="card-title">{{ __('dashboard.opportunity_details') }}</h4></div>
+                        @php
+                            $statusBadgeClass = match($row->status?->value) {
+                                'pending' => 'warning',
+                                'needs_revision' => 'danger',
+                                'published' => 'success',
+                                'reserved' => 'info',
+                                'completed' => 'secondary',
+                                default => 'primary',
+                            };
+                        @endphp
+                        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="d-flex align-items-center flex-wrap">
+                                <h4 class="card-title mb-0 mr-1">{{ __('dashboard.opportunity_details') }}</h4>
+                                <span class="badge badge-primary badge-pill px-2 py-1 mr-1">
+                                    #{{ $row->opportunity_number ?? $row->id }}
+                                </span>
+                                <span class="badge badge-{{ $statusBadgeClass }} badge-pill px-2 py-1">
+                                    {{ __('dashboard.opportunity_status_'.$row->status->value) }}
+                                </span>
+                            </div>
+                        </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-2"><strong>{{ __('dashboard.company_name') }}:</strong> {{ $row->company_name }}</div>
                                 <div class="col-md-6 mb-2"><strong>{{ __('dashboard.goal') }}:</strong> {{ __('dashboard.goal_'.$row->goal->value) }}</div>
-                                <div class="col-md-6 mb-2"><strong>{{ __('dashboard.table status') }}:</strong> {{ __('dashboard.opportunity_status_'.$row->status->value) }}</div>
                                 <div class="col-md-6 mb-2"><strong>{{ __('dashboard.category') }}:</strong> {{ $row->category?->getTranslation('name', app()->getLocale()) ?? '' }}</div>
                                 <div class="col-md-6 mb-2"><strong>{{ __('dashboard.contact_name') }}:</strong> {{ $row->contact_name }}</div>
                                 <div class="col-md-6 mb-2"><strong>{{ __('dashboard.contact_phone') }}:</strong> {{ $row->contact_phone }}</div>
@@ -34,6 +53,96 @@
                                 @if($row->review_note)
                                     <div class="col-12 mb-2"><strong>{{ __('dashboard.review_note') }}:</strong><br>{{ $row->review_note }}</div>
                                 @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                            <h4 class="card-title mb-0">{{ __('dashboard.latest_investment_seats') }}</h4>
+                            <a class="btn btn-sm btn-outline-primary mt-1 mt-lg-0" href="{{ route('admin.investment-seats.index', ['opportunity_id' => $row->id]) }}">
+                                {{ __('dashboard.view_all') }}
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive overflow-auto">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr class="text text-center">
+                                            <th>#</th>
+                                            <th>{{ __('dashboard.investor') }}</th>
+                                            <th>{{ __('dashboard.price_paid') }}</th>
+                                            <th>{{ __('dashboard.purchased_at') }}</th>
+                                            <th>{{ __('dashboard.actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text text-center">
+                                        @forelse($row->investmentSeats as $seat)
+                                            <tr>
+                                                <td>{{ $seat->id }}</td>
+                                                <td>{{ $seat->user?->name ?: '-' }}</td>
+                                                <td>{{ number_format((float) ($seat->price_paid ?? 0), 2) }}</td>
+                                                <td>{{ ($seat->purchased_at ?? $seat->created_at)?->timezone(config('app.timezone'))->locale(app()->getLocale())->translatedFormat('d M Y - h:i A') ?? '-' }}</td>
+                                                <td>
+                                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.investment-seats.show', $seat) }}">
+                                                        <i class="feather icon-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5">-</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                            <h4 class="card-title mb-0">{{ __('dashboard.latest_interest_requests') }}</h4>
+                            <a class="btn btn-sm btn-outline-primary mt-1 mt-lg-0" href="{{ route('admin.interest-requests.index', ['opportunity_id' => $row->id]) }}">
+                                {{ __('dashboard.view_all') }}
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive overflow-auto">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr class="text text-center">
+                                            <th>#</th>
+                                            <th>{{ __('dashboard.investor') }}</th>
+                                            <th>{{ __('dashboard.seat_reference') }}</th>
+                                            <th>{{ __('dashboard.submitted_at') }}</th>
+                                            <th>{{ __('dashboard.actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text text-center">
+                                        @forelse($row->interestRequests as $interestRequest)
+                                            <tr>
+                                                <td>{{ $interestRequest->id }}</td>
+                                                <td>{{ $interestRequest->user?->name ?: '-' }}</td>
+                                                <td>#{{ $interestRequest->investment_seat_id }}</td>
+                                                <td>{{ $interestRequest->created_at?->timezone(config('app.timezone'))->locale(app()->getLocale())->translatedFormat('d M Y - h:i A') ?? '-' }}</td>
+                                                <td>
+                                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.interest-requests.show', $interestRequest) }}">
+                                                        <i class="feather icon-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5">-</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

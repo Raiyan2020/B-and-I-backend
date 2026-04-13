@@ -75,6 +75,7 @@ class InterestRequestController extends Controller
         return view('dashboard.interest_requests.show', [
             'row' => $interestRequest,
             'awardStatuses' => [
+                OpportunityStatus::Published->value => __('dashboard.opportunity_status_published'),
                 OpportunityStatus::Reserved->value => __('dashboard.opportunity_status_reserved'),
                 OpportunityStatus::Completed->value => __('dashboard.opportunity_status_completed'),
             ],

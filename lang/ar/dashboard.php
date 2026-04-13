@@ -459,7 +459,7 @@ return [
     'investor' => 'المستثمر',
     'purchased_at' => 'تاريخ الشراء',
     'price_paid' => 'المبلغ المدفوع',
-    'seat_reference' => 'رقم الكرسي',
+    'seat_reference' => 'رقم الكراسة',
     'submitted_at' => 'تاريخ التقديم',
     'linked_interest_requests' => 'طلبات الاهتمام المرتبطة',
     'opportunity_reference' => 'مرجع الإعلان',
@@ -471,4 +471,6 @@ return [
     'invalid_interest_request_award' => 'لا يمكن قبول هذا الطلب لأن بياناته غير متطابقة',
     'investment_seats_count' => 'عدد كراسات الاستثمار',
     'interest_requests_count' => 'عدد طلبات الاهتمام',
+    'latest_investment_seats' => 'آخر 10 كراسات استثمار',
+    'latest_interest_requests' => 'آخر 10 طلبات اهتمام',
 ];

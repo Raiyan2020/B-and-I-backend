@@ -97,10 +97,6 @@ class OpportunityService
 
     public function reviewByAdmin(Admin $admin, Opportunity $opportunity, OpportunityStatus $status, ?string $reviewNote): Opportunity
     {
-        if (!in_array($status, [OpportunityStatus::Published, OpportunityStatus::NeedsRevision], true)) {
-            throw new \InvalidArgumentException(__('apis.invalid_opportunity_status_transition'));
-        }
-
         $opportunity->update([
             'status'               => $status,
             'review_note'          => $reviewNote,
@@ -125,7 +121,14 @@ class OpportunityService
     public function findForDashboard(int $id): Opportunity
     {
         return Opportunity::query()
-            ->with(['category', 'user', 'reviewer', 'investor'])
+            ->with([
+                'category',
+                'user',
+                'reviewer',
+                'investor',
+                'investmentSeats' => fn ($query) => $query->with('user')->latest('id')->limit(10),
+                'interestRequests' => fn ($query) => $query->with(['user', 'investmentSeat'])->latest('id')->limit(10),
+            ])
             ->findOrFail($id);
     }
 

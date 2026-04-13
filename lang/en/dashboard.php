@@ -462,6 +462,8 @@ return [
     'opportunity_reference' => 'Advertisement',
     'investment_seats_count' => 'Investment seats',
     'interest_requests_count' => 'Interest requests',
+    'latest_investment_seats' => 'Latest investment seats',
+    'latest_interest_requests' => 'Latest interest requests',
     'award_status' => 'Award status',
     'award_investment' => 'Award investment to this investor',
     'current_awarded_investor' => 'Current awarded investor',
