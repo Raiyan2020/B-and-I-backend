@@ -76,6 +76,22 @@ class OpportunityService
             ->withQueryString();
     }
 
+    public function listWithPurchasedSeatsForCompany(User $user, int $perPage = 15): LengthAwarePaginator
+    {
+        return $user->opportunities()
+            ->with(['category', 'reviewer'])
+            ->withCount(['investmentSeats', 'interestRequests'])
+            ->whereHas('investmentSeats',function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->whereDoesntHave('interestRequests', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
     public function showForCompany(User $user, Opportunity $opportunity): Opportunity
     {
         $this->assertOwnership($user, $opportunity);

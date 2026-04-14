@@ -340,6 +340,70 @@ class AdApiTest extends TestCase
         ]);
     }
 
+    public function test_reserved_ad_allows_interest_and_admin_contact_but_blocks_buying_new_seat(): void
+    {
+        GeneralSetting::create(['key' => 'seat_price', 'value' => '49.50']);
+        GeneralSetting::create(['key' => 'contact_phone', 'value' => '+96522223333']);
+        GeneralSetting::create(['key' => 'contact_email', 'value' => 'deals@example.test']);
+
+        $category = Category::factory()->create(['status' => true]);
+        $investor = User::factory()->create(['role' => UserRole::Investor]);
+        $ad = Opportunity::factory()->create([
+            'category_id' => $category->id,
+            'status' => OpportunityStatus::Reserved,
+        ]);
+
+        InvestmentSeat::create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $ad->id,
+            'price_paid' => 49.5,
+            'purchased_at' => now(),
+        ]);
+
+        Sanctum::actingAs($investor);
+
+        $response = $this->getJson("/api/v1/general/opportunities/{$ad->id}");
+
+        $response->assertOk()
+            ->assertJsonPath('data.can_buy_seat', false)
+            ->assertJsonPath('data.can_submit_interest', true)
+            ->assertJsonPath('data.admin_contact_phone', '+96522223333')
+            ->assertJsonPath('data.admin_contact_email', 'deals@example.test');
+    }
+
+    public function test_completed_ad_disables_interest_buying_and_admin_contact_even_with_seat(): void
+    {
+        GeneralSetting::create(['key' => 'seat_price', 'value' => '49.50']);
+        GeneralSetting::create(['key' => 'contact_phone', 'value' => '+96522223333']);
+        GeneralSetting::create(['key' => 'contact_email', 'value' => 'deals@example.test']);
+
+        $category = Category::factory()->create(['status' => true]);
+        $investor = User::factory()->create(['role' => UserRole::Investor]);
+        $ad = Opportunity::factory()->create([
+            'category_id' => $category->id,
+            'status' => OpportunityStatus::Completed,
+            'company_name' => 'Completed Opportunity',
+        ]);
+
+        InvestmentSeat::create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $ad->id,
+            'price_paid' => 49.5,
+            'purchased_at' => now(),
+        ]);
+
+        Sanctum::actingAs($investor);
+
+        $response = $this->getJson('/api/v1/investor/opportunities/purchased-seats');
+
+        $response->assertOk()
+            ->assertJsonPath('data.opportunities.0.company_name', 'Completed Opportunity')
+            ->assertJsonPath('data.opportunities.0.can_buy_seat', false)
+            ->assertJsonPath('data.opportunities.0.can_submit_interest', false)
+            ->assertJsonMissingPath('data.opportunities.0.admin_contact_phone')
+            ->assertJsonMissingPath('data.opportunities.0.admin_contact_email');
+    }
+
     public function test_ad_owner_can_update_only_when_needs_revision(): void
     {
         GeneralSetting::create(['key' => 'seat_price', 'value' => '50']);

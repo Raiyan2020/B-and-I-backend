@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Company;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Opportunities\ListCompanyOpportunitiesRequest;
 use App\Http\Requests\Api\V1\Opportunities\StoreOpportunityRequest;
@@ -11,9 +12,11 @@ use App\Http\Resources\OpportunityListResource;
 use App\Http\Resources\OpportunityResource;
 use App\Models\GeneralSetting;
 use App\Models\Opportunity;
+use App\Models\User;
 use App\Services\Opportunity\OpportunityService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class OpportunityController extends Controller
@@ -27,6 +30,32 @@ class OpportunityController extends Controller
     public function index(ListCompanyOpportunitiesRequest $request): JsonResponse
     {
         $paginator = $this->service->listForCompany($request->user(), $request->validated());
+
+        return $this->jsonResponse(data: [
+            'opportunities' => OpportunityListResource::collection($paginator->items())->resolve(),
+            'pagination'    => [
+                'current_page' => $paginator->currentPage(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
+            ],
+        ]);
+    }
+
+    public function purchasedSeats(Request $request): JsonResponse
+    {
+        if ($response = $this->ensureAdvertiser($request->user())) {
+            return $response;
+        }
+
+        $validated = $request->validate([
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
+        ]);
+
+        $paginator = $this->service->listWithPurchasedSeatsForCompany(
+            $request->user(),
+            (int) ($validated['per_page'] ?? 15),
+        );
 
         return $this->jsonResponse(data: [
             'opportunities' => OpportunityListResource::collection($paginator->items())->resolve(),
@@ -70,6 +99,19 @@ class OpportunityController extends Controller
             data: (new AdResource(
                 $opportunity->load('category')->loadCount(['investmentSeats', 'interestRequests'])
             ))->includeSectionB(),
+        );
+    }
+
+    protected function ensureAdvertiser(User $user): ?JsonResponse
+    {
+        if ($user->role === UserRole::Advertiser) {
+            return null;
+        }
+
+        return $this->jsonResponse(
+            msg: __('apis.have_no_permission'),
+            code: 403,
+            error: true,
         );
     }
 }

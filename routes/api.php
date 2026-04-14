@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\Auth\UserRegisterController;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\Company\OpportunityController;
 use App\Http\Controllers\Api\V1\General\OpportunityController as GeneralOpportunityController;
+use App\Http\Controllers\Api\V1\Investor\OpportunityController as InvestorOpportunityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -78,9 +79,16 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
 
         Route::group(['prefix' => 'company/opportunities', 'controller' => OpportunityController::class], function () {
             Route::get('/', 'index');
+            Route::get('/purchased-seats', 'purchasedSeats');
             Route::post('/', 'store');
             Route::get('/{opportunity}', 'show');
             Route::put('/{opportunity}', 'update');
+        });
+
+        Route::group(['prefix' => 'investor/opportunities', 'controller' => InvestorOpportunityController::class], function () {
+            Route::get('purchased-seats', 'purchasedSeats');
+            Route::get('sent-interests', 'sentInterests');
+            Route::get('current-requests', 'currentRequests');
         });
 
         Route::post('opportunities/{opportunity}/seats', [GeneralOpportunityController::class, 'purchaseSeat']);

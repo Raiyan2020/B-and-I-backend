@@ -6,6 +6,7 @@ use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\GeneralSetting;
+use App\Models\InvestmentSeat;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -127,6 +128,80 @@ class OpportunityApiTest extends TestCase
                     'pagination' => ['current_page', 'last_page', 'per_page', 'total'],
                 ],
             ]);
+    }
+
+    public function test_company_can_list_own_opportunities_with_purchased_seats_and_no_interests(): void
+    {
+        $company = User::factory()->create([
+            'role' => UserRole::Advertiser,
+        ]);
+        $otherCompany = User::factory()->create([
+            'role' => UserRole::Advertiser,
+        ]);
+        $investor = User::factory()->create([
+            'role' => UserRole::Investor,
+        ]);
+
+        $eligibleOpportunity = Opportunity::factory()->create([
+            'user_id' => $company->id,
+            'status' => OpportunityStatus::Published,
+            'company_name' => 'Eligible Opportunity',
+        ]);
+        $hasInterestOpportunity = Opportunity::factory()->create([
+            'user_id' => $company->id,
+            'status' => OpportunityStatus::Published,
+            'company_name' => 'Has Interest Opportunity',
+        ]);
+        Opportunity::factory()->create([
+            'user_id' => $otherCompany->id,
+            'status' => OpportunityStatus::Published,
+            'company_name' => 'Other Company Opportunity',
+        ]);
+
+        InvestmentSeat::query()->create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $eligibleOpportunity->id,
+            'price_paid' => 100,
+            'purchased_at' => now(),
+        ]);
+        $seat = InvestmentSeat::query()->create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $hasInterestOpportunity->id,
+            'price_paid' => 100,
+            'purchased_at' => now(),
+        ]);
+
+        \App\Models\InterestRequest::query()->create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $hasInterestOpportunity->id,
+            'investment_seat_id' => $seat->id,
+        ]);
+
+        Sanctum::actingAs($company);
+
+        $response = $this->getJson('/api/v1/company/opportunities/purchased-seats-without-interests?per_page=10');
+
+        $response->assertOk()
+            ->assertJsonPath('data.pagination.total', 1)
+            ->assertJsonCount(1, 'data.opportunities')
+            ->assertJsonPath('data.opportunities.0.company_name', 'Eligible Opportunity')
+            ->assertJsonPath('data.opportunities.0.statistics.purchased_seats_count', 1)
+            ->assertJsonPath('data.opportunities.0.statistics.interest_requests_count', 0);
+    }
+
+    public function test_investor_cannot_access_company_purchased_seats_without_interests_endpoint(): void
+    {
+        $investor = User::factory()->create([
+            'role' => UserRole::Investor,
+        ]);
+
+        Sanctum::actingAs($investor);
+
+        $response = $this->getJson('/api/v1/company/opportunities/purchased-seats-without-interests');
+
+        $response->assertStatus(403)
+            ->assertJsonPath('key', 'fail')
+            ->assertJsonPath('msg', __('apis.have_no_permission'));
     }
 
     public function test_sell_business_opportunity_does_not_require_sale_percentage(): void

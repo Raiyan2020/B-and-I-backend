@@ -30,6 +30,27 @@ class AdLightResource extends JsonResource
             'seat_price',
             GeneralSetting::getValueForKey('seat_price')
         );
+        $isFileOpen = (bool) ($isOwner || $hasSeat);
+        $canBuySeat = $user
+            ? (
+                ! $isOwner
+                && $isInvestor
+                && ! $hasSeat
+                && $status === OpportunityStatus::Published->value
+            )
+            : null;
+        $canSubmitInterest = $user
+            ? (
+                ! $isOwner
+                && $isInvestor
+                && $hasSeat
+                && ! $hasSubmittedInterest
+                && in_array($status, [
+                    OpportunityStatus::Published->value,
+                    OpportunityStatus::Reserved->value,
+                ], true)
+            )
+            : null;
 
         return [
             'id' => $this->id,
@@ -49,14 +70,15 @@ class AdLightResource extends JsonResource
             'sale_percentage' => $this->sale_percentage !== null ? (float) $this->sale_percentage : null,
             'seat_price' => $seatPrice !== null ? (float) $seatPrice : null,
             'statistics' => $this->statisticsPayload(),
+            'file_access' => [
+                'key' => $isFileOpen ? 'open' : 'locked',
+                'label' => $isFileOpen ? __('apis.file_open') : __('apis.file_locked'),
+                'is_open' => $isFileOpen,
+            ],
             'is_owner' => $isOwner,
             'has_seat' => $hasSeat,
-            'can_buy_seat' => $user
-                ? (! $isOwner && $isInvestor && ! $hasSeat && $status !== OpportunityStatus::Reserved->value)
-                : null,
-            'can_submit_interest' => $user
-                ? (! $isOwner && $isInvestor && $hasSeat && ! $hasSubmittedInterest)
-                : null,
+            'can_buy_seat' => $canBuySeat,
+            'can_submit_interest' => $canSubmitInterest,
             'has_submitted_interest' => $hasSubmittedInterest,
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\OpportunityStatus;
+use App\Enums\UserRole;
 use App\Http\Resources\Concerns\FormatsOpportunityData;
 use App\Models\GeneralSetting;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class AdResource extends JsonResource
     public function toArray(Request $request): array
     {
         $user = $request->user('sanctum') ?? auth('sanctum')->user();
+        $isInvestor = $user?->role === UserRole::Investor;
         $isOwner = $user?->id === $this->user_id;
         $currentLocale = app()->getLocale();
 
@@ -45,7 +47,30 @@ class AdResource extends JsonResource
 
         $canViewSectionB = $this->includeSectionB || $isOwner || ($hasSeat);
         $isFileOpen = (bool) $canViewSectionB;
-        $canViewAdminContact = $hasSeat;
+        $canViewAdminContact = $hasSeat && in_array($status, [
+            OpportunityStatus::Published->value,
+            OpportunityStatus::Reserved->value,
+        ], true);
+        $canBuySeat = $user
+            ? (
+                ! $isOwner
+                && $isInvestor
+                && ! $hasSeat
+                && $status === OpportunityStatus::Published->value
+            )
+            : null;
+        $canSubmitInterest = $user
+            ? (
+                ! $isOwner
+                && $isInvestor
+                && $hasSeat
+                && ! $hasSubmittedInterest
+                && in_array($status, [
+                    OpportunityStatus::Published->value,
+                    OpportunityStatus::Reserved->value,
+                ], true)
+            )
+            : null;
 
         return [
             'id' => $this->id,
@@ -73,12 +98,8 @@ class AdResource extends JsonResource
                 'is_open' => $isFileOpen,
             ],
             'has_seat' => $hasSeat,
-            'can_buy_seat' => $user
-                ? (! $isOwner && ! $hasSeat && $status !== OpportunityStatus::Reserved->value)
-                : null,
-            'can_submit_interest' => $user
-                ? (! $isOwner && $hasSeat && ! $hasSubmittedInterest)
-                : null,
+            'can_buy_seat' => $canBuySeat,
+            'can_submit_interest' => $canSubmitInterest,
             'has_submitted_interest' => $hasSubmittedInterest,
             $this->mergeWhen($canViewAdminContact, [
                 'admin_contact_phone' => $adminContactPhone,
