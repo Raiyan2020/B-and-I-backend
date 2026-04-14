@@ -4,10 +4,12 @@ namespace Tests\Feature\Api;
 
 use App\Enums\InvestorExperience;
 use App\Enums\InvestorType;
+use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Models\AuthUpdate;
 use App\Models\Category;
 use App\Models\Device;
+use App\Models\Opportunity;
 use App\Models\PreferredSector;
 use App\Models\User;
 use App\Notifications\EmailOtpNotification;
@@ -21,6 +23,139 @@ use Tests\TestCase;
 class AuthProfileManagementTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_advertiser_profile_includes_my_statistics(): void
+    {
+        $category = Category::factory()->create(['status' => true]);
+        $advertiser = User::factory()->create([
+            'role' => UserRole::Advertiser,
+            'category_id' => $category->id,
+            'password' => 'password123',
+        ]);
+        $investor = User::factory()->create([
+            'role' => UserRole::Investor,
+            'category_id' => $category->id,
+        ]);
+        $otherAdvertiser = User::factory()->create([
+            'role' => UserRole::Advertiser,
+            'category_id' => $category->id,
+        ]);
+
+        Opportunity::factory()->create([
+            'user_id' => $advertiser->id,
+            'category_id' => $category->id,
+            'investor_id' => $investor->id,
+            'status' => OpportunityStatus::Reserved,
+        ]);
+        Opportunity::factory()->create([
+            'user_id' => $advertiser->id,
+            'category_id' => $category->id,
+            'investor_id' => $investor->id,
+            'status' => OpportunityStatus::Completed,
+        ]);
+        Opportunity::factory()->create([
+            'user_id' => $advertiser->id,
+            'category_id' => $category->id,
+            'investor_id' => $investor->id,
+            'status' => OpportunityStatus::Completed,
+        ]);
+        Opportunity::factory()->create([
+            'user_id' => $otherAdvertiser->id,
+            'category_id' => $category->id,
+            'investor_id' => $investor->id,
+            'status' => OpportunityStatus::Completed,
+        ]);
+
+        Sanctum::actingAs($advertiser);
+
+        $response = $this->getJson('/api/v1/auth/profile');
+
+        $response->assertOk()
+            ->assertJsonPath('data.role.key', UserRole::Advertiser->value)
+            ->assertJsonPath('data.role.label', 'Business Owner')
+            ->assertJsonPath('data.user_name', sprintf('USR-ADV-ID-%03d', $advertiser->id))
+            ->assertJsonPath('data.statistics.my_ads_count', 3)
+            ->assertJsonPath('data.statistics.successful_deals_count', 2)
+            ->assertJsonPath('data.statistics.awarded_investments_count', 3)
+            ->assertJsonPath('data.my_statistics.my_ads_count', 3)
+            ->assertJsonPath('data.my_statistics.successful_deals_count', 2)
+            ->assertJsonPath('data.my_statistics.awarded_investments_count', 3);
+    }
+
+    public function test_investor_profile_includes_statistics(): void
+    {
+        $category = Category::factory()->create(['status' => true]);
+        $investor = User::factory()->create([
+            'role' => UserRole::Investor,
+            'category_id' => $category->id,
+            'capital' => 500000,
+            'password' => 'password123',
+        ]);
+        $otherInvestor = User::factory()->create([
+            'role' => UserRole::Investor,
+            'category_id' => $category->id,
+        ]);
+        $advertiser = User::factory()->create([
+            'role' => UserRole::Advertiser,
+            'category_id' => $category->id,
+        ]);
+
+        $completedOpportunityOne = Opportunity::factory()->create([
+            'user_id' => $advertiser->id,
+            'category_id' => $category->id,
+            'investor_id' => $investor->id,
+            'status' => OpportunityStatus::Completed,
+        ]);
+        $completedOpportunityTwo = Opportunity::factory()->create([
+            'user_id' => $advertiser->id,
+            'category_id' => $category->id,
+            'investor_id' => $investor->id,
+            'status' => OpportunityStatus::Completed,
+        ]);
+        $reservedOpportunity = Opportunity::factory()->create([
+            'user_id' => $advertiser->id,
+            'category_id' => $category->id,
+            'investor_id' => $investor->id,
+            'status' => OpportunityStatus::Reserved,
+        ]);
+        $otherInvestorOpportunity = Opportunity::factory()->create([
+            'user_id' => $advertiser->id,
+            'category_id' => $category->id,
+            'investor_id' => $otherInvestor->id,
+            'status' => OpportunityStatus::Completed,
+        ]);
+
+        \App\Models\InvestmentSeat::query()->create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $completedOpportunityOne->id,
+            'price_paid' => 100,
+            'purchased_at' => now(),
+        ]);
+        \App\Models\InvestmentSeat::query()->create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $completedOpportunityTwo->id,
+            'price_paid' => 100,
+            'purchased_at' => now(),
+        ]);
+        \App\Models\InvestmentSeat::query()->create([
+            'user_id' => $otherInvestor->id,
+            'opportunity_id' => $otherInvestorOpportunity->id,
+            'price_paid' => 100,
+            'purchased_at' => now(),
+        ]);
+
+        Sanctum::actingAs($investor);
+
+        $response = $this->getJson('/api/v1/auth/profile');
+
+        $response->assertOk()
+            ->assertJsonPath('data.role.key', UserRole::Investor->value)
+            ->assertJsonPath('data.role.label', 'Investor')
+            ->assertJsonPath('data.user_name', sprintf('USR-INV-ID-%03d', $investor->id))
+            ->assertJsonPath('data.statistics.purchased_seats_count', 2)
+            ->assertJsonPath('data.statistics.successful_investments_count', 2)
+            ->assertJsonPath('data.statistics.capital', '500000.000');
+    }
 
     public function test_investor_can_update_profile_details(): void
     {

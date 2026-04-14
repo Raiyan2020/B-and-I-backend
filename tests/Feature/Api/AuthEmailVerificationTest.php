@@ -101,7 +101,10 @@ class AuthEmailVerificationTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('key', 'success')
             ->assertJsonPath('data.id', $user->id)
-            ->assertJsonPath('data.email', 'verified-login@example.com');
+            ->assertJsonPath('data.email', 'verified-login@example.com')
+            ->assertJsonPath('data.role.key', UserRole::Investor->value)
+            ->assertJsonPath('data.role.label', 'Investor')
+            ->assertJsonPath('data.user_name', sprintf('USR-INV-ID-%03d', $user->id));
 
         self::assertNotNull($response->json('data.token'));
         $this->assertDatabaseHas('devices', [

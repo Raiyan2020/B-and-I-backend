@@ -11,6 +11,10 @@ return [
         'intermediate' => 'متوسط',
         'expert' => 'خبير',
     ],
+    'user_role' => [
+        'Investor' => 'مستثمر',
+        'Advertiser' => 'صاحب عمل',
+    ],
     'notification_category' => [
         'Interest' => 'إشعارات الاهتمام',
         'Orders' => 'إشعارات الطلبات',

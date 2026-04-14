@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Services\Notifications\NotificationPreferenceService;
 use BackedEnum;
@@ -10,17 +11,25 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class UserResource extends JsonResource
 {
     protected $token;
+
     public function setToken($token)
     {
         $this->token = $token;
 
         return $this;
     }
+
     public function toArray($request): array
     {
+        $roleValue = $this->role->value;
+
         $data = [
             'id' => $this->id,
-            'role' => $this->role->value,
+            'user_name' => $this->formattedUserName(),
+            'role' => [
+                'key' => $roleValue,
+                'label' => UserRole::getTranslatedName($roleValue, 'user_role'),
+            ],
             'name' => $this->name,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
@@ -34,10 +43,18 @@ class UserResource extends JsonResource
             'email_verified' => (bool) $this->email_verified_at,
             'lang' => $this->lang,
             'notification_settings' => app(NotificationPreferenceService::class)->settingsFor($this->resource),
-            'token' => $this->token ?? null,
+            'token' => $this->when($this->token ?? null, $this->token),
         ];
 
         if ($this->role === UserRole::Investor) {
+            if (! isset($this->purchased_seats_count) || ! isset($this->successful_investments_count)) {
+                $this->resource->loadCount([
+                    'investmentSeats as purchased_seats_count',
+                    'awardedOpportunities as successful_investments_count' => fn ($query) => $query
+                        ->where('status', OpportunityStatus::Completed->value),
+                ]);
+            }
+
             $experience = $this->investor_experience;
             $experienceValue = $experience instanceof BackedEnum ? $experience->value : $experience;
             $investorType = $this->investor_type;
@@ -65,15 +82,51 @@ class UserResource extends JsonResource
                 'investment_count' => $this->previous_investments_count,
                 'experience_level' => $this->experience_level,
                 'investor_experience' => $experienceValue,
+                'statistics' => [
+                    'purchased_seats_count' => (int) ($this->purchased_seats_count ?? 0),
+                    'successful_investments_count' => (int) ($this->successful_investments_count ?? 0),
+                    'capital' => $this->capital,
+                ],
             ]);
         }
 
         if ($this->role === UserRole::Advertiser) {
+            if (! isset($this->my_ads_count) || ! isset($this->successful_deals_count) || ! isset($this->awarded_investments_count)) {
+                $this->resource->loadCount([
+                    'opportunities as my_ads_count',
+                    'opportunities as successful_deals_count' => fn ($query) => $query
+                        ->where('status', OpportunityStatus::Completed->value),
+                    'opportunities as awarded_investments_count' => fn ($query) => $query
+                        ->whereNotNull('investor_id')
+                        ->whereIn('status', [
+                            OpportunityStatus::Reserved->value,
+                            OpportunityStatus::Completed->value,
+                        ]),
+                ]);
+            }
+
             $data = array_merge($data, [
                 'company_license_url' => $this->company_license_url,
+                'statistics' => [
+                    'my_ads_count' => (int) ($this->my_ads_count ?? 0),
+                    'successful_deals_count' => (int) ($this->successful_deals_count ?? 0),
+                    'awarded_investments_count' => (int) ($this->awarded_investments_count ?? 0),
+                ],
+                'my_statistics' => [
+                    'my_ads_count' => (int) ($this->my_ads_count ?? 0),
+                    'successful_deals_count' => (int) ($this->successful_deals_count ?? 0),
+                    'awarded_investments_count' => (int) ($this->awarded_investments_count ?? 0),
+                ],
             ]);
         }
 
         return $data;
+    }
+
+    protected function formattedUserName(): string
+    {
+        $rolePrefix = $this->role === UserRole::Investor ? 'INV' : 'ADV';
+
+        return sprintf('USR-%s-ID-%s', $rolePrefix, str_pad((string) $this->id, 3, '0', STR_PAD_LEFT));
     }
 }

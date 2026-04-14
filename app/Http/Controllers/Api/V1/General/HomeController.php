@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\General;
 
+use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Facades\BaseService;
 use App\Http\Controllers\Controller;
@@ -12,6 +13,7 @@ use App\Http\Resources\FeaturesResource;
 use App\Http\Resources\WhoWeAreResource;
 use App\Models\AboutUsItem;
 use App\Models\Category;
+use App\Models\Device;
 use App\Models\Feature;
 use App\Models\GeneralSetting;
 use App\Models\Opportunity;
@@ -87,6 +89,31 @@ class HomeController extends Controller
             'whoWeAreSettings' => $whoWeAreSettings,
             'items'            => WhoWeAreResource::collection($whoWeAreItems),
         ]);
+    }
+
+    public function statistics(): JsonResponse
+    {
+        $data = [
+            'advertisers_count' => User::query()
+                ->where('role', UserRole::Advertiser->value)
+                ->count(),
+            'investors_count' => User::query()
+                ->where('role', UserRole::Investor->value)
+                ->count(),
+            'projects_count' => Opportunity::query()->count(),
+            'online_users_count' => Device::query()
+                ->whereNotNull('user_id')
+                ->distinct('user_id')
+                ->count('user_id'),
+            'successful_deals_count' => Opportunity::query()
+                ->where('status', OpportunityStatus::Completed->value)
+                ->count(),
+            'proposed_deals_count' => Opportunity::query()
+                ->where('status', OpportunityStatus::Reserved->value)
+                ->count(),
+        ];
+
+        return $this->jsonResponse(data: $data);
     }
 
     /**

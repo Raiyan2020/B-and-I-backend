@@ -11,6 +11,10 @@ return [
         'intermediate' => 'Intermediate',
         'expert' => 'Expert',
     ],
+    'user_role' => [
+        'Investor' => 'Investor',
+        'Advertiser' => 'Business Owner',
+    ],
     'notification_category' => [
         'Interest' => 'Order notifications',
         'Orders' => 'Interest notifications',
