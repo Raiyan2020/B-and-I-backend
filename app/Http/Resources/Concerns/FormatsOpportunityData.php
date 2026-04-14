@@ -7,6 +7,15 @@ use Illuminate\Support\Collection;
 
 trait FormatsOpportunityData
 {
+    protected function statisticsPayload(): array
+    {
+        return [
+            'purchased_seats_count' => (int) ($this->investment_seats_count ?? 0),
+            'interest_requests_count' => (int) ($this->interest_requests_count ?? 0),
+            'views_count' => (int) ($this->views_count ?? 0),
+        ];
+    }
+
     protected function categoryPayload(): ?array
     {
         if (! $this->category) {

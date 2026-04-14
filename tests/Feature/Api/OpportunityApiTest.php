@@ -205,7 +205,7 @@ class OpportunityApiTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('data.status', OpportunityStatus::Pending->value)
+            ->assertJsonPath('data.status.value', OpportunityStatus::Pending->value)
             ->assertJsonPath('data.review_note', null)
             ->assertJsonPath('data.sale_percentage', null);
     }

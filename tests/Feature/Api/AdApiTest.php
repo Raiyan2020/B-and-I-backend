@@ -22,16 +22,34 @@ class AdApiTest extends TestCase
     {
         GeneralSetting::create(['key' => 'seat_price', 'value' => '49.50']);
         $category = Category::factory()->create(['status' => true]);
+        $investor = User::factory()->create(['role' => UserRole::Investor]);
 
-        Opportunity::factory()->create([
+        $opportunity = Opportunity::factory()->create([
             'category_id' => $category->id,
             'status' => OpportunityStatus::Published,
+            'views_count' => 7,
+        ]);
+
+        $seat = InvestmentSeat::create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $opportunity->id,
+            'price_paid' => 49.5,
+            'purchased_at' => now(),
+        ]);
+
+        InterestRequest::create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $opportunity->id,
+            'investment_seat_id' => $seat->id,
         ]);
 
         $response = $this->getJson('/api/v1/general/opportunities');
 
         $response->assertOk()
             ->assertJsonPath('data.opportunities.0.seat_price', 49.5)
+            ->assertJsonPath('data.opportunities.0.statistics.purchased_seats_count', 1)
+            ->assertJsonPath('data.opportunities.0.statistics.interest_requests_count', 1)
+            ->assertJsonPath('data.opportunities.0.statistics.views_count', 7)
             ->assertJsonPath('data.opportunities.0.has_seat', null)
             ->assertJsonMissingPath('data.opportunities.0.contact_name')
             ->assertJsonMissingPath('data.opportunities.0.legal_entity')
@@ -165,7 +183,7 @@ class AdApiTest extends TestCase
 
         Sanctum::actingAs($investor);
 
-        $purchaseResponse = $this->postJson("/api/v1/general/opportunities/{$ad->id}/seats");
+        $purchaseResponse = $this->postJson("/api/v1/opportunities/{$ad->id}/seats");
 
         $purchaseResponse->assertStatus(201)
             ->assertJsonPath('data.seat.opportunity_id', $ad->id)
@@ -195,7 +213,7 @@ class AdApiTest extends TestCase
 
         Sanctum::actingAs($investor);
 
-        $blockedResponse = $this->postJson("/api/v1/general/opportunities/{$ad->id}/interest-requests");
+        $blockedResponse = $this->postJson("/api/v1/opportunities/{$ad->id}/interest-requests");
 
         $blockedResponse->assertStatus(422)
             ->assertJsonPath('response_status.validation_errors.seat.0', __('apis.interest_requires_seat_purchase'));
@@ -207,7 +225,7 @@ class AdApiTest extends TestCase
             'purchased_at' => now(),
         ]);
 
-        $interestResponse = $this->postJson("/api/v1/general/opportunities/{$ad->id}/interest-requests");
+        $interestResponse = $this->postJson("/api/v1/opportunities/{$ad->id}/interest-requests");
 
         $interestResponse->assertStatus(201)
             ->assertJsonPath('data.interest_request.opportunity_id', $ad->id)
@@ -271,6 +289,55 @@ class AdApiTest extends TestCase
             ->assertJsonPath('data.file_access.label', trans('apis.file_open', [], 'ar'))
             ->assertJsonPath('data.file_access.is_open', true)
             ->assertJsonPath('data.legal_entity', 'LLC');
+    }
+
+    public function test_ad_show_increments_views_count_for_every_visit_including_guests(): void
+    {
+        GeneralSetting::create(['key' => 'seat_price', 'value' => '49.50']);
+
+        $category = Category::factory()->create(['status' => true]);
+        $investor = User::factory()->create(['role' => UserRole::Investor]);
+        $ad = Opportunity::factory()->create([
+            'category_id' => $category->id,
+            'status' => OpportunityStatus::Published,
+            'views_count' => 2,
+        ]);
+
+        $seat = InvestmentSeat::create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $ad->id,
+            'price_paid' => 49.5,
+            'purchased_at' => now(),
+        ]);
+
+        InterestRequest::create([
+            'user_id' => $investor->id,
+            'opportunity_id' => $ad->id,
+            'investment_seat_id' => $seat->id,
+        ]);
+
+        $this->getJson("/api/v1/general/opportunities/{$ad->id}")
+            ->assertOk()
+            ->assertJsonPath('data.statistics.purchased_seats_count', 1)
+            ->assertJsonPath('data.statistics.interest_requests_count', 1)
+            ->assertJsonPath('data.statistics.views_count', 3);
+
+        $this->getJson("/api/v1/general/opportunities/{$ad->id}")
+            ->assertOk()
+            ->assertJsonPath('data.statistics.views_count', 4);
+
+        Sanctum::actingAs($investor);
+
+        $this->getJson("/api/v1/general/opportunities/{$ad->id}")
+            ->assertOk()
+            ->assertJsonPath('data.statistics.views_count', 5)
+            ->assertJsonPath('data.has_seat', true)
+            ->assertJsonPath('data.has_submitted_interest', true);
+
+        $this->assertDatabaseHas('opportunities', [
+            'id' => $ad->id,
+            'views_count' => 5,
+        ]);
     }
 
     public function test_ad_owner_can_update_only_when_needs_revision(): void

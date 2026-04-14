@@ -67,7 +67,9 @@ class OpportunityController extends Controller
 
         return $this->jsonResponse(
             msg: __('apis.opportunity_updated_and_sent_for_review'),
-            data: (new AdResource($opportunity->load('category')))->includeSectionB(),
+            data: (new AdResource(
+                $opportunity->load('category')->loadCount(['investmentSeats', 'interestRequests'])
+            ))->includeSectionB(),
         );
     }
 }

@@ -39,6 +39,7 @@ class Opportunity extends BaseModel
         'financial_status',
         'investment_reason',
         'full_description',
+        'views_count',
         'review_note',
         'reviewed_at',
     ];
@@ -49,6 +50,7 @@ class Opportunity extends BaseModel
         'business_age_years'  => 'integer',
         'investment_required' => 'decimal:3',
         'sale_percentage'     => 'decimal:2',
+        'views_count'         => 'integer',
         'reviewed_at'         => 'datetime',
     ];
 

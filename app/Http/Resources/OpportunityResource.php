@@ -38,6 +38,7 @@ class OpportunityResource extends JsonResource
             'investment_required' => (float) $this->investment_required,
             'business_stage' => $this->business_stage,
             'sale_percentage' => $this->sale_percentage !== null ? (float) $this->sale_percentage : null,
+            'statistics' => $this->statisticsPayload(),
             'legal_entity' => $this->legal_entity,
             'financial_status' => $this->financial_status,
             'investment_reason' => $this->investment_reason,

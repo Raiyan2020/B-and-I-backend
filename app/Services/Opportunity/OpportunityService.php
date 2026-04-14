@@ -68,6 +68,7 @@ class OpportunityService
 
         return $user->opportunities()
             ->with(['category', 'reviewer'])
+            ->withCount(['investmentSeats', 'interestRequests'])
             ->when(!empty($filters['status']), fn($query) => $query->where('status', $filters['status']))
             ->when(!empty($filters['goal']), fn($query) => $query->where('goal', $filters['goal']))
             ->latest()
@@ -79,7 +80,9 @@ class OpportunityService
     {
         $this->assertOwnership($user, $opportunity);
 
-        return $opportunity->load(['category', 'reviewer', 'user']);
+        return $opportunity
+            ->load(['category', 'reviewer', 'user'])
+            ->loadCount(['investmentSeats', 'interestRequests']);
     }
 
     public function listApproved(QueryOptions $options): Collection

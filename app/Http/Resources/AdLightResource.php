@@ -4,12 +4,15 @@ namespace App\Http\Resources;
 
 use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
+use App\Http\Resources\Concerns\FormatsOpportunityData;
 use App\Models\GeneralSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AdLightResource extends JsonResource
 {
+    use FormatsOpportunityData;
+
     public function toArray(Request $request): array
     {
         $user = $request->user('sanctum') ?? auth('sanctum')->user();
@@ -45,6 +48,7 @@ class AdLightResource extends JsonResource
             'investment_required' => $this->investment_required !== null ? (float) $this->investment_required : null,
             'sale_percentage' => $this->sale_percentage !== null ? (float) $this->sale_percentage : null,
             'seat_price' => $seatPrice !== null ? (float) $seatPrice : null,
+            'statistics' => $this->statisticsPayload(),
             'is_owner' => $isOwner,
             'has_seat' => $hasSeat,
             'can_buy_seat' => $user

@@ -22,6 +22,7 @@ class OpportunityListResource extends JsonResource
             'category'             => $this->categoryPayload(),
             'investment_required'  => (float)$this->investment_required,
             'sale_percentage'      => $this->sale_percentage !== null ? (float)$this->sale_percentage : null,
+            'statistics'           => $this->statisticsPayload(),
             'created_at'           => $this->created_at?->toDateTimeString(),
             'created_at_formatted' => $this->created_at
                 ? $this->created_at->locale(app()->getLocale())->translatedFormat('d M Y - h:i A')

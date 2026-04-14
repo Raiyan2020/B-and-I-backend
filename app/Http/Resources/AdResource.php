@@ -3,13 +3,15 @@
 namespace App\Http\Resources;
 
 use App\Enums\OpportunityStatus;
-use App\Enums\UserRole;
+use App\Http\Resources\Concerns\FormatsOpportunityData;
 use App\Models\GeneralSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AdResource extends JsonResource
 {
+    use FormatsOpportunityData;
+
     protected bool $includeSectionB = false;
 
     public function includeSectionB(bool $includeSectionB = true): self
@@ -62,6 +64,7 @@ class AdResource extends JsonResource
             'sale_percentage' => $this->sale_percentage !== null ? (float) $this->sale_percentage : null,
             'seat_price' => $seatPrice !== null ? (float) $seatPrice : null,
             'completed_deals_commission' => $completedDealsCommission !== null ? (float) $completedDealsCommission : null,
+            'statistics' => $this->statisticsPayload(),
             'current_locale' => $currentLocale,
             'is_owner' => $isOwner,
             'file_access' => [

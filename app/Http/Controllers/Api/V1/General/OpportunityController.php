@@ -30,6 +30,7 @@ class OpportunityController extends Controller
 
         $opportunities = Opportunity::query()
             ->with('category')
+            ->withCount(['investmentSeats', 'interestRequests'])
             ->whereIn('status', [
                 OpportunityStatus::Published->value,
                 OpportunityStatus::Reserved->value,
@@ -72,16 +73,21 @@ class OpportunityController extends Controller
 
         $user = $request->user('sanctum') ?? auth('sanctum')->user();
 
+        $opportunity->increment('views_count');
         $opportunity->load('category');
 
-        $opportunity->load([
-            'investmentSeats' => fn($seatQuery) => $seatQuery
-                ->select(['id', 'opportunity_id', 'user_id'])
-                ->where('user_id', $user->id),
-            'interestRequests' => fn($interestQuery) => $interestQuery
-                ->select(['id', 'opportunity_id', 'user_id', 'investment_seat_id'])
-                ->where('user_id', $user->id),
-        ]);
+        if ($user) {
+            $opportunity->load([
+                'investmentSeats' => fn($seatQuery) => $seatQuery
+                    ->select(['id', 'opportunity_id', 'user_id'])
+                    ->where('user_id', $user->id),
+                'interestRequests' => fn($interestQuery) => $interestQuery
+                    ->select(['id', 'opportunity_id', 'user_id', 'investment_seat_id'])
+                    ->where('user_id', $user->id),
+            ]);
+        }
+
+        $opportunity->loadCount(['investmentSeats', 'interestRequests']);
 
 
         return $this->jsonResponse(data: AdResource::make($opportunity));
@@ -101,7 +107,7 @@ class OpportunityController extends Controller
             'interestRequests' => fn($interestQuery) => $interestQuery
                 ->select(['id', 'opportunity_id', 'user_id', 'investment_seat_id'])
                 ->where('user_id', $request->user()->id),
-        ]);
+        ])->loadCount(['investmentSeats', 'interestRequests']);
 
         return $this->jsonResponse(
             msg: __('apis.seat_purchased_successfully'),
@@ -127,7 +133,7 @@ class OpportunityController extends Controller
             'interestRequests' => fn($interestQuery) => $interestQuery
                 ->select(['id', 'opportunity_id', 'user_id', 'investment_seat_id'])
                 ->where('user_id', $request->user()->id),
-        ]);
+        ])->loadCount(['investmentSeats', 'interestRequests']);
 
         return $this->jsonResponse(
             msg: __('apis.interest_submitted_successfully'),
