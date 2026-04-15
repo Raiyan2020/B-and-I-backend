@@ -122,7 +122,7 @@ class HomeController extends Controller
                 ])->all(),
             ],
             [
-                'title' => __('dashboard.recent_investors'),
+                'title' => __('dashboard.recent investors'),
                 'icon' => 'feather icon-trending-up',
                 'color' => 'success',
                 'items' => User::query()
@@ -137,7 +137,7 @@ class HomeController extends Controller
                     ])->all(),
             ],
             [
-                'title' => __('dashboard.recent_advertisers_companies'),
+                'title' => __('dashboard.recent advertisers_companies'),
                 'icon' => 'feather icon-briefcase',
                 'color' => 'primary',
                 'items' => User::query()
