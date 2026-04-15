@@ -43,9 +43,9 @@ class OpportunityService
     {
         $this->assertOwnership($user, $opportunity);
 
-        if (($opportunity->status?->value ?? $opportunity->status) !== OpportunityStatus::NeedsRevision->value) {
+        if (!in_array(($opportunity->status?->value ?? $opportunity->status), [OpportunityStatus::NeedsRevision->value, OpportunityStatus::Pending->value], true)) {
             throw ValidationException::withMessages([
-                'status' => [__('apis.ad_edit_requires_needs_revision')],
+                'status' => [__('apis.ad_edit_requires_needs_revision_or_pending_status')],
             ]);
         }
 

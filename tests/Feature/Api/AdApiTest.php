@@ -470,6 +470,6 @@ class AdApiTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('response_status.validation_errors.status.0', __('apis.ad_edit_requires_needs_revision'));
+            ->assertJsonPath('response_status.validation_errors.status.0', __('apis.ad_edit_requires_needs_revision_or_pending_status'));
     }
 }

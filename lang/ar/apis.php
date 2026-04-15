@@ -66,7 +66,7 @@ return [
     'forgot_password_verification_required' => 'يرجى تأكيد رمز التحقق المرسل إلى بريدك الإلكتروني قبل تعيين كلمة مرور جديدة.',
     'password_reset_successfully_login_again' => 'تمت إعادة تعيين كلمة المرور بنجاح. يرجى تسجيل الدخول مرة أخرى باستخدام كلمة المرور الجديدة.',
     'account_not_found' => 'لا يوجد حساب مرتبط بهذا البريد الإلكتروني.',
-    'ad_edit_requires_needs_revision' => 'ÙŠÙ…ÙƒÙ† ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¥Ø¹Ù„Ø§Ù†Ø§Øª ÙÙ‚Ø· Ø¹Ù†Ø¯Ù…Ø§ ØªÙƒÙˆÙ† Ø­Ø§Ù„ØªÙ‡Ø§ needs_revision.',
+    'ad_edit_requires_needs_revision_or_pending_status' => 'يمكن تعديل الإعلانات فقط عندما تكون في حالة بحاجة إلى تعديل أو معلقة.',
     'file_open' => 'الملف مفتوح',
     'file_locked' => 'الملف مقفل',
     'investor_only_action' => 'هذا الإجراء متاح لحسابات المستثمرين فقط.',

@@ -91,7 +91,9 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
             Route::get('current-requests', 'currentRequests');
         });
 
-        Route::post('opportunities/{opportunity}/seats', [GeneralOpportunityController::class, 'purchaseSeat']);
-        Route::post('opportunities/{opportunity}/interest-requests', [GeneralOpportunityController::class, 'submitInterest']);
+        Route::group(['prefix' => 'opportunities/{opportunity}', 'controller' => GeneralOpportunityController::class], function () {
+            Route::post('seats',  'purchaseSeat');
+            Route::post('interest-requests',  'submitInterest');
+        });
     });
 });
