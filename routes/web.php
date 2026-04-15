@@ -12,6 +12,7 @@ use App\Http\Controllers\Dashboard\InterestRequestController;
 use App\Http\Controllers\Dashboard\InvestmentSeatController;
 use App\Http\Controllers\Dashboard\NotificationsController;
 use App\Http\Controllers\Dashboard\OpportunityController;
+use App\Http\Controllers\Dashboard\ProfileUpdateRequestController;
 use App\Http\Controllers\Dashboard\PreferredSectorController;
 use App\Http\Controllers\Dashboard\RolesController;
 use App\Http\Controllers\Dashboard\SubscriptionPackageController;
@@ -75,11 +76,20 @@ Route::group([
 
         // User specific routes (must be before Route::resources to avoid route conflict)
         Route::controller(UserController::class)->group(function () {
+            Route::get('advertisers', 'advertisers')->name('advertisers.index');
+            Route::get('advertisers/create', 'createAdvertiser')->name('advertisers.create');
+            Route::get('investors', 'investors')->name('investors.index');
+            Route::get('investors/create', 'createInvestor')->name('investors.create');
             Route::post('users/destroy-multiple', 'destroyMultiple')->name('users.destroyMultiple');
             Route::get('users/{user}/toggle-block', 'toggleBlock')->name('users.toggleBlock');
             Route::get('users/{user}/toggle-active', 'toggleActive')->name('users.toggleActive');
             Route::post('users/{user}/send-notification', 'sendNotification')->name('users.sendNotification');
             Route::post('users/{user}/charge-wallet', 'chargeWallet')->name('users.chargeWallet');
+        });
+
+        Route::controller(ProfileUpdateRequestController::class)->group(function () {
+            Route::get('profile-update-requests/{profileUpdateRequest}', 'show')->name('profile-update-requests.show');
+            Route::post('profile-update-requests/{profileUpdateRequest}/review', 'review')->name('profile-update-requests.review');
         });
 
         // Category specific routes (must be before Route::resources to avoid route conflict)

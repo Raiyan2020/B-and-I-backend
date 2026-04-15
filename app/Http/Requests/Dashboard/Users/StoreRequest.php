@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Dashboard\Users;
 
+use App\Enums\UserRole;
 use App\Helpers\CountryHelper;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -33,18 +34,22 @@ class StoreRequest extends FormRequest
             $phoneStart = $country['phone_start'] ?? null;
         }
 
-        $phoneRules = ['nullable', 'digits_between:9,15', Rule::unique('users', 'phone')->whereNull('deleted_at')];
+        $phoneRules = ['required', 'digits_between:8,15', Rule::unique('users', 'phone')->whereNull('deleted_at')];
 
         if ($phoneStart && $this->input('phone')) {
             $phoneRules[] = 'regex:/^' . preg_quote($phoneStart, '/') . '/';
         }
 
         return [
-            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-            'name' => ['required', 'min:3', 'max:100'],
-            'email' => ['nullable', 'email:dns,rfc,spoof', Rule::unique('users', 'email')->whereNull('deleted_at')],
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'role' => ['required', Rule::in(UserRole::values())],
+            'email' => ['required', 'email:dns,rfc,spoof', Rule::unique('users', 'email')->whereNull('deleted_at')],
             'phone' => $phoneRules,
-            'country_code' => ['nullable', 'string', 'max:5'],
+            'country_code' => ['required', 'string', 'max:5'],
+            'lang' => ['required', Rule::in(['ar', 'en'])],
+            'company_license' => [Rule::requiredIf(fn () => $this->input('role') === UserRole::Advertiser->value), 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
             'password' => ['required', 'confirmed', 'min:6', 'max:100'],
         ];
     }

@@ -22,13 +22,13 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('admin.users.create') }}" class="quick-link-item">
+                    <a href="{{ route('admin.advertisers.create') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-success">
                             <i class="feather icon-user-plus"></i>
                         </div>
                         <div class="quick-link-content">
-                            <h6 class="quick-link-title">{{ __('dashboard.add user') }}</h6>
-                            <p class="quick-link-desc">{{ __('dashboard.add new client account') }}</p>
+                            <h6 class="quick-link-title">{{ __('dashboard.add_advertiser_company') }}</h6>
+                            <p class="quick-link-desc">{{ __('dashboard.advertisers_companies') }}</p>
                         </div>
                         <div class="quick-link-arrow">
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>

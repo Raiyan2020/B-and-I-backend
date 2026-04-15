@@ -7,7 +7,7 @@
             lengthMenu: [5,10, 20, 40, 60, 80, 100],
             pageLength: 5,
             ajax: {
-                url: "{{ route('admin.users.index') }}",
+                url: "{{ route($indexRouteName ?? 'admin.users.index') }}",
                 headers: {
                     'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -19,7 +19,7 @@
                         email: $('#search-email').val() || '',
                         order: $('#order-filter').val() || 'ASC',
                         is_blocked: $('#block-status-filter').val() || '',
-                        is_active: $('#active-status-filter').val() || ''
+                        is_active: $('#account-status-filter').val() || ''
                     };
                 }
             },
@@ -52,7 +52,7 @@
                     name: 'name'
                 },
                 {
-                    data: 'phone',
+                    data: 'full_phone',
                     name: 'phone'
                 },
                 {
@@ -70,7 +70,24 @@
                     data: 'is_active',
                     name: 'is_active',
                     render: function(data) {
-                        return `<span class="badge text-white badge-${data == 1 ? 'success' : 'warning'}">${data == 1 ? '{{ __('dashboard.activated') }}' : '{{ __('dashboard.not_activated') }}'}</span>`
+                        return `<span class="badge text-white badge-${data ? 'success' : 'warning'}">${data ? '{{ __('dashboard.active') }}' : '{{ __('dashboard.inactive') }}'}</span>`
+                    }
+                },
+                {
+                    data: 'latest_pending_profile_update_request',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        if (!data || !data.id) {
+                            return `-`;
+                        }
+
+                        let reviewRoute = '{{ route('admin.profile-update-requests.show', ':id') }}'
+                            .replace(':id', data.id);
+
+                        return `<a href="${reviewRoute}" class="btn btn-sm btn-outline-info">
+                                    <i class="feather icon-eye mr-50"></i>{{ __('dashboard.review_request') }}
+                                </a>`;
                     }
                 },
                 {
@@ -88,23 +105,11 @@
                         let toggleActiveRoute = '{{ route('admin.users.toggleActive', ':id') }}'
                             .replace(':id', data);
 
-                        if (window.DataTablesShared && window.DataTablesShared.renderActions) {
-                            return window.DataTablesShared.renderActions({
-                                showRoute: showRoute,
-                                editRoute: editRoute,
-                                deleteRoute: deleteRoute,
-                                toggleBlockRoute: toggleBlockRoute,
-                                hideIf: function(id) {
-                                    return false;
-                                }
-                            })(data, type, row);
-                        }
-
-                        // Fallback
                         let blockTitle = row.is_blocked == 1 ?
                             '{{ __('dashboard.un_block') }}' : '{{ __('dashboard.block') }}';
-                        let activeTitle = row.is_active == 1 ?
-                            '{{ __('dashboard.deactivate_phone') }}' : '{{ __('dashboard.activate_phone') }}';
+                        let isActive = !!row.is_active;
+                        let activeTitle = isActive ?
+                            '{{ __('dashboard.deactivate') }}' : '{{ __('dashboard.activate') }}';
                         return `<div class="d-flex align-items-center gap-2">
                                     <a class="btn btn-sm btn-icon btn-outline-info" href="${showRoute}" title="{{ __('dashboard.show') }}">
                                         <i class="feather icon-eye text-info"></i>
@@ -115,8 +120,8 @@
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-warning toggle-block-btn" data-url="${toggleBlockRoute}" data-blocked="${row.is_blocked}" title="${blockTitle}">
                                         <i class="feather icon-slash text-warning"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-icon btn-outline-${row.is_active == 1 ? 'success' : 'secondary'} toggle-active-btn" data-url="${toggleActiveRoute}" data-active="${row.is_active}" title="${activeTitle}">
-                                        <i class="feather icon-${row.is_active == 1 ? 'check-circle' : 'x-circle'} text-${row.is_active == 1 ? 'success' : 'secondary'}"></i>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-${isActive ? 'success' : 'secondary'} toggle-active-btn" data-url="${toggleActiveRoute}" data-active="${isActive ? 1 : 0}" title="${activeTitle}">
+                                        <i class="feather icon-${isActive ? 'check-circle' : 'x-circle'} text-${isActive ? 'success' : 'secondary'}"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-danger delete-row" data-url="${deleteRoute}" title="{{ __('dashboard.delete') }}">
                                         <i class="feather icon-trash-2 text-danger"></i>
@@ -139,7 +144,7 @@
             $('#search-phone').val('');
             $('#search-email').val('');
             $('#block-status-filter').val('');
-            $('#active-status-filter').val('');
+            $('#account-status-filter').val('');
             $('#order-filter').val('ASC');
             // Reload table with reset filters
             table.ajax.reload(null, false);
@@ -180,12 +185,11 @@
             });
         }
 
-        // Initialize toggle active (phone activation)
+        // Initialize toggle active (account status)
         $(document).on('click', '.toggle-active-btn', function(e) {
             e.preventDefault();
             let btn = $(this);
             let url = btn.data('url');
-            let isActive = btn.data('active');
             
             Swal.fire({
                 title: '{{ __('dashboard.confirm') }}',

@@ -44,19 +44,21 @@ trait StatusTrait
     }
 
     /**
-     * Toggle the active status (phone verification) of a user.
+     * Toggle the account active status of a user.
      */
     public function toggleActive(int $id): array
     {
         try {
             $user = $this->find($id);
-            $user->update(['is_active' => !$user->is_active]);
+            $user->update([
+                'is_active' => ! $user->is_active,
+            ]);
 
             if ($user->is_active) {
-                return ['msg' => __('dashboard.phone_activated')];
+                return ['msg' => __('dashboard.active')];
             }
 
-            return ['msg' => __('dashboard.phone_deactivated')];
+            return ['msg' => __('dashboard.inactive')];
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }

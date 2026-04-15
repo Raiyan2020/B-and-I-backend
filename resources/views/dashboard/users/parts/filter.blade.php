@@ -24,11 +24,11 @@
             </select>
         </div>
         <div class="col-md-3 col-lg-2">
-            <label class="form-label">{{ __('dashboard.phone_activation_status') }}</label>
-            <select class="form-control" id="active-status-filter">
+            <label class="form-label">{{ __('dashboard.account_status') }}</label>
+            <select class="form-control" id="account-status-filter">
                 <option value="">{{ __('dashboard.all') }}</option>
-                <option value="1">{{ __('dashboard.activated') }}</option>
-                <option value="0">{{ __('dashboard.not_activated') }}</option>
+                <option value="1">{{ __('dashboard.active') }}</option>
+                <option value="0">{{ __('dashboard.inactive') }}</option>
             </select>
         </div>
         <div class="col-md-3 col-lg-2">
@@ -37,7 +37,7 @@
                 placeholder="{{ __('dashboard.search') }}...">
         </div>
         <div class="col-md-3 col-lg-2">
-            <label class="form-label">{{ __('dashboard.search by phone') }}</label>
+            <label class="form-label">{{ __('dashboard.search by full phone') }}</label>
             <input type="text" class="form-control" id="search-phone"
                 placeholder="{{ __('dashboard.search') }}...">
         </div>

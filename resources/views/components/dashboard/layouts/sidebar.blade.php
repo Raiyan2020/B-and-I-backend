@@ -46,9 +46,14 @@
                     <span class="menu-title" data-i18n="Roles">{{ __('dashboard.roles list') }}</span></a>
             </li>
 
-            <li class="{{ Route::is('admin.users.*') ? 'active' : '' }} nav-item">
-                <a href="{{ route('admin.users.index') }}"><i class="feather icon-users"></i>
-                    <span class="menu-title" data-i18n="Users">{{ __('dashboard.users') }}</span></a>
+            <li class="{{ Route::is('admin.advertisers.*') ? 'active' : '' }} nav-item">
+                <a href="{{ route('admin.advertisers.index') }}"><i class="feather icon-briefcase"></i>
+                    <span class="menu-title" data-i18n="Advertisers">{{ __('dashboard.advertisers_companies') }}</span></a>
+            </li>
+
+            <li class="{{ Route::is('admin.investors.*') ? 'active' : '' }} nav-item">
+                <a href="{{ route('admin.investors.index') }}"><i class="feather icon-trending-up"></i>
+                    <span class="menu-title" data-i18n="Investors">{{ __('dashboard.investors') }}</span></a>
             </li>
             {{--            start new side bar--}}
 

@@ -41,6 +41,7 @@ class UserResource extends JsonResource
             'country_code' => $this->country_code,
             'phone' => $this->phone,
             'email_verified' => (bool) $this->email_verified_at,
+            'has_pending_profile_update_request' => $this->has_pending_profile_update_request,
             'lang' => $this->lang,
             'notification_settings' => app(NotificationPreferenceService::class)->settingsFor($this->resource),
             'token' => $this->when($this->token ?? null, $this->token),

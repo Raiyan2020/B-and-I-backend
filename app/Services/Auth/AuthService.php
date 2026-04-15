@@ -9,6 +9,7 @@ use App\Enums\UserRole;
 use App\Jobs\SendEmailOtpNotificationJob;
 use App\Models\AuthUpdate;
 use App\Models\User;
+use App\Services\ProfileUpdateRequestService;
 use App\Services\Devices\DeviceService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -22,6 +23,7 @@ class AuthService implements AuthServiceInterface
     public function __construct(
         private readonly EmailVerificationService $emailVerificationService,
         private readonly DeviceService $deviceService,
+        private readonly ProfileUpdateRequestService $profileUpdateRequestService,
     ) {}
 
     public function registerInvestor(RegisterInvestorDTO $dto): User
@@ -140,27 +142,11 @@ class AuthService implements AuthServiceInterface
 
     public function updateProfile(User $user, array $data): array
     {
-        if ($user->role !== UserRole::Investor) {
-            unset(
-                $data['available_capital'],
-                $data['preferred_sector_id'],
-                $data['category_id'],
-                $data['investor_experience'],
-                $data['investor_type'],
-            );
-        } else {
-            unset($data['company_license']);
-
-            if (array_key_exists('available_capital', $data) && ! array_key_exists('capital', $data)) {
-                $data['capital'] = $data['available_capital'];
-            }
-        }
-
-        $user->fill($data);
-        $user->save();
+        $result = $this->profileUpdateRequestService->submit($user, $data);
         $user = $this->loadUserWithRelations($user);
 
         return [
+            'status' => $result['status'],
             'user' => $user,
             'email_verification_sent' => false,
         ];

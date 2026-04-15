@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\NotificationSettingsController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
+use App\Http\Controllers\Api\V1\Auth\ProfileUpdateRequestController;
 use App\Http\Controllers\Api\V1\Auth\ResendVerificationController;
 use App\Http\Controllers\Api\V1\Auth\UserPasswordController;
 use App\Http\Controllers\Api\V1\Auth\UserRegisterController;
@@ -61,6 +62,8 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
                 Route::get('/', '__invoke');
                 Route::patch('/', 'update');
             });
+
+            Route::get('profile-update-requests/latest', [ProfileUpdateRequestController::class, 'latest']);
 
             Route::group(['prefix' => 'email-change', 'controller' => ChangeEmailController::class], function () {
                 Route::post('request-current', 'requestCurrent')->middleware('throttle:6,1');

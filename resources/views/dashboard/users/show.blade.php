@@ -1,4 +1,4 @@
-<x-dashboard.layouts.master title="{{ __('dashboard.customer details') }}">
+<x-dashboard.layouts.master title="{{ $detailsTitle ?? __('dashboard.customer details') }}">
     <!-- BEGIN: Content-->
     <div class="app-content content">
         <div class="content-overlay"></div>
@@ -6,9 +6,9 @@
         <div class="content-wrapper">
             <div class="content-header row">
             </div>
-            <x-dashboard.layouts.breadcrumb now="{{ __('dashboard.customer details') }}">
+            <x-dashboard.layouts.breadcrumb now="{{ $detailsTitle ?? __('dashboard.customer details') }}">
                 <li class="breadcrumb-item"><a
-                        href="{{ route('admin.users.index') }}">{{ __('dashboard.users list') }}</a></li>
+                        href="{{ route($indexRouteName ?? 'admin.users.index') }}">{{ $listTitle ?? __('dashboard.users list') }}</a></li>
             </x-dashboard.layouts.breadcrumb>
             <div class="content-body">
                 <!-- page user view start -->
@@ -18,14 +18,14 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h4 class="card-title mb-0">{{ __('dashboard.customer details') }}</h4>
+                                    <h4 class="card-title mb-0">{{ $detailsTitle ?? __('dashboard.customer details') }}</h4>
                                     <div class="d-flex gap-2">
                                         @can('edit-user')
                                             <a href="{{ route('admin.users.edit', $row->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="feather icon-edit mr-1"></i>{{ __('dashboard.edit') }}
                                             </a>
                                         @endcan
-                                        <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-secondary">
+                                        <a href="{{ route($indexRouteName ?? 'admin.users.index') }}" class="btn btn-sm btn-outline-secondary">
                                             <i class="feather icon-arrow-right mr-1"></i>{{ __('dashboard.back') }}
                                         </a>
                                     </div>
@@ -63,6 +63,52 @@
                                                 </div>
 
                                                 <div class="col-12 col-sm-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="feather icon-user text-primary mr-2" style="font-size: 18px;"></i>
+                                                        <div>
+                                                            <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.table first name') }}</p>
+                                                            <h5 class="mb-0">{{ $row->first_name ?? __('dashboard.not specified') }}</h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="feather icon-user text-secondary mr-2" style="font-size: 18px;"></i>
+                                                        <div>
+                                                            <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.table last name') }}</p>
+                                                            <h5 class="mb-0">{{ $row->last_name ?? __('dashboard.not specified') }}</h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="feather icon-globe text-warning mr-2" style="font-size: 18px;"></i>
+                                                        <div>
+                                                            <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.table language') }}</p>
+                                                            <h5 class="mb-0">{{ $row->lang === 'ar' ? __('api.language_arabic') : ($row->lang === 'en' ? __('api.language_english') : __('dashboard.not specified')) }}</h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="feather icon-file text-info mr-2" style="font-size: 18px;"></i>
+                                                        <div>
+                                                            <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.table company license') }}</p>
+                                                            <h5 class="mb-0">
+                                                                @if($row->company_license_url)
+                                                                    <a href="{{ $row->company_license_url }}" target="_blank">{{ __('dashboard.view current license') }}</a>
+                                                                @else
+                                                                    {{ __('dashboard.not specified') }}
+                                                                @endif
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6 mb-2">
                                                     <div class="d-flex align-items-center justify-content-between">
                                                         <div class="d-flex align-items-center">
                                                             <i class="feather icon-mail text-info mr-2" style="font-size: 18px;"></i>
@@ -83,6 +129,13 @@
                                                                     title="{{ __('dashboard.charge_wallet') }}"
                                                                     style="width: 35px; height: 35px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                                                 <i class="fa fa-money" style="font-size: 16px;"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-icon btn-outline-{{ $row->is_active ? 'success' : 'secondary' }} toggle-active-btn-show"
+                                                                    data-url="{{ route('admin.users.toggleActive', $row->id) }}"
+                                                                    data-active="{{ $row->is_active ? '1' : '0' }}"
+                                                                    title="{{ $row->is_active ? __('dashboard.deactivate') : __('dashboard.activate') }}"
+                                                                    style="width: 35px; height: 35px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="feather icon-{{ $row->is_active ? 'check-circle' : 'x-circle' }}" style="font-size: 16px;"></i>
                                                             </button>
                                                             @can('block-user')
                                                                 <button type="button" class="btn btn-sm btn-icon btn-outline-warning toggle-block-btn-show"
@@ -114,7 +167,7 @@
                                                                 @if($row->country_code)
                                                                     <span class="flag-icon flag-icon-{{ \App\Helpers\CountryHelper::getCountryByCode($row->country_code)['iso'] ?? 'sa' }} flag-icon-squared mr-1"></span>
                                                                 @endif
-                                                                {{ $row->country_code ?? '' }} {{ $row->phone ?? __('dashboard.not specified') }}
+                                                                {{ $row->full_phone ?: __('dashboard.not specified') }}
                                                             </h5>
                                                         </div>
                                                     </div>
@@ -124,10 +177,10 @@
                                                     <div class="d-flex align-items-center">
                                                         <i class="feather icon-check-circle text-success mr-2" style="font-size: 18px;"></i>
                                                         <div>
-                                                            <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.phone_activation_status') }}</p>
+                                                            <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.account_status') }}</p>
                                                             <h5 class="mb-0">
                                                                 <span class="badge badge-{{ $row->is_active ? 'success' : 'warning' }}">
-                                                                    {{ $row->is_active ? __('dashboard.activated') : __('dashboard.not_activated') }}
+                                                                    {{ $row->is_active ? __('dashboard.active') : __('dashboard.inactive') }}
                                                                 </span>
                                                             </h5>
                                                         </div>
@@ -228,6 +281,69 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title mb-0">
+                                        <i class="feather icon-clock text-warning mr-1"></i>
+                                        {{ __('dashboard.profile_update_requests') }}
+                                    </h4>
+                                    <span class="badge badge-primary">{{ $row->profileUpdateRequests?->count() ?? 0 }}</span>
+                                </div>
+                                <div class="card-body">
+                                    @if(isset($row->profileUpdateRequests) && $row->profileUpdateRequests->count() > 0)
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>{{ __('dashboard.request_status') }}</th>
+                                                        <th>{{ __('dashboard.request_submitted_at') }}</th>
+                                                        <th>{{ __('dashboard.reviewed_at') }}</th>
+                                                        <th>{{ __('dashboard.reviewed_by') }}</th>
+                                                        <th>{{ __('dashboard.rejection_reason') }}</th>
+                                                        <th>{{ __('dashboard.actions') }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($row->profileUpdateRequests as $profileUpdateRequest)
+                                                        <tr>
+                                                            <td>#{{ $profileUpdateRequest->id }}</td>
+                                                            <td>
+                                                                <span class="badge badge-{{ match($profileUpdateRequest->status?->value) {
+                                                                    'approved' => 'success',
+                                                                    'rejected' => 'danger',
+                                                                    default => 'warning',
+                                                                } }}">
+                                                                    {{ __('dashboard.'.($profileUpdateRequest->status?->value ?? 'pending')) }}
+                                                                </span>
+                                                            </td>
+                                                            <td>{{ $profileUpdateRequest->created_at?->format('Y-m-d H:i') ?? '-' }}</td>
+                                                            <td>{{ $profileUpdateRequest->reviewed_at?->format('Y-m-d H:i') ?? '-' }}</td>
+                                                            <td>{{ $profileUpdateRequest->reviewer?->name ?? '-' }}</td>
+                                                            <td>{{ $profileUpdateRequest->rejection_reason ?: '-' }}</td>
+                                                            <td>
+                                                                <a href="{{ route('admin.profile-update-requests.show', $profileUpdateRequest) }}"
+                                                                   class="btn btn-sm btn-outline-info"
+                                                                   title="{{ __('dashboard.show') }}">
+                                                                    <i class="feather icon-eye"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @else
+                                        <div class="text-center py-4">
+                                            <i class="feather icon-inbox text-muted" style="font-size: 48px;"></i>
+                                            <p class="text-muted mt-2 mb-0">{{ __('dashboard.no_profile_update_requests') }}</p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -560,7 +676,7 @@
                                         timer: 2000,
                                         showConfirmButton: false
                                     }).then(() => {
-                                        window.location.href = '{{ route('admin.users.index') }}';
+                                        window.location.href = '{{ route($indexRouteName ?? 'admin.users.index') }}';
                                     });
                                 } else {
                                     Swal.fire({
@@ -589,6 +705,59 @@
                     csrfToken: $('meta[name="csrf-token"]').attr('content')
                 });
             }
+
+            $(document).on('click', '.toggle-active-btn-show', function(e) {
+                e.preventDefault();
+                var $btn = $(this);
+                var toggleUrl = $btn.data('url');
+
+                Swal.fire({
+                    title: '{{ __('dashboard.confirm') }}',
+                    text: '{{ __('dashboard.toggle_active_text') }}',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '{{ __('dashboard.yes') }}',
+                    cancelButtonText: '{{ __('dashboard.cancel') }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: toggleUrl,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                if (response.key === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '{{ __('dashboard.success') }}',
+                                        text: response.msg,
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: '{{ __('dashboard.error') }}',
+                                        text: response.msg
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: '{{ __('dashboard.error') }}',
+                                    text: xhr.responseJSON?.msg || '{{ __('dashboard.something_went_wrong') }}'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
 
             // Handle toggle block button click on show page (reload page after success)
             $(document).on('click', '.toggle-block-btn-show', function(e) {
@@ -678,7 +847,7 @@
                                         timer: 2000,
                                         showConfirmButton: false
                                     }).then(() => {
-                                        window.location.href = '{{ route('admin.users.index') }}';
+                                        window.location.href = '{{ route($indexRouteName ?? 'admin.users.index') }}';
                                     });
                                 } else {
                                     Swal.fire({

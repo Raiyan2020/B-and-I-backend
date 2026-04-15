@@ -23,14 +23,14 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('company_license')->nullable();
 
-            $table->string('investor_type')->default(InvestorType::Angel->value);
+            $table->string('investor_type')->nullable();
             $table->decimal('capital', 12, 3)->nullable(); // راس المال
             $table->decimal('available_capital', 12, 3)->nullable(); // راس المال المتاح
             $table->foreignId('preferred_sector_id')->nullable()->constrained('preferred_sectors');
             $table->foreignId('category_id')->nullable()->constrained('categories');
             $table->decimal('experience_level', 12, 3)->nullable();
             $table->integer('previous_investments_count')->nullable();
-            $table->string('investor_experience')->default(InvestorExperience::Beginner->value);
+            $table->string('investor_experience')->nullable();
 
             $table->string('image')->nullable();
             $table->timestamp('email_verified_at')->nullable();

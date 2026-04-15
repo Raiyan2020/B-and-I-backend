@@ -30,7 +30,7 @@ interface AuthServiceInterface
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array{user: User, email_verification_sent: bool}
+     * @return array{status: string, user: User, email_verification_sent?: bool}
      */
     public function updateProfile(User $user, array $data): array;
 

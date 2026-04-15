@@ -1,4 +1,4 @@
-<x-dashboard.layouts.master title="{{ __('dashboard.users list') }}">
+<x-dashboard.layouts.master title="{{ $listTitle ?? __('dashboard.users list') }}">
     <!-- BEGIN: Content-->
     <div class="app-content content">
         <div class="content-overlay"></div>
@@ -9,7 +9,7 @@
             <div class="content-body">
                 <!-- users list start -->
                 <section class="users-list-wrapper">
-                    <x-dashboard.layouts.breadcrumb now="{{ __('dashboard.users list') }}">
+                    <x-dashboard.layouts.breadcrumb now="{{ $listTitle ?? __('dashboard.users list') }}">
                     </x-dashboard.layouts.breadcrumb>
 
                     <!-- Filter Section -->
@@ -21,11 +21,11 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="card-title mb-0">{{ __('dashboard.users list') }}</h4>
+                                        <h4 class="card-title mb-0">{{ $listTitle ?? __('dashboard.users list') }}</h4>
                                         @can('add-user')
-                                            <a href="{{ route('admin.users.create') }}">
+                                            <a href="{{ route($createRouteName ?? 'admin.users.create') }}">
                                                 <button class="btn btn-primary btn-sm">
-                                                    <i class="mr-1 feather icon-plus"></i>{{ __('dashboard.add user') }}
+                                                    <i class="mr-1 feather icon-plus"></i>{{ $createTitle ?? __('dashboard.add user') }}
                                                 </button>
                                             </a>
                                         @endcan
@@ -40,10 +40,11 @@
                                                             <x-dashboard.tables.select-all-checkbox />
                                                             <th>{{ __('dashboard.table image') }}</th>
                                                             <th>{{ __('dashboard.table name') }}</th>
-                                                            <th>{{ __('dashboard.table phone') }}</th>
+                                                            <th>{{ __('dashboard.full_phone') }}</th>
                                                             <th>{{ __('dashboard.table email') }}</th>
                                                             <th>{{ __('dashboard.table status') }}</th>
-                                                            <th>{{ __('dashboard.phone activation') }}</th>
+                                                            <th>{{ __('dashboard.account_status') }}</th>
+                                                            <th>{{ __('dashboard.profile_update_request') }}</th>
                                                             <th>{{ __('dashboard.actions') }}</th>
                                                         </tr>
                                                     </thead>

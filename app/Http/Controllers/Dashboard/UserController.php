@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Models\User;
-use App\Http\Requests\Dashboard\Users\StoreRequest;
-use App\Http\Requests\Dashboard\Users\UpdateRequest;
+use App\Enums\NotificationCategory;
+use App\Enums\UserRole;
 use App\Http\Requests\Dashboard\Users\ChargeWalletRequest;
 use App\Http\Requests\Dashboard\Users\SendNotificationRequest;
-use App\Enums\NotificationCategory;
+use App\Http\Requests\Dashboard\Users\StoreRequest;
+use App\Http\Requests\Dashboard\Users\UpdateRequest;
+use App\Models\User;
 use App\Notifications\GeneralNotification;
 use App\Services\Core\BaseService;
 use App\Services\Notifications\GeneralNotificationService;
+use App\Support\QueryOptions;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends AdminBasicController
 {
@@ -28,11 +32,95 @@ class UserController extends AdminBasicController
             with: ['wallet', 'walletTransactions', 'orders'],
         );
 
-        $this->middleware('permission:users', ['only' => ['index', 'show']]);
-        $this->middleware('permission:add-user', ['only' => ['create', 'store']]);
+        $this->middleware('permission:users', ['only' => ['index', 'advertisers', 'investors', 'show']]);
+        $this->middleware('permission:add-user', ['only' => ['create', 'createAdvertiser', 'createInvestor', 'store']]);
         $this->middleware('permission:edit-user', ['only' => ['edit', 'update']]);
         $this->middleware('permission:delete-user', ['only' => ['destroy', 'destroyMultiple']]);
         $this->middleware('permission:block-user', ['only' => ['toggleBlock']]);
+    }
+
+    public function index(): View|JsonResponse
+    {
+        return $this->indexListing();
+    }
+
+    public function create(): View
+    {
+        return $this->createAdvertiser();
+    }
+
+    public function advertisers(): View|JsonResponse
+    {
+        return $this->indexListing(UserRole::Advertiser);
+    }
+
+    public function investors(): View|JsonResponse
+    {
+        return $this->indexListing(UserRole::Investor);
+    }
+
+    public function createAdvertiser(): View
+    {
+        return $this->createByRole(UserRole::Advertiser);
+    }
+
+    public function createInvestor(): View
+    {
+        return $this->createByRole(UserRole::Investor);
+    }
+
+    public function store(): JsonResponse|RedirectResponse
+    {
+        $this->storeRequest = app($this->storeRequest);
+        $validated = $this->storeRequest->validated();
+        $role = $this->resolveRole($validated['role'] ?? request()->input('role'));
+        $validated = $this->prepareUserData($validated, $role);
+
+        $model = $this->serviceName->create($validated);
+
+        if (method_exists($this->serviceName, 'afterCreate')) {
+            $this->serviceName->afterCreate($model, $validated);
+        }
+
+        return response()->json([
+            'url' => route($this->roleContext($role)['indexRouteName']),
+        ]);
+    }
+
+    public function edit($id): View
+    {
+        $row = $this->serviceName->find($id);
+
+        return view('dashboard.' . $this->directoryName . '.edit', array_merge(
+            ['row' => $row],
+            $this->roleContext($this->resolveRole($row->role)),
+            $this->editCompactVariables ?? [],
+        ));
+    }
+
+    public function update($id): JsonResponse|RedirectResponse
+    {
+        $row = $this->serviceName->find($id);
+        $this->updateRequest = app($this->updateRequest);
+        $validated = $this->updateRequest->validated();
+        $validated = $this->prepareUserData($validated, $this->resolveRole($row->role), $row);
+
+        if (blank($validated['password'] ?? null)) {
+            unset($validated['password']);
+        }
+
+        $this->serviceName->update(id: $id, data: $validated);
+
+        $model = $this->serviceName->find($id);
+
+        if (method_exists($this->serviceName, 'afterUpdate')) {
+            $this->serviceName->afterUpdate($model, $validated);
+        }
+
+        return response()->json([
+            'url' => route($this->roleContext($this->resolveRole($row->role))['indexRouteName']),
+            'msg' => __('dashboard.item updated successfully'),
+        ]);
     }
 
     /**
@@ -87,11 +175,18 @@ class UserController extends AdminBasicController
      */
     public function show($id): View|JsonResponse
     {
-        $row = $this->serviceName->find(id: $id, with: ['wallet', 'walletTransactions' => function($query) {
-            $query->latest()->take(10);
-        }, 'orders' => function($query) {
-            $query->latest()->take(10);
-        }]);
+        $row = $this->serviceName->find(id: $id, with: [
+            'wallet',
+            'walletTransactions' => function($query) {
+                $query->latest()->take(10);
+            },
+            'orders' => function($query) {
+                $query->latest()->take(10);
+            },
+            'profileUpdateRequests' => function ($query) {
+                $query->with('reviewer')->latest()->take(10);
+            },
+        ]);
 
         // Load counts for statistics (safely handle if relationships don't exist)
         try {
@@ -113,7 +208,10 @@ class UserController extends AdminBasicController
             $row->setAttribute('wallet_transactions_count', 0);
         }
 
-        return view('dashboard.' . $this->directoryName . '.show', ['row' => $row]);
+        return view('dashboard.' . $this->directoryName . '.show', array_merge(
+            ['row' => $row],
+            $this->roleContext($this->resolveRole($row->role)),
+        ));
     }
 
     /**
@@ -257,5 +355,117 @@ class UserController extends AdminBasicController
                 'msg' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function indexListing(?UserRole $role = null): View|JsonResponse
+    {
+        $context = $role
+            ? $this->roleContext($role)
+            : [
+                'listTitle' => __('dashboard.users list'),
+                'createTitle' => __('dashboard.add user'),
+                'indexRouteName' => 'admin.users.index',
+                'createRouteName' => 'admin.users.create',
+                'storeRouteName' => 'admin.users.store',
+            ];
+
+        if (request()->ajax()) {
+            $conditions = $this->indexConditions ?? [];
+
+            if ($role) {
+                $conditions[] = ['role', '=', $role->value];
+            }
+
+            $rows = $this->serviceName->all(
+                (new QueryOptions())
+                    ->paginateNum(30)
+                    ->scopes($this->indexScopes ?? 'search')
+                    ->conditions($conditions)
+                    ->with(array_merge($this->with ?? [], ['latestPendingProfileUpdateRequest']))
+                    ->latest(false)
+            );
+
+            return DataTables::of($rows)
+                ->addColumn('latest_pending_profile_update_request', function (User $user): ?array {
+                    $request = $user->latestPendingProfileUpdateRequest;
+
+                    if (! $request) {
+                        return null;
+                    }
+
+                    return [
+                        'id' => $request->id,
+                        'status' => $request->status?->value,
+                    ];
+                })
+                ->make(true);
+        }
+
+        return view(
+            'dashboard.' . $this->directoryName . '.index',
+            array_merge($context, $this->indexCompactVariables ?? []),
+        );
+    }
+
+    private function createByRole(UserRole $role): View
+    {
+        return view(
+            'dashboard.' . $this->directoryName . '.create',
+            array_merge($this->roleContext($role), $this->createCompactVariables ?? []),
+        );
+    }
+
+    private function roleContext(UserRole $role): array
+    {
+        return match ($role) {
+            UserRole::Advertiser => [
+                'roleValue' => $role->value,
+                'listTitle' => __('dashboard.advertisers_companies_list'),
+                'createTitle' => __('dashboard.add_advertiser_company'),
+                'editTitle' => __('dashboard.edit_advertiser_company'),
+                'detailsTitle' => __('dashboard.advertiser_company_details'),
+                'indexRouteName' => 'admin.advertisers.index',
+                'createRouteName' => 'admin.advertisers.create',
+                'storeRouteName' => 'admin.users.store',
+            ],
+            UserRole::Investor => [
+                'roleValue' => $role->value,
+                'listTitle' => __('dashboard.investors_list'),
+                'createTitle' => __('dashboard.add_investor'),
+                'editTitle' => __('dashboard.edit_investor'),
+                'detailsTitle' => __('dashboard.investor_details'),
+                'indexRouteName' => 'admin.investors.index',
+                'createRouteName' => 'admin.investors.create',
+                'storeRouteName' => 'admin.users.store',
+            ],
+        };
+    }
+
+    private function resolveRole(UserRole|string|null $role): UserRole
+    {
+        if ($role instanceof UserRole) {
+            return $role;
+        }
+
+        return UserRole::from($role ?: UserRole::Advertiser->value);
+    }
+
+    private function prepareUserData(array $validated, UserRole $role, ?User $user = null): array
+    {
+        $firstName = trim((string) ($validated['first_name'] ?? $validated['name'] ?? $user?->first_name ?? ''));
+        $lastName = trim((string) ($validated['last_name'] ?? $user?->last_name ?? ''));
+
+        if ($lastName === '') {
+            $lastName = $firstName;
+        }
+
+        unset($validated['name']);
+
+        $validated['role'] = $role->value;
+        $validated['first_name'] = $firstName;
+        $validated['last_name'] = $lastName;
+        $validated['display_name'] = trim($firstName . ' ' . $lastName);
+
+        return $validated;
     }
 }

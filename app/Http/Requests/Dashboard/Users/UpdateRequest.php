@@ -37,7 +37,7 @@ class UpdateRequest extends FormRequest
             $phoneStart = $country['phone_start'] ?? null;
         }
 
-        $phoneRules = ['nullable', 'digits_between:9,15', Rule::unique('users', 'phone')->whereNull('deleted_at')->ignore($userId)];
+        $phoneRules = ['required', 'digits_between:9,15', Rule::unique('users', 'phone')->whereNull('deleted_at')->ignore($userId)];
 
         if ($phoneStart && $this->input('phone')) {
             $phoneRules[] = 'regex:/^' . preg_quote($phoneStart, '/') . '/';
@@ -45,10 +45,13 @@ class UpdateRequest extends FormRequest
 
         return [
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-            'name' => ['required', 'min:3', 'max:100'],
-            'email' => ['nullable', 'email', Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($userId)],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($userId)],
             'phone' => $phoneRules,
-            'country_code' => ['nullable', 'string', 'max:5'],
+            'country_code' => ['required', 'string', 'max:5'],
+            'lang' => ['required', Rule::in(['ar', 'en'])],
+            'company_license' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
             'password' => ['nullable', 'confirmed', 'min:6', 'max:100'],
         ];
     }

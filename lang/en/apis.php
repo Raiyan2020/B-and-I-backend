@@ -79,6 +79,8 @@ return [
     'ad_edit_requires_needs_revision_or_pending_status' => 'Only advertisements in needs_revision or pending status can be edited.',
     'profile_updated_successfully' => 'Profile updated successfully.',
     'profile_updated_verification_required' => 'Profile updated successfully. Please verify your new email address.',
+    'profile_update_sent_for_review' => 'Your profile update request has been sent to the admin for review.',
+    'profile_update_request_already_pending' => 'You already have a pending profile update request.',
     'password_updated_successfully' => 'Password updated successfully.',
     'password_updated_logged_out_all_devices' => 'Password updated successfully. We logged you out from all linked devices for your security.',
     'current_password_incorrect' => 'The current password is incorrect.',

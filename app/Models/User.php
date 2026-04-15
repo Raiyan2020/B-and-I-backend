@@ -7,10 +7,12 @@ use App\Notifications\VerifyEmailNotification;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Enums\InvestorExperience;
@@ -22,7 +24,10 @@ use Illuminate\Http\UploadedFile;
 
 class User extends Authenticatable implements HasLocalePreference, MustVerifyEmailContract
 {
-    use HasApiTokens, HasFactory, MustVerifyEmail, Notifiable, SoftDeletes, FilterTrait, UploadTrait;
+    use HasApiTokens, HasFactory, MustVerifyEmail, Notifiable, SoftDeletes, UploadTrait;
+    use FilterTrait {
+        applyColumnFilter as protected applyColumnFilterTrait;
+    }
 
     const FOLDER = 'users';
 
@@ -39,6 +44,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'country_code',
         'phone',
         'email',
+        'email_verified_at',
         'password',
         'company_license',
 
@@ -105,6 +111,9 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      */
     protected $appends = [
         'name',
+        'full_phone',
+        'email_verified',
+        'has_pending_profile_update_request',
     ];
 
     /**
@@ -113,6 +122,25 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     public function getNameAttribute(): string
     {
         return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+    }
+
+    public function getFullPhoneAttribute(): string
+    {
+        return trim(collect([$this->country_code, $this->phone])->filter()->implode(''));
+    }
+
+    public function getEmailVerifiedAttribute(): bool
+    {
+        return ! is_null($this->email_verified_at);
+    }
+
+    public function getHasPendingProfileUpdateRequestAttribute(): bool
+    {
+        if ($this->relationLoaded('latestPendingProfileUpdateRequest')) {
+            return $this->latestPendingProfileUpdateRequest !== null;
+        }
+
+        return $this->pendingProfileUpdateRequests()->exists();
     }
 
     /**
@@ -194,6 +222,24 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     public function authUpdates(): MorphMany
     {
         return $this->morphMany(AuthUpdate::class, 'auth_updateable');
+    }
+
+    public function pendingProfileUpdateRequests(): HasMany
+    {
+        return $this->hasMany(ProfileUpdateRequest::class)
+            ->where('status', \App\Enums\ProfileUpdateRequestStatus::Pending);
+    }
+
+    public function latestPendingProfileUpdateRequest(): HasOne
+    {
+        return $this->hasOne(ProfileUpdateRequest::class)
+            ->where('status', \App\Enums\ProfileUpdateRequestStatus::Pending)
+            ->latestOfMany();
+    }
+
+    public function profileUpdateRequests(): HasMany
+    {
+        return $this->hasMany(ProfileUpdateRequest::class)->latest();
     }
 
     public function preferredSector()
@@ -281,5 +327,55 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         }
         // Return a dummy relationship that always returns empty collection
         return $this->hasMany(static::class, 'id', 'id')->whereRaw($impossibleCondition);
+    }
+
+    public function isInvestor(): bool
+    {
+        return $this->role === UserRole::Investor;
+    }
+
+    public function isCompany(): bool
+    {
+        return $this->role === UserRole::Advertiser;
+    }
+
+    protected function applyColumnFilter(Builder $query, string $column, $value, ?string $op = null): void
+    {
+        if ($column === 'name') {
+            $like = '%'.$value.'%';
+            $query->where(function (Builder $q) use ($like): void {
+                $q->where('first_name', 'like', $like)
+                    ->orWhere('last_name', 'like', $like)
+                    ->orWhere('display_name', 'like', $like)
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
+            });
+
+            return;
+        }
+
+        if ($column === 'phone') {
+            $normalizedValue = preg_replace('/\s+/', '', (string) $value);
+            $query->where(function (Builder $q) use ($normalizedValue): void {
+                $q->where('phone', 'like', '%'.$normalizedValue.'%')
+                    ->orWhereRaw(
+                        "REPLACE(CONCAT(COALESCE(country_code, ''), COALESCE(phone, '')), ' ', '') LIKE ?",
+                        ['%'.$normalizedValue.'%']
+                    );
+            });
+
+            return;
+        }
+
+        if ($column === 'email_verified') {
+            if ((string) $value === '1') {
+                $query->whereNotNull('email_verified_at');
+            } elseif ((string) $value === '0') {
+                $query->whereNull('email_verified_at');
+            }
+
+            return;
+        }
+
+        $this->applyColumnFilterTrait($query, $column, $value, $op);
     }
 }

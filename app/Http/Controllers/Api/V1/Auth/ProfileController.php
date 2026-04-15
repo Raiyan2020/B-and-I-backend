@@ -32,11 +32,18 @@ class ProfileController extends Controller
     {
         $result = $this->service->updateProfile($request->user(), $request->validated());
 
+        if (($result['status'] ?? null) === 'pending_request_exists') {
+            return $this->jsonResponse(
+                msg: __('apis.profile_update_request_already_pending'),
+                code: 422,
+                error: true,
+                data: UserResource::make($result['user']),
+            );
+        }
+
         return $this->jsonResponse(
             data: UserResource::make($result['user']),
-            msg: $result['email_verification_sent']
-                ? __('apis.profile_updated_verification_required')
-                : __('apis.profile_updated_successfully'),
+            msg: __('apis.profile_update_sent_for_review'),
         );
     }
 }

@@ -1,25 +1,26 @@
-<x-dashboard.layouts.master title="{{ __('dashboard.add user') }}">
+<x-dashboard.layouts.master title="{{ $createTitle ?? __('dashboard.add user') }}">
     <div class="app-content content">
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
             <div class="content-header row">
             </div>
-            <x-dashboard.layouts.breadcrumb now="{{ __('dashboard.add user') }}">
+            <x-dashboard.layouts.breadcrumb now="{{ $createTitle ?? __('dashboard.add user') }}">
                 <li class="breadcrumb-item"><a
-                        href="{{ route('admin.users.index') }}">{{ __('dashboard.users list') }}</a></li>
+                        href="{{ route($indexRouteName ?? 'admin.users.index') }}">{{ $listTitle ?? __('dashboard.users list') }}</a></li>
             </x-dashboard.layouts.breadcrumb>
             <div class="col-12 mt-3">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">{{ __('dashboard.add user') }}</h4>
+                        <h4 class="card-title">{{ $createTitle ?? __('dashboard.add user') }}</h4>
                     </div>
                     <div class="card-content">
                         <div class="card-body">
                             <form class="form form-vertical store" method="POST"
-                                action="{{ route('admin.users.store') }}"
+                                action="{{ route($storeRouteName ?? 'admin.users.store') }}"
                                 enctype="multipart/form-data">
                                 @csrf
+                                <input type="hidden" name="role" value="{{ old('role', $roleValue ?? '') }}">
                                 <div class="form-body">
                                     <div class="row">
 
@@ -27,21 +28,37 @@
 
                                         <div class="col-6">
                                             <div class="form-group">
-                                                <label for="first-name-icon">{{ __('dashboard.table name') }}</label>
+                                                <label for="first-name-icon">{{ __('dashboard.table first name') }}</label>
                                                 <div class="position-relative has-icon-left">
                                                     <input type="text" id="first-name-icon"
-                                                        value="{{ old('name') }}"
-                                                        class="form-control" name="name"
-                                                        placeholder="{{ __('dashboard.table name') }}" required>
+                                                        value="{{ old('first_name') }}"
+                                                        class="form-control" name="first_name"
+                                                        placeholder="{{ __('dashboard.table first name') }}" required>
                                                     <div class="form-control-position">
-                                                        <i class="feather icon-grid"></i>
+                                                        <i class="feather icon-user"></i>
                                                     </div>
                                                 </div>
 
                                             </div>
                                         </div>
 
-                                        <x-dashboard.forms.country-code-selector 
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label for="last-name-icon">{{ __('dashboard.table last name') }}</label>
+                                                <div class="position-relative has-icon-left">
+                                                    <input type="text" id="last-name-icon"
+                                                        value="{{ old('last_name') }}"
+                                                        class="form-control" name="last_name"
+                                                        placeholder="{{ __('dashboard.table last name') }}" required>
+                                                    <div class="form-control-position">
+                                                        <i class="feather icon-user"></i>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <x-dashboard.forms.country-code-selector
                                             name="country_code"
                                             id="country-code-selector"
                                             :value="old('country_code')"
@@ -55,7 +72,7 @@
                                                 <div class="position-relative has-icon-left">
                                                     <input type="text" id="phone-input" class="form-control phone-input"
                                                         value="{{ old('phone') }}"
-                                                        name="phone" placeholder="{{ __('dashboard.table phone') }}">
+                                                        name="phone" placeholder="{{ __('dashboard.table phone') }}" required>
                                                     <div class="form-control-position">
                                                         <i class="fa fa-phone"></i>
                                                     </div>
@@ -65,13 +82,40 @@
                                                 @enderror
                                             </div>
                                         </div>
+
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label for="lang-select">{{ __('dashboard.table language') }}</label>
+                                                <select id="lang-select" name="lang" class="form-control" required>
+                                                    <option value="">{{ __('dashboard.select language') }}</option>
+                                                    <option value="ar" {{ old('lang') === 'ar' ? 'selected' : '' }}>{{ __('api.language_arabic') }}</option>
+                                                    <option value="en" {{ old('lang') === 'en' ? 'selected' : '' }}>{{ __('api.language_english') }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label for="company-license">{{ __('dashboard.table company license') }}</label>
+                                                <div class="position-relative has-icon-left">
+                                                    <input type="file" id="company-license" class="form-control" name="company_license" accept="image/jpeg,image/png,image/jpg,application/pdf">
+                                                    <div class="form-control-position">
+                                                        <i class="feather icon-file"></i>
+                                                    </div>
+                                                </div>
+                                                @error('company_license')
+                                                    <span class="text text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label for="password-icon">{{ __('dashboard.table email') }}</label>
                                                 <div class="position-relative has-icon-left">
                                                     <input type="email" class="form-control"
                                                         value="{{ old('email') }}"
-                                                        name="email" placeholder="{{ __('dashboard.table email') }}">
+                                                        name="email" placeholder="{{ __('dashboard.table email') }}" required>
                                                     <div class="form-control-position">
                                                         <i class="fa fa-envelope"></i>
                                                     </div>
