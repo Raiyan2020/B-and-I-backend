@@ -9,78 +9,78 @@
         <div class="card-content">
             <div class="card-body">
                 <div class="quick-links-grid">
-                    <a href="{{ route('admin.admins.create') }}" class="quick-link-item">
+                    <a href="{{ route('admin.admins.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-danger">
-                            <i class="feather icon-user-plus"></i>
+                            <i class="feather icon-shield"></i>
                         </div>
                         <div class="quick-link-content">
-                            <h6 class="quick-link-title">{{ __('dashboard.add admin') }}</h6>
-                            <p class="quick-link-desc">{{ __('dashboard.add new admin account') }}</p>
+                            <h6 class="quick-link-title">{{ __('dashboard.admins') }}</h6>
+                            <p class="quick-link-desc">{{ __('dashboard.admins list') }}</p>
                         </div>
                         <div class="quick-link-arrow">
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
 
-                    <a href="{{ route('admin.advertisers.create') }}" class="quick-link-item">
+                    <a href="{{ route('admin.advertisers.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-success">
-                            <i class="feather icon-user-plus"></i>
+                            <i class="feather icon-briefcase"></i>
                         </div>
                         <div class="quick-link-content">
-                            <h6 class="quick-link-title">{{ __('dashboard.add_advertiser_company') }}</h6>
-                            <p class="quick-link-desc">{{ __('dashboard.advertisers_companies') }}</p>
+                            <h6 class="quick-link-title">{{ __('dashboard.advertisers_companies') }}</h6>
+                            <p class="quick-link-desc">{{ __('dashboard.advertisers_companies_list') }}</p>
                         </div>
                         <div class="quick-link-arrow">
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
 
-                    <a href="{{ route('admin.categories.create') }}" class="quick-link-item">
+                    <a href="{{ route('admin.investors.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-primary">
-                            <i class="feather icon-plus-circle"></i>
+                            <i class="feather icon-trending-up"></i>
                         </div>
                         <div class="quick-link-content">
-                            <h6 class="quick-link-title">{{ __('dashboard.add category') }}</h6>
-                            <p class="quick-link-desc">{{ __('dashboard.add new category') }}</p>
+                            <h6 class="quick-link-title">{{ __('dashboard.investors') }}</h6>
+                            <p class="quick-link-desc">{{ __('dashboard.investors_list') }}</p>
                         </div>
                         <div class="quick-link-arrow">
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
 
-                    <a href="{{ route('admin.generalSetting.index') }}" class="quick-link-item">
+                    <a href="{{ route('admin.categories.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-info">
-                            <i class="feather icon-settings"></i>
+                            <i class="feather icon-list"></i>
                         </div>
                         <div class="quick-link-content">
-                            <h6 class="quick-link-title">{{ __('dashboard.general settings') }}</h6>
-                            <p class="quick-link-desc">{{ __('dashboard.manage general settings') }}</p>
+                            <h6 class="quick-link-title">{{ __('dashboard.categories') }}</h6>
+                            <p class="quick-link-desc">{{ __('dashboard.categories list') }}</p>
                         </div>
                         <div class="quick-link-arrow">
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
 
-                    <a href="{{ route('admin.profile') }}" class="quick-link-item">
+                    <a href="{{ route('admin.preferred_sectors.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-warning">
-                            <i class="feather icon-user"></i>
+                            <i class="feather icon-target"></i>
                         </div>
                         <div class="quick-link-content">
-                            <h6 class="quick-link-title">{{ __('dashboard.Edit Profile') }}</h6>
-                            <p class="quick-link-desc">{{ __('dashboard.edit your profile') }}</p>
+                            <h6 class="quick-link-title">{{ __('dashboard.preferred_sectors') }}</h6>
+                            <p class="quick-link-desc">{{ __('dashboard.preferred sectors list') }}</p>
                         </div>
                         <div class="quick-link-arrow">
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
 
-                    <a href="{{ route('admin.roles.index') }}" class="quick-link-item">
+                    <a href="{{ route('admin.opportunities.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-secondary">
-                            <i class="feather icon-lock"></i>
+                            <i class="feather icon-layout"></i>
                         </div>
                         <div class="quick-link-content">
-                            <h6 class="quick-link-title">{{ __('dashboard.roles list') }}</h6>
-                            <p class="quick-link-desc">{{ __('dashboard.manage roles and permissions') }}</p>
+                            <h6 class="quick-link-title">{{ __('dashboard.manage_advertisements') }}</h6>
+                            <p class="quick-link-desc">{{ __('dashboard.opportunities_list') }}</p>
                         </div>
                         <div class="quick-link-arrow">
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>

@@ -3,25 +3,26 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title mb-0">
                 <i class="feather icon-trending-up text-primary"></i>
-                {{ __('dashboard.trends') }}
+                {{ __('dashboard.category_performance_chart') }}
             </h4>
             <div class="chart-legend">
                 <span class="legend-item">
                     <span class="legend-color bg-primary"></span>
-                    {{ __('dashboard.users') }}
+                    {{ __('dashboard.opportunities_menu') }}
                 </span>
                 <span class="legend-item">
-                    <span class="legend-color bg-danger"></span>
-                    {{ __('dashboard.admins list') }}
+                    <span class="legend-color bg-warning"></span>
+                    {{ __('dashboard.investment_seats_menu') }}
                 </span>
                 <span class="legend-item">
                     <span class="legend-color bg-success"></span>
-                    {{ __('dashboard.categories') }}
+                    {{ __('dashboard.interest_requests_menu') }}
                 </span>
             </div>
         </div>
         <div class="card-content">
             <div class="card-body">
+                <p class="text-muted mb-2">{{ __('dashboard.category_performance_chart_hint') }}</p>
                 <div id="trend-chart" style="min-height: 350px;"></div>
             </div>
         </div>
@@ -33,41 +34,43 @@
     $(document).ready(function() {
         var trendChartOptions = {
             series: [{
-                name: '{{ __('dashboard.users') }}',
-                data: @json($clientsData)
+                name: '{{ __('dashboard.opportunities_menu') }}',
+                data: @json($categoryChart['adsData'] ?? [])
             }, {
-                name: '{{ __('dashboard.admins list') }}',
-                data: @json($adminsData)
+                name: '{{ __('dashboard.investment_seats_menu') }}',
+                data: @json($categoryChart['seatsData'] ?? [])
             }, {
-                name: '{{ __('dashboard.categories') }}',
-                data: @json($categoriesData)
+                name: '{{ __('dashboard.interest_requests_menu') }}',
+                data: @json($categoryChart['interestsData'] ?? [])
             }],
             chart: {
-                type: 'line',
+                type: 'bar',
                 height: 350,
                 toolbar: {
                     show: true,
                     tools: {
                         download: true,
-                        selection: true,
-                        zoom: true,
-                        zoomin: true,
-                        zoomout: true,
-                        pan: true,
-                        reset: true
+                        selection: false,
+                        zoom: false,
+                        zoomin: false,
+                        zoomout: false,
+                        pan: false,
+                        reset: false
                     }
-                },
-                zoom: {
-                    enabled: true
                 }
             },
-            colors: ['#9C88FF', '#E57373', '#66BB6A'],
+            colors: ['#9C88FF', '#FFB74D', '#66BB6A'],
             dataLabels: {
                 enabled: false
             },
             stroke: {
-                curve: 'smooth',
-                width: 3
+                width: 0
+            },
+            plotOptions: {
+                bar: {
+                    columnWidth: '50%',
+                    borderRadius: 6,
+                }
             },
             grid: {
                 borderColor: '#e7e7e7',
@@ -76,14 +79,8 @@
                     opacity: 0.5
                 }
             },
-            markers: {
-                size: 5,
-                hover: {
-                    size: 7
-                }
-            },
             xaxis: {
-                categories: @json($last7Days),
+                categories: @json($categoryChart['labels'] ?? []),
                 labels: {
                     style: {
                         colors: '#5e5873',
@@ -109,7 +106,15 @@
             tooltip: {
                 shared: true,
                 intersect: false,
-                theme: 'light'
+                theme: 'light',
+                y: {
+                    formatter: function (value) {
+                        return value + ' {{ __('dashboard.count_unit') }}';
+                    }
+                }
+            },
+            noData: {
+                text: '{{ __('dashboard.no_data_available_in_chart') }}'
             }
         };
 
@@ -149,7 +154,6 @@
         }
     }
 
-    /* Dark Mode Improvements */
     body.dark-layout .chart-legend .legend-item {
         color: #c2c6dc !important;
     }

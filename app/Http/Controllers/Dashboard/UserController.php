@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Enums\InvestorExperience;
+use App\Enums\InvestorType;
 use App\Enums\NotificationCategory;
 use App\Enums\UserRole;
 use App\Http\Requests\Dashboard\Users\ChargeWalletRequest;
 use App\Http\Requests\Dashboard\Users\SendNotificationRequest;
 use App\Http\Requests\Dashboard\Users\StoreRequest;
 use App\Http\Requests\Dashboard\Users\UpdateRequest;
+use App\Models\Category;
+use App\Models\PreferredSector;
 use App\Models\User;
 use App\Notifications\GeneralNotification;
 use App\Services\Core\BaseService;
@@ -94,6 +98,7 @@ class UserController extends AdminBasicController
         return view('dashboard.' . $this->directoryName . '.edit', array_merge(
             ['row' => $row],
             $this->roleContext($this->resolveRole($row->role)),
+            $this->roleSpecificContext($this->resolveRole($row->role)),
             $this->editCompactVariables ?? [],
         ));
     }
@@ -177,6 +182,8 @@ class UserController extends AdminBasicController
     {
         $row = $this->serviceName->find(id: $id, with: [
             'wallet',
+            'preferredSector',
+            'category',
             'walletTransactions' => function($query) {
                 $query->latest()->take(10);
             },
@@ -211,6 +218,7 @@ class UserController extends AdminBasicController
         return view('dashboard.' . $this->directoryName . '.show', array_merge(
             ['row' => $row],
             $this->roleContext($this->resolveRole($row->role)),
+            $this->roleSpecificContext($this->resolveRole($row->role)),
         ));
     }
 
@@ -411,7 +419,7 @@ class UserController extends AdminBasicController
     {
         return view(
             'dashboard.' . $this->directoryName . '.create',
-            array_merge($this->roleContext($role), $this->createCompactVariables ?? []),
+            array_merge($this->roleContext($role), $this->roleSpecificContext($role), $this->createCompactVariables ?? []),
         );
     }
 
@@ -466,6 +474,39 @@ class UserController extends AdminBasicController
         $validated['last_name'] = $lastName;
         $validated['display_name'] = trim($firstName . ' ' . $lastName);
 
+        if ($role === UserRole::Investor) {
+            unset($validated['company_license']);
+
+            if (array_key_exists('available_capital', $validated) && ! array_key_exists('capital', $validated)) {
+                $validated['capital'] = $validated['available_capital'];
+            }
+        } else {
+            unset(
+                $validated['investor_type'],
+                $validated['capital'],
+                $validated['available_capital'],
+                $validated['preferred_sector_id'],
+                $validated['category_id'],
+                $validated['experience_level'],
+                $validated['previous_investments_count'],
+                $validated['investor_experience'],
+            );
+        }
+
         return $validated;
+    }
+
+    private function roleSpecificContext(UserRole $role): array
+    {
+        if ($role !== UserRole::Investor) {
+            return [];
+        }
+
+        return [
+            'investorTypes' => InvestorType::cases(),
+            'investorExperiences' => InvestorExperience::cases(),
+            'categories' => Category::query()->where('status', true)->get(),
+            'preferredSectors' => PreferredSector::query()->where('status', true)->get(),
+        ];
     }
 }

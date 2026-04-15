@@ -21,6 +21,7 @@
                                 enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
+                                <input type="hidden" name="role" value="{{ $roleValue ?? $row->role?->value ?? '' }}">
                                 <div class="form-body">
                                     <div class="row">
 
@@ -98,25 +99,111 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-6">
-                                            <div class="form-group">
-                                                <label for="company-license">{{ __('dashboard.table company license') }}</label>
-                                                <div class="position-relative has-icon-left">
-                                                    <input type="file" id="company-license" class="form-control" name="company_license" accept="image/jpeg,image/png,image/jpg,application/pdf">
-                                                    <div class="form-control-position">
-                                                        <i class="feather icon-file"></i>
-                                                    </div>
+                                        @if(($roleValue ?? null) === \App\Enums\UserRole::Investor->value)
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>{{ __('dashboard.investor_type') }}</label>
+                                                    <select name="investor_type" class="form-control" required>
+                                                        <option value="">{{ __('dashboard.choose option') }}</option>
+                                                        @foreach($investorTypes ?? [] as $investorType)
+                                                            <option value="{{ $investorType->value }}" {{ old('investor_type', $row->investor_type?->value ?? $row->investor_type) === $investorType->value ? 'selected' : '' }}>
+                                                                {{ __('enums.investor_type.'.$investorType->value) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
-                                                @error('company_license')
-                                                    <span class="text text-danger">{{ $message }}</span>
-                                                @enderror
-                                                @if($row->company_license_url)
-                                                    <div class="mt-2">
-                                                        <a href="{{ $row->company_license_url }}" target="_blank">{{ __('dashboard.view current license') }}</a>
-                                                    </div>
-                                                @endif
                                             </div>
-                                        </div>
+
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>{{ __('dashboard.capital') }}</label>
+                                                    <input type="number" step="0.001" min="1000" class="form-control" name="capital" value="{{ old('capital', $row->capital) }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>{{ __('dashboard.available_capital') }}</label>
+                                                    <input type="number" step="0.001" min="1000" class="form-control" name="available_capital" value="{{ old('available_capital', $row->available_capital) }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>{{ __('dashboard.preferred_sectors') }}</label>
+                                                    <select name="preferred_sector_id" class="form-control" required>
+                                                        <option value="">{{ __('dashboard.choose option') }}</option>
+                                                        @foreach($preferredSectors ?? [] as $preferredSector)
+                                                            <option value="{{ $preferredSector->id }}" {{ (string) old('preferred_sector_id', $row->preferred_sector_id) === (string) $preferredSector->id ? 'selected' : '' }}>
+                                                                {{ $preferredSector->getTranslation('name', app()->getLocale()) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>{{ __('dashboard.category') }}</label>
+                                                    <select name="category_id" class="form-control" required>
+                                                        <option value="">{{ __('dashboard.choose option') }}</option>
+                                                        @foreach($categories ?? [] as $category)
+                                                            <option value="{{ $category->id }}" {{ (string) old('category_id', $row->category_id) === (string) $category->id ? 'selected' : '' }}>
+                                                                {{ $category->getTranslation('name', app()->getLocale()) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>{{ __('dashboard.experience_level') }}</label>
+                                                    <input type="number" step="0.001" min="0" max="100" class="form-control" name="experience_level" value="{{ old('experience_level', $row->experience_level) }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>{{ __('dashboard.previous_investments_count') }}</label>
+                                                    <input type="number" min="0" class="form-control" name="previous_investments_count" value="{{ old('previous_investments_count', $row->previous_investments_count) }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>{{ __('dashboard.investor_experience') }}</label>
+                                                    <select name="investor_experience" class="form-control" required>
+                                                        <option value="">{{ __('dashboard.choose option') }}</option>
+                                                        @foreach($investorExperiences ?? [] as $investorExperience)
+                                                            <option value="{{ $investorExperience->value }}" {{ old('investor_experience', $row->investor_experience?->value ?? $row->investor_experience) === $investorExperience->value ? 'selected' : '' }}>
+                                                                {{ __('enums.investor_experience.'.$investorExperience->value) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label for="company-license">{{ __('dashboard.table company license') }}</label>
+                                                    <div class="position-relative has-icon-left">
+                                                        <input type="file" id="company-license" class="form-control" name="company_license" accept="image/jpeg,image/png,image/jpg,application/pdf">
+                                                        <div class="form-control-position">
+                                                            <i class="feather icon-file"></i>
+                                                        </div>
+                                                    </div>
+                                                    @error('company_license')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
+                                                    @if($row->company_license_url)
+                                                        <div class="mt-2">
+                                                            <a href="{{ $row->company_license_url }}" target="_blank">{{ __('dashboard.view current license') }}</a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endif
 
                                         <div class="col-6">
                                             <div class="form-group">

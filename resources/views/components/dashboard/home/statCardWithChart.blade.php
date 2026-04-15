@@ -4,9 +4,11 @@
     $chartData = $chartData ?? [];
     $growth = $growth ?? 0;
     $todayCount = $todayCount ?? 0;
+    $chartKey = 'chart_' . substr(md5(($slug ?? 'stat') . '-' . $color . '-' . $count), 0, 10);
+    $chartId = 'mini-' . $chartKey;
 @endphp
 
-<div class="col-lg-4 col-md-6 col-12">
+<div class="col-xl-3 col-lg-4 col-md-6 col-12">
     @if($link)
         <a href="{{ $link }}" class="dashboard-card-link" style="text-decoration: none; color: inherit; display: block;">
     @endif
@@ -32,7 +34,7 @@
 
                 @if(count($chartData) > 0)
                     <div class="mini-chart-container mt-2">
-                        <div id="mini-chart-{{ $color }}" style="height: 60px;"></div>
+                        <div id="{{ $chartId }}" style="height: 60px;"></div>
                     </div>
                 @endif
 
@@ -50,7 +52,7 @@
                     <div class="mt-2">
                         <small class="text-{{ $color }}">
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
-                            {{ __('dashboard.view all') }}
+                            {{ __('dashboard.view_all') }}
                         </small>
                     </div>
                 @endif
@@ -66,7 +68,7 @@
 <script>
     $(document).ready(function() {
         @if(count($chartData) > 0)
-        var miniChart{{ ucfirst($color) }} = {
+        var miniChart{{ $chartKey }} = {
             series: [{
                 name: '{{ $slug }}',
                 data: @json($chartData)
@@ -81,7 +83,7 @@
                     show: false
                 }
             },
-            colors: ['{{ $color === 'primary' ? '#9C88FF' : ($color === 'success' ? '#66BB6A' : '#E57373') }}'],
+            colors: ['{{ match($color) { 'primary' => '#9C88FF', 'success' => '#66BB6A', 'danger' => '#E57373', 'warning' => '#FFB74D', 'info' => '#42A5F5', 'secondary' => '#8E8E8E', default => '#9C88FF' } }}'],
             stroke: {
                 curve: 'smooth',
                 width: 2
@@ -115,8 +117,8 @@
             }
         };
 
-        var chart{{ ucfirst($color) }} = new ApexCharts(document.querySelector("#mini-chart-{{ $color }}"), miniChart{{ ucfirst($color) }});
-        chart{{ ucfirst($color) }}.render();
+        var chart{{ $chartKey }} = new ApexCharts(document.querySelector("#{{ $chartId }}"), miniChart{{ $chartKey }});
+        chart{{ $chartKey }}.render();
         @endif
     });
 </script>
@@ -162,6 +164,10 @@
     
     .statistics-card-enhanced[data-color="warning"] {
         border-left-color: #ff9f43;
+    }
+
+    .statistics-card-enhanced[data-color="secondary"] {
+        border-left-color: #8e8e8e;
     }
     
     .dashboard-card-link:hover .statistics-card-enhanced {

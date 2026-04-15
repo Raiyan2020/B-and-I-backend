@@ -9,74 +9,33 @@
         <div class="card-content">
             <div class="card-body">
                 <div class="activity-list">
-                    @if($recentUsers->count() > 0)
+                    @forelse($activitySections as $section)
                         <div class="activity-section">
                             <h6 class="activity-section-title">
-                                <i class="feather icon-users text-success"></i>
-                                {{ __('dashboard.recent users') }}
+                                <i class="{{ $section['icon'] }} text-{{ $section['color'] }}"></i>
+                                {{ $section['title'] }}
                             </h6>
-                            @foreach($recentUsers as $user)
+                            @foreach($section['items'] as $item)
                                 <div class="activity-item">
-                                    <div class="activity-icon bg-success">
-                                        <i class="feather icon-user"></i>
+                                    <div class="activity-icon bg-{{ $section['color'] }}">
+                                        <i class="{{ $section['icon'] }}"></i>
                                     </div>
                                     <div class="activity-content">
                                         <p class="activity-text">
-                                            <strong>{{ $user->name ?? __('dashboard.user') }}</strong>
-                                            {{ __('dashboard.joined') }}
+                                            <strong>{{ $item['title'] }}</strong>
+                                            {{ $item['description'] }}
                                         </p>
-                                        <span class="activity-time">{{ $user->created_at->diffForHumans() }}</span>
+                                        <span class="activity-time">{{ $item['time'] }}</span>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
-                    @endif
-
-                    @if($recentAdmins->count() > 0)
-                        <div class="activity-section">
-                            <h6 class="activity-section-title">
-                                <i class="feather icon-shield text-danger"></i>
-                                {{ __('dashboard.recent admins') }}
-                            </h6>
-                            @foreach($recentAdmins as $admin)
-                                <div class="activity-item">
-                                    <div class="activity-icon bg-danger">
-                                        <i class="feather icon-shield"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p class="activity-text">
-                                            <strong>{{ $admin->name ?? __('dashboard.admin') }}</strong>
-                                            {{ __('dashboard.added') }}
-                                        </p>
-                                        <span class="activity-time">{{ $admin->created_at->diffForHumans() }}</span>
-                                    </div>
-                                </div>
-                            @endforeach
+                    @empty
+                        <div class="text-center py-4">
+                            <i class="feather icon-inbox text-muted" style="font-size: 48px;"></i>
+                            <p class="text-muted mt-2 mb-0">{{ __('dashboard.no_recent_activity') }}</p>
                         </div>
-                    @endif
-
-                    @if($recentCategories->count() > 0)
-                        <div class="activity-section">
-                            <h6 class="activity-section-title">
-                                <i class="feather icon-list text-primary"></i>
-                                {{ __('dashboard.recent categories') }}
-                            </h6>
-                            @foreach($recentCategories as $category)
-                                <div class="activity-item">
-                                    <div class="activity-icon bg-primary">
-                                        <i class="feather icon-list"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p class="activity-text">
-                                            <strong>{{ $category->name ?? __('dashboard.category') }}</strong>
-                                            {{ __('dashboard.created') }}
-                                        </p>
-                                        <span class="activity-time">{{ $category->created_at->diffForHumans() }}</span>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -155,6 +114,10 @@
         background: linear-gradient(135deg, #9C88FF 0%, #8B7EC8 100%) !important;
     }
 
+    .activity-icon.bg-info {
+        background: linear-gradient(135deg, #64B5F6 0%, #42A5F5 100%) !important;
+    }
+
     .activity-content {
         flex: 1;
         min-width: 0;
@@ -192,7 +155,6 @@
         background: #555;
     }
 
-    /* Dark Mode Improvements */
     body.dark-layout .activity-section-title {
         color: #ebeefd !important;
         border-bottom-color: #414561 !important;

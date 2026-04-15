@@ -38,35 +38,17 @@
 
                     <!-- Enhanced Statistics Cards with Charts -->
                     <div class="row match-height">
-                        <x-dashboard.home.statCardWithChart
-                            :count="$adminsCount"
-                            :chartData="$adminsData"
-                            :growth="$adminsGrowth"
-                            :todayCount="$todayAdminsCount"
-                            color="danger"
-                            slug="{{ __('dashboard.admins list') }}"
-                            link="{{ route('admin.admins.index') }}"
-                            icon="feather icon-shield" />
-
-                        <x-dashboard.home.statCardWithChart
-                            :count="$clientsCount"
-                            :chartData="$clientsData"
-                            :growth="$usersGrowth"
-                            :todayCount="$todayUsersCount"
-                            color="success"
-                            slug="{{ __('dashboard.users') }}"
-                            link="{{ route('admin.users.index') }}"
-                            icon="feather icon-users" />
-
-                        <x-dashboard.home.statCardWithChart
-                            :count="$categoriesCount"
-                            :chartData="$categoriesData"
-                            :growth="$categoriesGrowth"
-                            :todayCount="$todayCategoriesCount"
-                            color="primary"
-                            slug="{{ __('dashboard.categories') }}"
-                            link="{{ route('admin.categories.index') }}"
-                            icon="feather icon-list" />
+                        @foreach($statCards as $statCard)
+                            <x-dashboard.home.statCardWithChart
+                                :count="$statCard['count']"
+                                :chartData="$statCard['chartData']"
+                                :growth="$statCard['growth']"
+                                :todayCount="$statCard['todayCount']"
+                                :color="$statCard['color']"
+                                :slug="$statCard['title']"
+                                :link="$statCard['link']"
+                                :icon="$statCard['icon']" />
+                        @endforeach
                     </div>
 
                     <!-- Divider: Trends & Analytics -->
@@ -86,15 +68,10 @@
                     <!-- Trends Chart and Recent Activity -->
                     <div class="row match-height">
                         <x-dashboard.home.trendChart
-                            :clientsData="$clientsData"
-                            :adminsData="$adminsData"
-                            :categoriesData="$categoriesData"
-                            :last7Days="$last7Days" />
+                            :categoryChart="$categoryChart" />
 
                         <x-dashboard.home.recentActivity
-                            :recentUsers="$recentUsers"
-                            :recentAdmins="$recentAdmins"
-                            :recentCategories="$recentCategories" />
+                            :activitySections="$activitySections" />
                     </div>
 
                     <!-- Divider: Quick Links -->

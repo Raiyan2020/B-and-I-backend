@@ -92,21 +92,103 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-12 col-sm-6 mb-2">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="feather icon-file text-info mr-2" style="font-size: 18px;"></i>
-                                                        <div>
-                                                            <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.table company license') }}</p>
-                                                            <h5 class="mb-0">
-                                                                @if($row->company_license_url)
-                                                                    <a href="{{ $row->company_license_url }}" target="_blank">{{ __('dashboard.view current license') }}</a>
-                                                                @else
-                                                                    {{ __('dashboard.not specified') }}
-                                                                @endif
-                                                            </h5>
+                                                @if(($roleValue ?? null) === \App\Enums\UserRole::Investor->value)
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-briefcase text-info mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.investor_type') }}</p>
+                                                                <h5 class="mb-0">{{ $row->investor_type ? __('enums.investor_type.'.($row->investor_type->value ?? $row->investor_type)) : __('dashboard.not specified') }}</h5>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-dollar-sign text-success mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.capital') }}</p>
+                                                                <h5 class="mb-0">{{ $row->capital ?? __('dashboard.not specified') }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-pocket text-warning mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.available_capital') }}</p>
+                                                                <h5 class="mb-0">{{ $row->available_capital ?? __('dashboard.not specified') }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-target text-primary mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.preferred_sectors') }}</p>
+                                                                <h5 class="mb-0">{{ $row->preferredSector?->getTranslation('name', app()->getLocale()) ?? __('dashboard.not specified') }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-layers text-secondary mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.category') }}</p>
+                                                                <h5 class="mb-0">{{ $row->category?->getTranslation('name', app()->getLocale()) ?? __('dashboard.not specified') }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-award text-danger mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.investor_experience') }}</p>
+                                                                <h5 class="mb-0">{{ $row->investor_experience ? __('enums.investor_experience.'.($row->investor_experience->value ?? $row->investor_experience)) : __('dashboard.not specified') }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-trending-up text-info mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.experience_level') }}</p>
+                                                                <h5 class="mb-0">{{ $row->experience_level ?? __('dashboard.not specified') }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-bar-chart text-primary mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.previous_investments_count') }}</p>
+                                                                <h5 class="mb-0">{{ $row->previous_investments_count ?? __('dashboard.not specified') }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <div class="col-12 col-sm-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="feather icon-file text-info mr-2" style="font-size: 18px;"></i>
+                                                            <div>
+                                                                <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.table company license') }}</p>
+                                                                <h5 class="mb-0">
+                                                                    @if($row->company_license_url)
+                                                                        <a href="{{ $row->company_license_url }}" target="_blank">{{ __('dashboard.view current license') }}</a>
+                                                                    @else
+                                                                        {{ __('dashboard.not specified') }}
+                                                                    @endif
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
 
                                                 <div class="col-12 col-sm-6 mb-2">
                                                     <div class="d-flex align-items-center justify-content-between">

@@ -68,7 +68,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (ValidationException $e, Request $request) {
-            if ($request->expectsJson() || $request->is('api/*')) {
+            if ($request->is('api/*')) {
                 return responseJson(
                     msg: __('apis.the_given_data_was_invalid'),
                     code: $e->status,
