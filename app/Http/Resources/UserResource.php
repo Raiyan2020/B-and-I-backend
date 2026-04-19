@@ -43,6 +43,7 @@ class UserResource extends JsonResource
             'email_verified' => (bool) $this->email_verified_at,
             'has_pending_profile_update_request' => $this->has_pending_profile_update_request,
             'lang' => $this->lang,
+            'unread_notifications_count' => $this->unreadNotificationsCount(),
             'notification_settings' => app(NotificationPreferenceService::class)->settingsFor($this->resource),
             'token' => $this->when($this->token ?? null, $this->token),
         ];
@@ -129,5 +130,14 @@ class UserResource extends JsonResource
         $rolePrefix = $this->role === UserRole::Investor ? 'INV' : 'ADV';
 
         return sprintf('USR-%s-ID-%s', $rolePrefix, str_pad((string) $this->id, 3, '0', STR_PAD_LEFT));
+    }
+
+    protected function unreadNotificationsCount(): int
+    {
+        if (isset($this->unread_notifications_count)) {
+            return (int) $this->unread_notifications_count;
+        }
+
+        return (int) $this->resource->notifications()->where('seen', false)->count();
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\AccountDeletionRequestController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\NotificationSettingsController;
+use App\Http\Controllers\Api\V1\Auth\NotificationController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\ProfileUpdateRequestController;
 use App\Http\Controllers\Api\V1\Auth\ResendVerificationController;
@@ -79,6 +80,14 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
             Route::group(['prefix' => 'notification-settings', 'controller' => NotificationSettingsController::class], function () {
                 Route::get('/', 'show');
                 Route::patch('/', 'update');
+            });
+
+            Route::group(['prefix' => 'notifications', 'controller' => NotificationController::class], function () {
+                Route::get('/', 'index');
+                Route::get('/unread-count', 'unreadCount');
+                Route::patch('/read-all', 'markAllAsRead');
+                Route::delete('/delete-all', 'destroyAll');
+                Route::delete('/{notification}', 'destroy');
             });
 
             Route::group(['prefix' => 'account-deletion-requests', 'controller' => AccountDeletionRequestController::class], function () {
