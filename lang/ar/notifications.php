@@ -1,0 +1,49 @@
+<?php
+
+return [
+    'generic_title' => 'إشعار',
+    'generic_body' => 'لديك إشعار جديد.',
+    'legacy_notification_title' => 'إشعار',
+    'legacy_notification_body' => 'لديك إشعار جديد.',
+    'user_notification_title' => 'إشعار',
+    'user_notification_body' => 'لديك إشعار جديد.',
+    'admin_notification_title' => 'إشعار من الإدارة',
+    'admin_notification_body' => 'لديك إشعار جديد من الإدارة.',
+
+    'register_user_for_admin_title' => 'تسجيل مستخدم جديد',
+    'register_user_for_admin_body' => 'تم تسجيل حساب جديد من نوع :role.',
+
+    'create_profile_update_request_for_admin_title' => 'طلب تعديل ملف شخصي',
+    'create_profile_update_request_for_admin_body' => 'قام أحد المستخدمين بإرسال طلب تعديل الملف الشخصي.',
+    'approve_profile_update_request_title' => 'تمت الموافقة على تعديل الملف الشخصي',
+    'approve_profile_update_request_body' => 'تمت الموافقة على طلب تعديل الملف الشخصي الخاص بك.',
+    'reject_profile_update_request_title' => 'تم رفض تعديل الملف الشخصي',
+    'reject_profile_update_request_body' => 'تم رفض طلب تعديل الملف الشخصي الخاص بك.',
+
+    'create_account_deletion_request_for_admin_title' => 'طلب حذف حساب',
+    'create_account_deletion_request_for_admin_body' => 'قام أحد المستخدمين بإرسال طلب حذف حساب.',
+    'approve_account_deletion_request_title' => 'تمت الموافقة على حذف الحساب',
+    'approve_account_deletion_request_body' => 'تمت الموافقة على طلب حذف الحساب الخاص بك.',
+    'reject_account_deletion_request_title' => 'تم رفض حذف الحساب',
+    'reject_account_deletion_request_body' => 'تم رفض طلب حذف الحساب الخاص بك.',
+
+    'create_opportunity_for_admin_title' => 'إضافة فرصة جديدة',
+    'create_opportunity_for_admin_body' => 'تمت إضافة فرصة جديدة.',
+    'update_opportunity_for_admin_title' => 'تحديث فرصة',
+    'update_opportunity_for_admin_body' => 'تم تحديث إحدى الفرص.',
+    'change_opportunity_status_title' => 'تغيير حالة الفرصة',
+    'change_opportunity_status_body' => 'تم تغيير حالة الفرصة.',
+    'publish_opportunity_title' => 'تم نشر الفرصة',
+    'publish_opportunity_body' => 'تم نشر الفرصة الخاصة بك.',
+
+    'create_company_investor_interest_for_admin_title' => 'طلب اهتمام جديد',
+    'create_company_investor_interest_for_admin_body' => 'تم إنشاء طلب اهتمام جديد بين شركة ومستثمر.',
+    'purchase_investment_seat_for_admin_title' => 'شراء مقعد استثماري',
+    'purchase_investment_seat_for_admin_body' => 'تم شراء مقعد استثماري.',
+    'purchase_opportunity_booklet_title' => 'تم شراء كتيب الفرصة',
+    'purchase_opportunity_booklet_body' => 'تم شراء كتيب الفرصة الخاصة بك.',
+    'create_interest_request_for_admin_title' => 'طلب اهتمام جديد',
+    'create_interest_request_for_admin_body' => 'تم إنشاء طلب اهتمام جديد.',
+    'create_interest_request_for_opportunity_owner_title' => 'استلام طلب اهتمام',
+    'create_interest_request_for_opportunity_owner_body' => 'تم إرسال طلب اهتمام جديد على فرصتك.',
+];

@@ -101,4 +101,5 @@ return [
     'interest_submission_unavailable_for_opportunity' => 'This advertisement is not available for interest submission.',
     'interest_submitted_successfully' => 'Interest submitted successfully. Our team will contact you shortly.',
     'company_investor_interest_request_created' => 'Your investor interest request has been sent successfully.',
+    'success' => 'Success',
 ];

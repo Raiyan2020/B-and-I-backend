@@ -219,9 +219,9 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     /**
      * Get notifications relationship.
      */
-    public function notifications()
+    public function notifications(): MorphMany
     {
-        return $this->hasMany(Notification::class)->latest();
+        return $this->morphMany(Notification::class, 'notifiable')->latest();
     }
 
     public function devices(): HasMany

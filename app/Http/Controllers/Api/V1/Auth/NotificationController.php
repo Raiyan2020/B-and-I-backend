@@ -33,13 +33,13 @@ class NotificationController extends Controller
     public function unreadCount(Request $request): JsonResponse
     {
         return $this->jsonResponse(data: [
-            'unread_notifications_count' => $request->user()->notifications()->where('seen', false)->count(),
+            'unread_notifications_count' => $request->user()->notifications()->whereNull('read_at')->count(),
         ]);
     }
 
     public function markAllAsRead(Request $request): JsonResponse
     {
-        $request->user()->notifications()->where('seen', false)->update(['seen' => true]);
+        $request->user()->notifications()->whereNull('read_at')->update(['read_at' => now()]);
 
         return $this->jsonResponse(msg: __('apis.success'), data: [
             'unread_notifications_count' => 0,
@@ -48,13 +48,17 @@ class NotificationController extends Controller
 
     public function destroy(Request $request, Notification $notification): JsonResponse
     {
-        abort_unless((int) $notification->user_id === (int) $request->user()->id, 404);
+        abort_unless(
+            $notification->notifiable_type === $request->user()::class
+            && (int) $notification->notifiable_id === (int) $request->user()->id,
+            404
+        );
 
         $notification->delete();
 
         return $this->jsonResponse(msg: __('apis.success'), data: [
             'deleted_id' => $notification->id,
-            'unread_notifications_count' => $request->user()->notifications()->where('seen', false)->count(),
+            'unread_notifications_count' => $request->user()->notifications()->whereNull('read_at')->count(),
         ]);
     }
 

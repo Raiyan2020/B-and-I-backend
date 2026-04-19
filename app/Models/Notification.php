@@ -2,64 +2,132 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\NotificationType;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class  Notification extends Model
+class Notification extends DatabaseNotification
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasUuids;
 
-    protected $appends=['title','body'];
-    protected $guarded = [''];
+    public $incrementing = false;
 
-    protected $casts = [
-        'payload' => 'array',
-        'seen' => 'boolean',
+    protected $keyType = 'string';
+
+    protected $appends = [
+        'title',
+        'body',
+        'notification_type',
+        'payload',
     ];
 
-    public function getTitleAttribute(){
-        $title = app()->getLocale() == 'ar' ? $this->title_ar : $this->title_en;
-        return $title;
-    }
-    public function getBodyAttribute(){
-        $body = app()->getLocale() == 'ar' ? $this->body_ar : $this->body_en;
-        return $body;
+    protected $casts = [
+        'data' => 'array',
+        'read_at' => 'datetime',
+    ];
+
+    public function getTitleAttribute(): string
+    {
+        return $this->resolveLocalizedText('title');
     }
 
-    public function user()
+    public function getBodyAttribute(): string
     {
-        return $this->belongsTo(User::class);
+        return $this->resolveLocalizedText('body');
     }
 
-    public function admin()
+    public function getNotificationTypeAttribute(): string
     {
-        return $this->belongsTo(Admin::class);
+        return NotificationType::normalize(
+            data_get($this->data, 'notification_type', NotificationType::Generic->value)
+        )->value;
+    }
+
+    public function getPayloadAttribute(): array
+    {
+        $data = $this->data ?? [];
+
+        unset(
+            $data['notification_type'],
+            $data['notification_category'],
+            $data['title'],
+            $data['body'],
+            $data['click_action'],
+            $data['icon'],
+            $data['model_type'],
+            $data['model_id'],
+            $data['model_data']
+        );
+
+        return $data;
     }
 
     public function targetUrl(): ?string
     {
-        if ($this->order_id) {
-            return route('admin.orders.show', $this->order_id);
-        }
-
-        if (! $this->model_type || ! $this->model_id) {
+        if ($this->notifiable_type !== Admin::class) {
             return null;
         }
 
-        return match ($this->model_type) {
-            'User' => route('admin.users.show', $this->model_id),
-            'Opportunity' => route('admin.opportunities.show', $this->model_id),
-            'InvestmentSeat' => route('admin.investment-seats.show', $this->model_id),
-            'InterestRequest' => route('admin.interest-requests.show', $this->model_id),
-            'ProfileUpdateRequest' => route('admin.profile-update-requests.show', $this->model_id),
-            'AccountDeletionRequest' => route('admin.account-deletion-requests.show', $this->model_id),
+        $modelType = data_get($this->data, 'model_type');
+        $modelId = data_get($this->data, 'model_id');
+
+        if ($orderId = data_get($this->data, 'order_id')) {
+            return route('admin.orders.show', $orderId);
+        }
+
+        if (! $modelType || ! $modelId) {
+            return null;
+        }
+
+        return match ($modelType) {
+            'User' => route('admin.users.show', $modelId),
+            'Opportunity' => route('admin.opportunities.show', $modelId),
+            'InvestmentSeat' => route('admin.investment-seats.show', $modelId),
+            'InterestRequest' => route('admin.interest-requests.show', $modelId),
+            'ProfileUpdateRequest' => route('admin.profile-update-requests.show', $modelId),
+            'AccountDeletionRequest' => route('admin.account-deletion-requests.show', $modelId),
             'CompanyInvestorInterestRequest' => route('admin.company-investor-interest-requests.index', [
-                'company_id' => data_get($this->payload, 'company_id'),
-                'investor_id' => data_get($this->payload, 'investor_id'),
+                'company_id' => data_get($this->data, 'company_id'),
+                'investor_id' => data_get($this->data, 'investor_id'),
             ]),
             default => null,
         };
+    }
+
+    private function resolveLocalizedText(string $key): string
+    {
+        $locale = app()->getLocale() === 'ar' ? 'ar' : 'en';
+        $rawOverride = data_get($this->data, $key);
+        $override = is_array($rawOverride)
+            ? data_get($rawOverride, $locale)
+            : $rawOverride;
+
+        if (filled($override)) {
+            return (string) $override;
+        }
+
+        $type = $this->notification_type;
+        $translationKey = "notifications.{$type}_{$key}";
+        $translated = trans($translationKey, $this->translationReplacements(), $locale);
+
+        if ($translated !== $translationKey) {
+            return $translated;
+        }
+
+        return '';
+    }
+
+    private function translationReplacements(): array
+    {
+        $data = $this->data ?? [];
+        $replacements = [];
+
+        foreach ($data as $key => $value) {
+            if (is_scalar($value) || $value === null) {
+                $replacements[$key] = (string) $value;
+            }
+        }
+
+        return $replacements;
     }
 }

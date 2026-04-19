@@ -14,14 +14,24 @@ class NotificationsController extends Controller
     public function __construct(private readonly DeviceService $deviceService) {}
 
     public function readAll(){
-        Notification::where('admin_id',auth('admin')->user()->id)->update(['seen'=>1]);
+        auth('admin')->user()
+            ?->notifications()
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
         return back();
     }
 
     public function read(Notification $notification){
-        abort_unless((int) $notification->admin_id === (int) auth('admin')->id(), 403);
+        abort_unless(
+            $notification->notifiable_type === auth('admin')->user()::class
+            && (int) $notification->notifiable_id === (int) auth('admin')->id(),
+            403
+        );
 
-        $notification->update(['seen'=>1]);
+        if ($notification->read_at === null) {
+            $notification->update(['read_at' => now()]);
+        }
 
         return $notification->targetUrl()
             ? redirect($notification->targetUrl())

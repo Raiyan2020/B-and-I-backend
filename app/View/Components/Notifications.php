@@ -2,7 +2,6 @@
 
 namespace App\View\Components;
 
-use App\Models\Notification;
 use Illuminate\View\Component;
 
 class Notifications extends Component
@@ -28,7 +27,7 @@ class Notifications extends Component
 
         return view('components.notifications',[
             'notifications' => $admin
-                ? Notification::query()->latest()->where('admin_id', $admin->id)->get()
+                ? $admin->notifications()->latest()->get()
                 : collect(),
         ]);
     }

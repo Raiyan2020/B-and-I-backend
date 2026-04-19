@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Enums\InvestorExperience;
 use App\Enums\InvestorType;
 use App\Enums\NotificationCategory;
+use App\Enums\NotificationType;
 use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Http\Requests\Dashboard\Users\ChargeWalletRequest;
@@ -357,7 +358,7 @@ class UserController extends AdminBasicController
      * @param int $id
      * @return JsonResponse
      */
-    public function sendNotification(SendNotificationRequest $request, $id): JsonResponse
+    public function sendNotification(SendNotificationRequest $request, $id): JsonResponse|RedirectResponse
     {
         try {
             $user = $this->serviceName->find($id);
@@ -383,21 +384,29 @@ class UserController extends AdminBasicController
                         'ar' => $validated['body_ar'],
                         'en' => $validated['body_en'],
                     ],
-                    notificationType: $validated['notification_type'] ?? 'user_notification',
+                    notificationType: NotificationType::normalize($validated['notification_type'] ?? NotificationType::AdminNotification),
                     category: $validated['category'] ?? NotificationCategory::System,
                     payload: $payload,
                 ),
             );
 
-            return response()->json([
-                'key' => 'success',
-                'msg' => __('dashboard.notification_sent_successfully')
-            ]);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'key' => 'success',
+                    'msg' => __('dashboard.notification_sent_successfully'),
+                ]);
+            }
+
+            return back()->with('success', __('dashboard.notification_sent_successfully'));
         } catch (\Exception $e) {
-            return response()->json([
-                'key' => 'error',
-                'msg' => $e->getMessage()
-            ], 500);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'key' => 'error',
+                    'msg' => $e->getMessage(),
+                ], 500);
+            }
+
+            return back()->with('error', $e->getMessage());
         }
     }
 

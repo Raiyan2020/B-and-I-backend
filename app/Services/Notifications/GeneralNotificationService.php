@@ -18,7 +18,7 @@ class GeneralNotificationService
 
     public function sendToUser(User $user, GeneralNotification $notification): Notification
     {
-        $stored = Notification::query()->create(
+        $stored = $user->notifications()->create(
             $notification->databaseAttributesFor($user)
         );
         // Firebase Admin Dashboard Setup
@@ -31,7 +31,7 @@ class GeneralNotificationService
 
     public function sendToAdmin(Admin $admin, GeneralNotification $notification): Notification
     {
-        $stored = Notification::query()->create(
+        $stored = $admin->notifications()->create(
             $notification->databaseAttributesForAdmin($admin)
         );
         // Firebase Admin Dashboard Setup

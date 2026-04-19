@@ -84,4 +84,5 @@ return [
     'interest_submission_unavailable_for_opportunity' => 'هذا الإعلان غير متاح لتسجيل الاهتمام.',
     'interest_submitted_successfully' => 'تم تسجيل الاهتمام بنجاح، وسيقوم فريقنا بالتواصل معك قريباً.',
     'company_investor_interest_request_created' => 'تم إرسال طلب اهتمام الشركة بالمستثمر بنجاح.',
+    'success' => 'تم بنجاح',
 ];

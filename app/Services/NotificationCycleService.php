@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\NotificationCategory;
+use App\Enums\NotificationType;
 use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Models\AccountDeletionRequest;
@@ -35,7 +36,7 @@ class NotificationCycleService
                 'ar' => "تم تسجيل {$role['ar']} جديد: {$this->userName($user)}.",
                 'en' => "A new {$role['en']} has registered: {$this->userName($user)}.",
             ],
-            notificationType: 'admin.user.registered',
+            notificationType: NotificationType::RegisterUserForAdmin,
             category: NotificationCategory::System,
             model: $user,
             payload: [
@@ -58,7 +59,7 @@ class NotificationCycleService
                 'ar' => "قام {$this->userName($request->user)} بإرسال طلب تعديل بياناته.",
                 'en' => "{$this->userName($request->user)} submitted a profile update request.",
             ],
-            notificationType: 'admin.profile_update_request.created',
+            notificationType: NotificationType::CreateProfileUpdateRequestForAdmin,
             category: NotificationCategory::System,
             model: $request,
             payload: [
@@ -92,7 +93,7 @@ class NotificationCycleService
                     ? 'Your profile update request has been approved.'
                     : 'Your profile update request has been rejected.'.($reason ? " Reason: {$reason}" : ''),
             ],
-            notificationType: $approved ? 'profile_update_request.approved' : 'profile_update_request.rejected',
+            notificationType: $approved ? NotificationType::ApproveProfileUpdateRequest : NotificationType::RejectProfileUpdateRequest,
             category: NotificationCategory::System,
             model: $request,
             payload: [
@@ -115,7 +116,7 @@ class NotificationCycleService
                 'ar' => "قام {$this->userName($request->user)} بإرسال طلب حذف الحساب.",
                 'en' => "{$this->userName($request->user)} submitted an account deletion request.",
             ],
-            notificationType: 'admin.account_deletion_request.created',
+            notificationType: NotificationType::CreateAccountDeletionRequestForAdmin,
             category: NotificationCategory::System,
             model: $request,
             payload: [
@@ -142,7 +143,7 @@ class NotificationCycleService
                 'ar' => 'تمت الموافقة على طلب حذف حسابك، وسيتم تسجيل خروجك من جميع الأجهزة.',
                 'en' => 'Your account deletion request has been approved, and you will be logged out from all devices.',
             ],
-            notificationType: 'account_deletion_request.approved',
+            notificationType: NotificationType::ApproveAccountDeletionRequest,
             category: NotificationCategory::System,
             model: $request,
             payload: [
@@ -168,7 +169,7 @@ class NotificationCycleService
                 'ar' => "تم رفض طلب حذف الحساب. السبب: {$reason}",
                 'en' => "Your account deletion request has been rejected. Reason: {$reason}",
             ],
-            notificationType: 'account_deletion_request.rejected',
+            notificationType: NotificationType::RejectAccountDeletionRequest,
             category: NotificationCategory::System,
             model: $request,
             payload: [
@@ -191,7 +192,7 @@ class NotificationCycleService
                 'ar' => "قام {$this->userName($opportunity->user)} بإضافة إعلان جديد: {$this->opportunityName($opportunity)}.",
                 'en' => "{$this->userName($opportunity->user)} created a new opportunity: {$this->opportunityName($opportunity)}.",
             ],
-            notificationType: 'admin.opportunity.created',
+            notificationType: NotificationType::CreateOpportunityForAdmin,
             category: NotificationCategory::System,
             model: $opportunity,
             payload: [
@@ -214,7 +215,7 @@ class NotificationCycleService
                 'ar' => "قام {$this->userName($opportunity->user)} بتعديل الإعلان: {$this->opportunityName($opportunity)}.",
                 'en' => "{$this->userName($opportunity->user)} updated the opportunity: {$this->opportunityName($opportunity)}.",
             ],
-            notificationType: 'admin.opportunity.updated',
+            notificationType: NotificationType::UpdateOpportunityForAdmin,
             category: NotificationCategory::System,
             model: $opportunity,
             payload: [
@@ -243,7 +244,7 @@ class NotificationCycleService
                 'ar' => "حالة الإعلان {$this->opportunityName($opportunity)} أصبحت: {$status['ar']}.",
                 'en' => "The status of {$this->opportunityName($opportunity)} is now: {$status['en']}.",
             ],
-            notificationType: 'opportunity.status_changed',
+            notificationType: NotificationType::ChangeOpportunityStatus,
             category: NotificationCategory::System,
             model: $opportunity,
             payload: [
@@ -271,7 +272,7 @@ class NotificationCycleService
                 'ar' => "تم نشر إعلان جديد: {$this->opportunityName($opportunity)}.",
                 'en' => "A new opportunity has been published: {$this->opportunityName($opportunity)}.",
             ],
-            notificationType: 'opportunity.published',
+            notificationType: NotificationType::PublishOpportunity,
             category: NotificationCategory::System,
             model: $opportunity,
             payload: [
@@ -293,7 +294,7 @@ class NotificationCycleService
                 'ar' => "قامت {$this->userName($request->company)} بإرسال طلب اهتمام بالمستثمر {$this->userName($request->investor)}.",
                 'en' => "{$this->userName($request->company)} submitted interest in investor {$this->userName($request->investor)}.",
             ],
-            notificationType: 'admin.company_investor_interest.created',
+            notificationType: NotificationType::CreateCompanyInvestorInterestForAdmin,
             category: NotificationCategory::Interest,
             model: $request,
             payload: [
@@ -317,7 +318,7 @@ class NotificationCycleService
                 'ar' => "قام {$this->userName($seat->user)} بشراء كراسة للإعلان {$this->opportunityName($seat->opportunity)}.",
                 'en' => "{$this->userName($seat->user)} purchased a booklet for {$this->opportunityName($seat->opportunity)}.",
             ],
-            notificationType: 'admin.investment_seat.purchased',
+            notificationType: NotificationType::PurchaseInvestmentSeatForAdmin,
             category: NotificationCategory::Interest,
             model: $seat,
             payload: [
@@ -346,7 +347,7 @@ class NotificationCycleService
                 'ar' => "قام {$this->userName($seat->user)} بشراء كراسة الإعلان {$this->opportunityName($opportunity)}.",
                 'en' => "{$this->userName($seat->user)} purchased the booklet for {$this->opportunityName($opportunity)}.",
             ],
-            notificationType: 'opportunity.booklet_purchased',
+            notificationType: NotificationType::PurchaseOpportunityBooklet,
             category: NotificationCategory::Interest,
             model: $opportunity,
             payload: [
@@ -370,7 +371,7 @@ class NotificationCycleService
                 'ar' => "قام {$this->userName($interestRequest->user)} بإرسال طلب اهتمام للإعلان {$this->opportunityName($interestRequest->opportunity)}.",
                 'en' => "{$this->userName($interestRequest->user)} submitted interest in {$this->opportunityName($interestRequest->opportunity)}.",
             ],
-            notificationType: 'admin.interest_request.created',
+            notificationType: NotificationType::CreateInterestRequestForAdmin,
             category: NotificationCategory::Interest,
             model: $interestRequest,
             payload: [
@@ -399,7 +400,7 @@ class NotificationCycleService
                 'ar' => "قام {$this->userName($interestRequest->user)} بإرسال طلب اهتمام على الإعلان {$this->opportunityName($opportunity)}.",
                 'en' => "{$this->userName($interestRequest->user)} submitted interest in {$this->opportunityName($opportunity)}.",
             ],
-            notificationType: 'opportunity.interest_request.created',
+            notificationType: NotificationType::CreateInterestRequestForOpportunityOwner,
             category: NotificationCategory::Interest,
             model: $opportunity,
             payload: [

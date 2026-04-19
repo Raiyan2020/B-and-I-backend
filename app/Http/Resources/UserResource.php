@@ -138,6 +138,6 @@ class UserResource extends JsonResource
             return (int) $this->unread_notifications_count;
         }
 
-        return (int) $this->resource->notifications()->where('seen', false)->count();
+        return (int) $this->resource->notifications()->whereNull('read_at')->count();
     }
 }
