@@ -126,7 +126,7 @@ class AdminBasicController extends Controller
         return view('dashboard.' . $this->directoryName . '.edit', array_merge(['row' => $row], $this->editCompactVariables ?? []));
     }
 
-    public function show($id): View|JsonResponse
+    public function show($id): View|JsonResponse|RedirectResponse
     {
         $row = $this->serviceName->find(id: $id, with: $this->with ?? []);
         return view('dashboard.' . $this->directoryName . '.show', array_merge(['row' => $row], $this->showCompactVariables ?? []));

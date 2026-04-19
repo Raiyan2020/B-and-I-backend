@@ -114,6 +114,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'full_phone',
         'email_verified',
         'has_pending_profile_update_request',
+        'has_pending_account_deletion_request',
     ];
 
     /**
@@ -141,6 +142,15 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         }
 
         return $this->pendingProfileUpdateRequests()->exists();
+    }
+
+    public function getHasPendingAccountDeletionRequestAttribute(): bool
+    {
+        if ($this->relationLoaded('latestPendingAccountDeletionRequest')) {
+            return $this->latestPendingAccountDeletionRequest !== null;
+        }
+
+        return $this->pendingAccountDeletionRequests()->exists();
     }
 
     /**
@@ -242,6 +252,24 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         return $this->hasMany(ProfileUpdateRequest::class)->latest();
     }
 
+    public function pendingAccountDeletionRequests(): HasMany
+    {
+        return $this->hasMany(AccountDeletionRequest::class)
+            ->where('status', \App\Enums\AccountDeletionRequestStatus::Pending);
+    }
+
+    public function latestPendingAccountDeletionRequest(): HasOne
+    {
+        return $this->hasOne(AccountDeletionRequest::class)
+            ->where('status', \App\Enums\AccountDeletionRequestStatus::Pending)
+            ->latestOfMany();
+    }
+
+    public function accountDeletionRequests(): HasMany
+    {
+        return $this->hasMany(AccountDeletionRequest::class)->latest();
+    }
+
     public function preferredSector()
     {
         return $this->belongsTo(PreferredSector::class);
@@ -275,6 +303,16 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     public function interestRequests(): HasMany
     {
         return $this->hasMany(InterestRequest::class);
+    }
+
+    public function companyInvestorInterestRequestsSent(): HasMany
+    {
+        return $this->hasMany(CompanyInvestorInterestRequest::class, 'company_id');
+    }
+
+    public function companyInvestorInterestRequestsReceived(): HasMany
+    {
+        return $this->hasMany(CompanyInvestorInterestRequest::class, 'investor_id');
     }
 
     /**

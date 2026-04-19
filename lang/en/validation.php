@@ -163,6 +163,7 @@ return [
     */
 
     'attributes' => [
+        'investor_id' => 'Investor ID',
         'title_ar' => 'Role name (Arabic)',
         'title_en' => 'Role name (English)',
         'title.ar' => 'Role name (Arabic)',

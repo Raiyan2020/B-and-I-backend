@@ -91,6 +91,23 @@
                     }
                 },
                 {
+                    data: 'latest_pending_account_deletion_request',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        if (!data || !data.id) {
+                            return `-`;
+                        }
+
+                        let reviewRoute = '{{ route('admin.account-deletion-requests.show', ':id') }}'
+                            .replace(':id', data.id);
+
+                        return `<a href="${reviewRoute}" class="btn btn-sm btn-outline-danger">
+                                    <i class="feather icon-trash-2 mr-50"></i>{{ __('dashboard.show') }}
+                                </a>`;
+                    }
+                },
+                {
                     data: 'id',
                     orderable: false,
                     render: function(data, type, row) {
@@ -190,7 +207,7 @@
             e.preventDefault();
             let btn = $(this);
             let url = btn.data('url');
-            
+
             Swal.fire({
                 title: '{{ __('dashboard.confirm') }}',
                 text: '{{ __('dashboard.toggle_active_text') }}',

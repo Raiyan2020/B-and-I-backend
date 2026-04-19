@@ -3,6 +3,7 @@
 namespace App\Traits\BaseService;
 
 use App\Support\QueryOptions;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 
 trait QueryTrait
@@ -117,6 +118,8 @@ trait QueryTrait
                 ->with($with)
                 ->where($conditions)
                 ->findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -129,6 +132,8 @@ trait QueryTrait
                 ->where($conditions)
                 ->withTrashed()
                 ->findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }

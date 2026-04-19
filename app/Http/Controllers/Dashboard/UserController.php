@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Enums\InvestorExperience;
 use App\Enums\InvestorType;
 use App\Enums\NotificationCategory;
+use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Http\Requests\Dashboard\Users\ChargeWalletRequest;
 use App\Http\Requests\Dashboard\Users\SendNotificationRequest;
@@ -17,6 +18,7 @@ use App\Notifications\GeneralNotification;
 use App\Services\Core\BaseService;
 use App\Services\Notifications\GeneralNotificationService;
 use App\Support\QueryOptions;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -33,7 +35,7 @@ class UserController extends AdminBasicController
             directoryName: 'users',
             serviceName: new BaseService(User::class),
             indexScopes: 'search',
-            with: ['wallet', 'walletTransactions', 'orders'],
+            with: [],
         );
 
         $this->middleware('permission:users', ['only' => ['index', 'advertisers', 'investors', 'show']]);
@@ -173,29 +175,55 @@ class UserController extends AdminBasicController
     }
 
     /**
-     * Override show method to load wallet and orders relationships.
+     * Override show method to load user relations for the details page.
      *
      * @param int $id
      * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
      */
-    public function show($id): View|JsonResponse
+    public function show($id): View|RedirectResponse
     {
-        $row = $this->serviceName->find(id: $id, with: [
-            'wallet',
-            'preferredSector',
-            'category',
-            'walletTransactions' => function($query) {
-                $query->latest()->take(10);
-            },
-            'orders' => function($query) {
-                $query->latest()->take(10);
-            },
-            'profileUpdateRequests' => function ($query) {
-                $query->with('reviewer')->latest()->take(10);
-            },
-        ]);
+        try {
+            $row = $this->serviceName->find(id: $id, with: [
+                'preferredSector',
+                'category',
+                'wallet',
+                'walletTransactions' => function ($query) {
+                    $query->latest('wallet_transactions.created_at')->take(10);
+                },
+                'orders' => function($query) {
+                    $query->latest()->take(10);
+                },
+                'profileUpdateRequests' => function ($query) {
+                    $query->with('reviewer')->latest()->take(10);
+                },
+                'accountDeletionRequests' => function ($query) {
+                    $query->with(['reviewer', 'user' => fn ($userQuery) => $userQuery->withTrashed()])->latest()->take(10);
+                },
+                'companyInvestorInterestRequestsSent' => function ($query) {
+                    $query->with('investor')->latest('id')->take(15);
+                },
+            ]);
+        } catch (ModelNotFoundException $e) {
+            $fallbackUrl = url()->previous() !== url()->current()
+                ? url()->previous()
+                : route('admin.users.index');
 
-        // Load counts for statistics (safely handle if relationships don't exist)
+            return redirect($fallbackUrl)
+                ->with('error', __('dashboard.user_not_found'));
+        }
+
+        try {
+            $row->loadCount('companyInvestorInterestRequestsSent');
+        } catch (\Exception $e) {
+            $row->setAttribute('company_investor_interest_requests_sent_count', 0);
+        }
+
+        try {
+            $row->loadCount('walletTransactions');
+        } catch (\Exception $e) {
+            $row->setAttribute('wallet_transactions_count', 0);
+        }
+
         try {
             $row->loadCount([
                 'orders',
@@ -205,18 +233,71 @@ class UserController extends AdminBasicController
                 'orders as pending_orders_count' => function($query) {
                     $query->where('status', 'pending');
                 },
-                'walletTransactions'
             ]);
         } catch (\Exception $e) {
-            // If relationships don't exist, set default values
             $row->setAttribute('orders_count', 0);
             $row->setAttribute('completed_orders_count', 0);
             $row->setAttribute('pending_orders_count', 0);
-            $row->setAttribute('wallet_transactions_count', 0);
+        }
+
+        $companyDashboardData = [
+            'latestInterestRequestsByUser' => collect(),
+            'latestInvestmentSeatsByUser' => collect(),
+            'latestSuccessfulDealsOnAds' => collect(),
+            'latestSuccessfulDealsAsInvestor' => collect(),
+        ];
+
+        if ($row->isCompany()) {
+            try {
+                $row->loadCount([
+                    'opportunities as my_ads_count',
+                    'opportunities as successful_deals_on_ads_count' => function ($query) {
+                        $query->where('status', OpportunityStatus::Completed->value);
+                    },
+                    'awardedOpportunities as successful_deals_as_investor_count' => function ($query) use ($row) {
+                        $query
+                            ->where('status', OpportunityStatus::Completed->value)
+                            ->where('user_id', '!=', $row->id);
+                    },
+                ]);
+            } catch (\Exception $e) {
+                $row->setAttribute('my_ads_count', 0);
+                $row->setAttribute('successful_deals_on_ads_count', 0);
+                $row->setAttribute('successful_deals_as_investor_count', 0);
+            }
+
+            $companyDashboardData = [
+                'latestInterestRequestsByUser' => $row->interestRequests()
+                    ->with(['opportunity.user', 'investmentSeat'])
+                    ->whereHas('opportunity', fn ($query) => $query->where('user_id', '!=', $row->id))
+                    ->latest('id')
+                    ->take(5)
+                    ->get(),
+                'latestInvestmentSeatsByUser' => $row->investmentSeats()
+                    ->with(['opportunity.user'])
+                    ->whereHas('opportunity', fn ($query) => $query->where('user_id', '!=', $row->id))
+                    ->latest('id')
+                    ->take(5)
+                    ->get(),
+                'latestSuccessfulDealsOnAds' => $row->opportunities()
+                    ->with('investor')
+                    ->where('status', OpportunityStatus::Completed->value)
+                    ->latest('id')
+                    ->take(5)
+                    ->get(),
+                'latestSuccessfulDealsAsInvestor' => $row->awardedOpportunities()
+                    ->with('user')
+                    ->where('status', OpportunityStatus::Completed->value)
+                    ->where('user_id', '!=', $row->id)
+                    ->latest('id')
+                    ->take(5)
+                    ->get(),
+            ];
         }
 
         return view('dashboard.' . $this->directoryName . '.show', array_merge(
             ['row' => $row],
+            $companyDashboardData,
             $this->roleContext($this->resolveRole($row->role)),
             $this->roleSpecificContext($this->resolveRole($row->role)),
         ));
@@ -389,13 +470,25 @@ class UserController extends AdminBasicController
                     ->paginateNum(30)
                     ->scopes($this->indexScopes ?? 'search')
                     ->conditions($conditions)
-                    ->with(array_merge($this->with ?? [], ['latestPendingProfileUpdateRequest']))
+                    ->with(array_merge($this->with ?? [], ['latestPendingProfileUpdateRequest', 'latestPendingAccountDeletionRequest']))
                     ->latest(false)
             );
 
             return DataTables::of($rows)
                 ->addColumn('latest_pending_profile_update_request', function (User $user): ?array {
                     $request = $user->latestPendingProfileUpdateRequest;
+
+                    if (! $request) {
+                        return null;
+                    }
+
+                    return [
+                        'id' => $request->id,
+                        'status' => $request->status?->value,
+                    ];
+                })
+                ->addColumn('latest_pending_account_deletion_request', function (User $user): ?array {
+                    $request = $user->latestPendingAccountDeletionRequest;
 
                     if (! $request) {
                         return null;

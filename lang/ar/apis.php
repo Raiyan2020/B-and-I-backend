@@ -58,6 +58,8 @@ return [
     'profile_updated_verification_required' => 'تم تحديث الحساب بنجاح. يرجى تأكيد بريدك الإلكتروني الجديد.',
     'profile_update_sent_for_review' => 'تم إرسال بياناتك للإدارة للمراجعة.',
     'profile_update_request_already_pending' => 'لديك بالفعل طلب تعديل بيانات معلق.',
+    'account_deletion_request_submitted' => 'تم إرسال طلب حذف الحساب إلى الإدارة للمراجعة.',
+    'account_deletion_request_already_pending' => 'لديك بالفعل طلب حذف حساب معلق.',
     'password_updated_successfully' => 'تم تغيير كلمة المرور بنجاح.',
     'password_updated_logged_out_all_devices' => 'تم تغيير كلمة المرور بنجاح. لقد قمنا بتسجيل خروجك من جميع الأجهزة المرتبطة حفاظًا على أمان حسابك.',
     'current_password_incorrect' => 'كلمة المرور الحالية غير صحيحة.',
@@ -81,4 +83,5 @@ return [
     'interest_already_submitted' => 'تم تسجيل اهتمامك بهذا الإعلان من قبل.',
     'interest_submission_unavailable_for_opportunity' => 'هذا الإعلان غير متاح لتسجيل الاهتمام.',
     'interest_submitted_successfully' => 'تم تسجيل الاهتمام بنجاح، وسيقوم فريقنا بالتواصل معك قريباً.',
+    'company_investor_interest_request_created' => 'تم إرسال طلب اهتمام الشركة بالمستثمر بنجاح.',
 ];

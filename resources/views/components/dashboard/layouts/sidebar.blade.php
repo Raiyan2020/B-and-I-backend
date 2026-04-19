@@ -112,6 +112,12 @@
                     <span class="menu-title">{{ __('dashboard.interest_requests_menu') }}</span></a>
             </li>
 
+            <li class=" nav-item {{ Route::is('admin.company-investor-interest-requests.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.company-investor-interest-requests.index') }}">
+                    <i class="feather icon-user-check"></i>
+                    <span class="menu-title">{{ __('dashboard.company_investor_interest_requests_menu') }}</span></a>
+            </li>
+
             <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
                 <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>
                     <span class="menu-title" data-i18n="Ecommerce">{{ __('dashboard.general settings') }}</span></a>

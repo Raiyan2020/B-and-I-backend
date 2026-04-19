@@ -45,6 +45,7 @@
                                                             <th>{{ __('dashboard.table status') }}</th>
                                                             <th>{{ __('dashboard.account_status') }}</th>
                                                             <th>{{ __('dashboard.profile_update_request') }}</th>
+                                                            <th>{{ __('dashboard.account_deletion_request') }}</th>
                                                             <th>{{ __('dashboard.actions') }}</th>
                                                         </tr>
                                                     </thead>

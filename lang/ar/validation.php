@@ -181,6 +181,7 @@ return [
         'category_id' => 'قطاع التركيز',
         'previous_investments_count' => 'عدد الاستثمارات السابقة',
         'first_name' => 'الاسم الأول',
+        'investor_id' => 'معرف المستثمر',
         'last_name' => 'اسم العائلة',
         'email' => 'البريد الإلكتروني',
         'password' => 'كلمة المرور',

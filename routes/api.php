@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\Api\V1\Auth\ChangeEmailController;
+use App\Http\Controllers\Api\V1\Auth\AccountDeletionRequestController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\NotificationSettingsController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Api\V1\Auth\UserPasswordController;
 use App\Http\Controllers\Api\V1\Auth\UserRegisterController;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\Company\OpportunityController;
+use App\Http\Controllers\Api\V1\Company\InvestorInterestRequestController;
 use App\Http\Controllers\Api\V1\General\OpportunityController as GeneralOpportunityController;
 use App\Http\Controllers\Api\V1\Investor\OpportunityController as InvestorOpportunityController;
 use Illuminate\Support\Facades\Route;
@@ -78,6 +80,11 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
                 Route::get('/', 'show');
                 Route::patch('/', 'update');
             });
+
+            Route::group(['prefix' => 'account-deletion-requests', 'controller' => AccountDeletionRequestController::class], function () {
+                Route::get('latest', 'latest');
+                Route::post('/', 'store');
+            });
         });
 
         Route::group(['prefix' => 'company/opportunities', 'controller' => OpportunityController::class], function () {
@@ -86,6 +93,10 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
             Route::post('/', 'store');
             Route::get('/{opportunity}', 'show');
             Route::put('/{opportunity}', 'update');
+        });
+
+        Route::group(['prefix' => 'company/investor-interest-requests', 'controller' => InvestorInterestRequestController::class], function () {
+            Route::post('/', 'store');
         });
 
         Route::group(['prefix' => 'investor/opportunities', 'controller' => InvestorOpportunityController::class], function () {

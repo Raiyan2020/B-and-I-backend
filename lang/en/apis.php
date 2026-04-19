@@ -81,6 +81,8 @@ return [
     'profile_updated_verification_required' => 'Profile updated successfully. Please verify your new email address.',
     'profile_update_sent_for_review' => 'Your profile update request has been sent to the admin for review.',
     'profile_update_request_already_pending' => 'You already have a pending profile update request.',
+    'account_deletion_request_submitted' => 'Your account deletion request has been sent to the admin for review.',
+    'account_deletion_request_already_pending' => 'You already have a pending account deletion request.',
     'password_updated_successfully' => 'Password updated successfully.',
     'password_updated_logged_out_all_devices' => 'Password updated successfully. We logged you out from all linked devices for your security.',
     'current_password_incorrect' => 'The current password is incorrect.',
@@ -98,4 +100,5 @@ return [
     'interest_already_submitted' => 'You have already submitted interest for this advertisement.',
     'interest_submission_unavailable_for_opportunity' => 'This advertisement is not available for interest submission.',
     'interest_submitted_successfully' => 'Interest submitted successfully. Our team will contact you shortly.',
+    'company_investor_interest_request_created' => 'Your investor interest request has been sent successfully.',
 ];

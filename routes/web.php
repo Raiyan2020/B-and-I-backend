@@ -2,9 +2,11 @@
 
 
 use App\Http\Controllers\Dashboard\AboutUsItemController;
+use App\Http\Controllers\Dashboard\AccountDeletionRequestController;
 use App\Http\Controllers\Dashboard\AdminController;
 use App\Http\Controllers\Dashboard\AuthController;
 use App\Http\Controllers\Dashboard\CategoryController;
+use App\Http\Controllers\Dashboard\CompanyInvestorInterestRequestController;
 use App\Http\Controllers\Dashboard\FeatureController;
 use App\Http\Controllers\Dashboard\GeneralSettingController;
 use App\Http\Controllers\Dashboard\HomeController;
@@ -92,6 +94,11 @@ Route::group([
             Route::post('profile-update-requests/{profileUpdateRequest}/review', 'review')->name('profile-update-requests.review');
         });
 
+        Route::controller(AccountDeletionRequestController::class)->group(function () {
+            Route::get('account-deletion-requests/{accountDeletionRequest}', 'show')->name('account-deletion-requests.show');
+            Route::post('account-deletion-requests/{accountDeletionRequest}/review', 'review')->name('account-deletion-requests.review');
+        });
+
         // Category specific routes (must be before Route::resources to avoid route conflict)
         Route::controller(CategoryController::class)->group(function () {
             Route::post('categories/destroy-multiple', 'destroyMultiple')->name('categories.destroyMultiple');
@@ -129,6 +136,11 @@ Route::group([
         Route::controller(InterestRequestController::class)->group(function () {
             Route::post('interest-requests/{interestRequest}/award', 'award')->name('interest-requests.award');
         });
+
+        Route::get(
+            'company-investor-interest-requests',
+            [CompanyInvestorInterestRequestController::class, 'index']
+        )->name('company-investor-interest-requests.index');
 
         Route::resources([
             'admins' => AdminController::class,
