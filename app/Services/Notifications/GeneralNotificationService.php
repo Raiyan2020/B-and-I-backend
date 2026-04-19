@@ -3,6 +3,7 @@
 namespace App\Services\Notifications;
 
 use App\Models\Notification;
+use App\Models\Admin;
 use App\Models\User;
 use App\Notifications\GeneralNotification;
 use Illuminate\Support\Collection;
@@ -31,6 +32,21 @@ class GeneralNotificationService
         return $stored;
     }
 
+    public function sendToAdmin(Admin $admin, GeneralNotification $notification): Notification
+    {
+        $stored = Notification::query()->create(
+            $notification->databaseAttributesForAdmin($admin)
+        );
+
+        $this->firebaseNotificationService->sendToAdmin(
+            $admin,
+            $notification->message(),
+            data: $notification->pushDataForAdmin($stored, $admin),
+        );
+
+        return $stored;
+    }
+
     /**
      * @param  iterable<User>  $users
      * @return Collection<int, Notification>
@@ -45,6 +61,25 @@ class GeneralNotificationService
             }
 
             $stored->push($this->sendToUser($user, $notification));
+        }
+
+        return $stored;
+    }
+
+    /**
+     * @param  iterable<Admin>  $admins
+     * @return Collection<int, Notification>
+     */
+    public function sendToAdmins(iterable $admins, GeneralNotification $notification): Collection
+    {
+        $stored = collect();
+
+        foreach ($admins as $admin) {
+            if (! $admin instanceof Admin) {
+                continue;
+            }
+
+            $stored->push($this->sendToAdmin($admin, $notification));
         }
 
         return $stored;

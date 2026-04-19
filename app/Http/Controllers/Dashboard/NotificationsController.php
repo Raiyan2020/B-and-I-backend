@@ -19,8 +19,13 @@ class NotificationsController extends Controller
     }
 
     public function read(Notification $notification){
+        abort_unless((int) $notification->admin_id === (int) auth('admin')->id(), 403);
+
         $notification->update(['seen'=>1]);
-        return back();
+
+        return $notification->targetUrl()
+            ? redirect($notification->targetUrl())
+            : back();
     }
 
     public function updateToken(Request $request){

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\AccountDeletionRequestStatus;
-use App\Enums\NotificationCategory;
 use App\Enums\OpportunityStatus;
 use App\Models\AccountDeletionRequest;
 use App\Models\Admin;
@@ -12,9 +11,7 @@ use App\Models\InterestRequest;
 use App\Models\InvestmentSeat;
 use App\Models\Opportunity;
 use App\Models\User;
-use App\Notifications\GeneralNotification;
 use App\Services\Devices\DeviceService;
-use App\Services\Notifications\GeneralNotificationService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +19,7 @@ use Illuminate\Validation\ValidationException;
 class AccountDeletionRequestService
 {
     public function __construct(
-        private readonly GeneralNotificationService $generalNotificationService,
+        private readonly NotificationCycleService $notificationCycleService,
         private readonly DeviceService $deviceService,
     ) {}
 
@@ -54,6 +51,10 @@ class AccountDeletionRequestService
             ]);
         });
 
+        DB::afterCommit(fn () => $this->notificationCycleService->adminAccountDeletionSubmitted(
+            $request->fresh(['user'])
+        ));
+
         return [
             'status' => 'submitted',
             'request' => $request->fresh(['user']),
@@ -73,32 +74,16 @@ class AccountDeletionRequestService
 
             $user = $accountDeletionRequest->user()->lockForUpdate()->firstOrFail();
 
-            $this->generalNotificationService->sendToUser(
-                $user,
-                new GeneralNotification(
-                    title: [
-                        'ar' => 'تمت الموافقة على طلب حذف الحساب',
-                        'en' => 'Your account deletion request was approved',
-                    ],
-                    body: [
-                        'ar' => 'تمت الموافقة على طلب حذف حسابك، وتم تسجيل خروجك من جميع الأجهزة.',
-                        'en' => 'Your account deletion request was approved and you have been logged out from all devices.',
-                    ],
-                    notificationType: 'account_deletion_request.approved',
-                    category: NotificationCategory::System,
-                    model: $accountDeletionRequest,
-                    payload: [
-                        'account_deletion_request_id' => $accountDeletionRequest->id,
-                    ],
-                )
-            );
-
             $accountDeletionRequest->update([
                 'status' => AccountDeletionRequestStatus::Approved,
                 'rejection_reason' => null,
                 'reviewed_by_admin_id' => $admin->id,
                 'reviewed_at' => now(),
             ]);
+
+            $this->notificationCycleService->userAccountDeletionApproved(
+                $accountDeletionRequest->fresh(['user', 'reviewer'])
+            );
 
             $user->tokens()->delete();
             $this->deviceService->forgetAllUserDevices($user);
@@ -125,7 +110,7 @@ class AccountDeletionRequestService
                 ]);
             }
 
-            $user = $accountDeletionRequest->user()->lockForUpdate()->firstOrFail();
+            $accountDeletionRequest->user()->lockForUpdate()->firstOrFail();
 
             $accountDeletionRequest->update([
                 'status' => AccountDeletionRequestStatus::Rejected,
@@ -134,28 +119,10 @@ class AccountDeletionRequestService
                 'reviewed_at' => now(),
             ]);
 
-            $this->generalNotificationService->sendToUser(
-                $user,
-                new GeneralNotification(
-                    title: [
-                        'ar' => 'تم رفض طلب حذف الحساب',
-                        'en' => 'Your account deletion request was rejected',
-                    ],
-                    body: [
-                        'ar' => 'تم رفض طلب حذف الحساب. يمكنك مراجعة سبب الرفض داخل التطبيق.',
-                        'en' => 'Your account deletion request was rejected. You can review the rejection reason in the app.',
-                    ],
-                    notificationType: 'account_deletion_request.rejected',
-                    category: NotificationCategory::System,
-                    model: $accountDeletionRequest,
-                    payload: [
-                        'account_deletion_request_id' => $accountDeletionRequest->id,
-                        'rejection_reason' => $reason,
-                    ],
-                )
-            );
+            $reviewedRequest = $accountDeletionRequest->fresh(['user', 'reviewer']);
+            $this->notificationCycleService->userAccountDeletionRejected($reviewedRequest, $reason);
 
-            return $accountDeletionRequest->fresh(['user', 'reviewer']);
+            return $reviewedRequest;
         });
     }
 

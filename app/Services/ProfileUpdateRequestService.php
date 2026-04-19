@@ -19,6 +19,10 @@ class ProfileUpdateRequestService
 {
     use UploadTrait;
 
+    public function __construct(
+        private readonly NotificationCycleService $notificationCycleService,
+    ) {}
+
     public function latestForUser(User $user): ?ProfileUpdateRequest
     {
         return $user->profileUpdateRequests()
@@ -50,6 +54,10 @@ class ProfileUpdateRequestService
             ]);
         });
 
+        DB::afterCommit(fn () => $this->notificationCycleService->adminProfileUpdateSubmitted(
+            $request->fresh(['user'])
+        ));
+
         return [
             'status' => 'submitted',
             'request' => $request->fresh(['user']),
@@ -58,7 +66,7 @@ class ProfileUpdateRequestService
 
     public function approve(Admin $admin, ProfileUpdateRequest $profileUpdateRequest): ProfileUpdateRequest
     {
-        return DB::transaction(function () use ($admin, $profileUpdateRequest) {
+        $reviewedRequest = DB::transaction(function () use ($admin, $profileUpdateRequest) {
             $profileUpdateRequest->refresh();
 
             if ($profileUpdateRequest->status !== ProfileUpdateRequestStatus::Pending) {
@@ -88,11 +96,15 @@ class ProfileUpdateRequestService
 
             return $profileUpdateRequest->fresh(['user', 'reviewer']);
         });
+
+        DB::afterCommit(fn () => $this->notificationCycleService->userProfileUpdateReviewed($reviewedRequest));
+
+        return $reviewedRequest;
     }
 
     public function reject(Admin $admin, ProfileUpdateRequest $profileUpdateRequest, string $reason): ProfileUpdateRequest
     {
-        return DB::transaction(function () use ($admin, $profileUpdateRequest, $reason) {
+        $reviewedRequest = DB::transaction(function () use ($admin, $profileUpdateRequest, $reason) {
             $profileUpdateRequest->refresh();
 
             if ($profileUpdateRequest->status !== ProfileUpdateRequestStatus::Pending) {
@@ -110,6 +122,10 @@ class ProfileUpdateRequestService
 
             return $profileUpdateRequest->fresh(['user', 'reviewer']);
         });
+
+        DB::afterCommit(fn () => $this->notificationCycleService->userProfileUpdateReviewed($reviewedRequest));
+
+        return $reviewedRequest;
     }
 
     public function hasPendingRequest(User $user): bool

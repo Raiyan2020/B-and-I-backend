@@ -2,9 +2,8 @@
 
 namespace App\Services\Opportunity;
 
-use App\Enums\OpportunityStatus;
 use App\Enums\OpportunityGoal;
-use App\Enums\NotificationCategory;
+use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
 use App\Models\Admin;
 use App\Models\GeneralSetting;
@@ -12,7 +11,7 @@ use App\Models\InterestRequest;
 use App\Models\InvestmentSeat;
 use App\Models\Opportunity;
 use App\Models\User;
-use App\Notifications\GeneralNotification;
+use App\Services\NotificationCycleService;
 use App\Support\QueryOptions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -22,7 +21,7 @@ use Illuminate\Validation\ValidationException;
 class OpportunityService
 {
     public function __construct(
-        private readonly ?\App\Services\Notifications\GeneralNotificationService $notificationService = null,
+        private readonly ?NotificationCycleService $notificationCycleService = null,
     ) {}
 
     public function createForCompany(User $user, array $data): Opportunity
@@ -34,16 +33,22 @@ class OpportunityService
         unset($data['terms_accepted']);
         $data = $this->normalizeGoalSpecificFields($data);
 
-        return $user->opportunities()->create(array_merge($data, [
+        $opportunity = $user->opportunities()->create(array_merge($data, [
             'status' => OpportunityStatus::Pending,
         ]));
+
+        DB::afterCommit(fn () => $this->notificationCycleService?->adminOpportunityCreated(
+            $opportunity->fresh(['category', 'user'])
+        ));
+
+        return $opportunity;
     }
 
     public function updateForCompany(User $user, Opportunity $opportunity, array $data): Opportunity
     {
         $this->assertOwnership($user, $opportunity);
 
-        if (!in_array(($opportunity->status?->value ?? $opportunity->status), [OpportunityStatus::NeedsRevision->value, OpportunityStatus::Pending->value], true)) {
+        if (! in_array(($opportunity->status?->value ?? $opportunity->status), [OpportunityStatus::NeedsRevision->value, OpportunityStatus::Pending->value], true)) {
             throw ValidationException::withMessages([
                 'status' => [__('apis.ad_edit_requires_needs_revision_or_pending_status')],
             ]);
@@ -53,24 +58,28 @@ class OpportunityService
         $data = $this->normalizeGoalSpecificFields($data);
 
         $opportunity->update(array_merge($data, [
-            'status'               => OpportunityStatus::Pending,
-            'review_note'          => null,
+            'status' => OpportunityStatus::Pending,
+            'review_note' => null,
             'reviewed_by_admin_id' => null,
-            'reviewed_at'          => null,
+            'reviewed_at' => null,
         ]));
 
-        return $opportunity->refresh(['category', 'reviewer', 'user']);
+        $opportunity = $opportunity->refresh(['category', 'reviewer', 'user']);
+
+        DB::afterCommit(fn () => $this->notificationCycleService?->adminOpportunityUpdated($opportunity));
+
+        return $opportunity;
     }
 
     public function listForCompany(User $user, array $filters = []): LengthAwarePaginator
     {
-        $perPage = (int)($filters['per_page'] ?? 15);
+        $perPage = (int) ($filters['per_page'] ?? 15);
 
         return $user->opportunities()
             ->with(['category', 'reviewer'])
             ->withCount(['investmentSeats', 'interestRequests'])
-            ->when(!empty($filters['status']), fn($query) => $query->where('status', $filters['status']))
-            ->when(!empty($filters['goal']), fn($query) => $query->where('goal', $filters['goal']))
+            ->when(! empty($filters['status']), fn ($query) => $query->where('status', $filters['status']))
+            ->when(! empty($filters['goal']), fn ($query) => $query->where('goal', $filters['goal']))
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
@@ -81,7 +90,7 @@ class OpportunityService
         return $user->opportunities()
             ->with(['category', 'reviewer'])
             ->withCount(['investmentSeats', 'interestRequests'])
-            ->whereHas('investmentSeats',function($query) use ($user) {
+            ->whereHas('investmentSeats', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
             ->whereDoesntHave('interestRequests', function ($query) use ($user) {
@@ -110,20 +119,34 @@ class OpportunityService
                 OpportunityStatus::Reserved,
             ])
             ->latest()
-            ->when($options->paginateNum > 0, fn($query) => $query->limit($options->paginateNum))
+            ->when($options->paginateNum > 0, fn ($query) => $query->limit($options->paginateNum))
             ->get();
     }
 
     public function reviewByAdmin(Admin $admin, Opportunity $opportunity, OpportunityStatus $status, ?string $reviewNote): Opportunity
     {
+        $oldStatus = $opportunity->status?->value ?? $opportunity->status;
+
         $opportunity->update([
-            'status'               => $status,
-            'review_note'          => $reviewNote,
+            'status' => $status,
+            'review_note' => $reviewNote,
             'reviewed_by_admin_id' => $admin->id,
-            'reviewed_at'          => now(),
+            'reviewed_at' => now(),
         ]);
 
-        return $opportunity->refresh(['category', 'reviewer', 'user']);
+        $opportunity = $opportunity->refresh(['category', 'reviewer', 'user']);
+
+        if ($oldStatus !== $status->value) {
+            DB::afterCommit(function () use ($opportunity, $status): void {
+                $this->notificationCycleService?->userOpportunityStatusChanged($opportunity);
+
+                if ($status === OpportunityStatus::Published) {
+                    $this->notificationCycleService?->usersOpportunityPublished($opportunity);
+                }
+            });
+        }
+
+        return $opportunity;
     }
 
     public function dashboardIndex(QueryOptions $options): Collection
@@ -131,7 +154,7 @@ class OpportunityService
         return Opportunity::query()
             ->with(['category', 'user', 'reviewer'])
             ->withCount(['investmentSeats', 'interestRequests'])
-            ->when($options->conditions, fn($query) => $query->where($options->conditions))
+            ->when($options->conditions, fn ($query) => $query->where($options->conditions))
             ->latest()
             ->search(request()->filters ?? [])
             ->get();
@@ -192,6 +215,7 @@ class OpportunityService
 
         return DB::transaction(function () use ($admin, $interestRequest, $status) {
             $opportunity = $interestRequest->opportunity;
+            $oldStatus = $opportunity->status?->value ?? $opportunity->status;
 
             $opportunity->update([
                 'status' => $status,
@@ -200,7 +224,13 @@ class OpportunityService
                 'reviewed_at' => now(),
             ]);
 
-            return $opportunity->fresh(['category', 'user', 'reviewer', 'investor']);
+            $opportunity = $opportunity->fresh(['category', 'user', 'reviewer', 'investor']);
+
+            if ($oldStatus !== $status->value) {
+                DB::afterCommit(fn () => $this->notificationCycleService?->userOpportunityStatusChanged($opportunity));
+            }
+
+            return $opportunity;
         });
     }
 
@@ -223,7 +253,6 @@ class OpportunityService
         }
 
         // TODO:: Handle payment processing here before creating the seat
-
         $seat = DB::transaction(function () use ($user, $opportunity, $seatPrice) {
             return InvestmentSeat::query()->create([
                 'user_id' => $user->id,
@@ -233,9 +262,14 @@ class OpportunityService
             ]);
         });
 
-        $this->notifyAdminsAboutSeatPurchase($user, $opportunity, $seat);
+        $seat = $seat->refresh(['user', 'opportunity.user']);
 
-        return $seat->refresh();
+        DB::afterCommit(function () use ($seat): void {
+            $this->notificationCycleService?->adminInvestmentSeatPurchased($seat);
+            $this->notificationCycleService?->opportunityOwnerSeatPurchased($seat);
+        });
+
+        return $seat;
     }
 
     public function submitInterest(User $user, Opportunity $opportunity): InterestRequest
@@ -266,9 +300,14 @@ class OpportunityService
             ]);
         });
 
-        $this->notifyAdminsAboutInterest($user, $opportunity, $interestRequest);
+        $interestRequest = $interestRequest->refresh(['user', 'opportunity.user', 'investmentSeat']);
 
-        return $interestRequest->refresh();
+        DB::afterCommit(function () use ($interestRequest): void {
+            $this->notificationCycleService?->adminInterestRequestSubmitted($interestRequest);
+            $this->notificationCycleService?->opportunityOwnerInterestSubmitted($interestRequest);
+        });
+
+        return $interestRequest;
     }
 
     protected function assertOwnership(User $user, Opportunity $opportunity): void
@@ -277,7 +316,6 @@ class OpportunityService
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException(__('apis.have_no_permission'));
         }
     }
-
 
     protected function assertOpportunityAvailableForSeatPurchase(Opportunity $opportunity): void
     {
@@ -311,62 +349,6 @@ class OpportunityService
                 'opportunity' => [__('apis.interest_submission_unavailable_for_opportunity')],
             ]);
         }
-    }
-
-    protected function notifyAdminsAboutSeatPurchase(User $user, Opportunity $opportunity, InvestmentSeat $seat): void
-    {
-        if (! $this->notificationService) {
-            return;
-        }
-
-        $admins = collect();
-
-        $this->notificationService->sendToUsers($admins, new GeneralNotification(
-            title: [
-                'ar' => 'تم شراء كراسة استثمار',
-                'en' => 'Investment seat purchased',
-            ],
-            body: [
-                'ar' => "قام {$user->name} بشراء كراسة للإعلان {$opportunity->company_name}",
-                'en' => "{$user->name} purchased a seat for {$opportunity->company_name}",
-            ],
-            notificationType: 'investment_seat_purchased',
-            category: NotificationCategory::Interest,
-            model: $seat,
-            payload: [
-                'opportunity_id' => $opportunity->id,
-                'opportunity_name' => $opportunity->company_name,
-                'investor_id' => $user->id,
-            ],
-        ));
-    }
-
-    protected function notifyAdminsAboutInterest(User $user, Opportunity $opportunity, InterestRequest $interestRequest): void
-    {
-        if (! $this->notificationService) {
-            return;
-        }
-
-        $admins = collect();
-
-        $this->notificationService->sendToUsers($admins, new GeneralNotification(
-            title: [
-                'ar' => 'تم تسجيل اهتمام جديد',
-                'en' => 'New interest registered',
-            ],
-            body: [
-                'ar' => "قام {$user->name} بتسجيل اهتمامه بالإعلان {$opportunity->company_name}",
-                'en' => "{$user->name} registered interest in {$opportunity->company_name}",
-            ],
-            notificationType: 'interest_request_created',
-            category: NotificationCategory::Interest,
-            model: $interestRequest,
-            payload: [
-                'opportunity_id' => $opportunity->id,
-                'opportunity_name' => $opportunity->company_name,
-                'investor_id' => $user->id,
-            ],
-        ));
     }
 
     protected function normalizeGoalSpecificFields(array $data): array

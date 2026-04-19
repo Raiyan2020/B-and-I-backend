@@ -11,6 +11,7 @@ use App\Models\AuthUpdate;
 use App\Models\User;
 use App\Services\ProfileUpdateRequestService;
 use App\Services\Devices\DeviceService;
+use App\Services\NotificationCycleService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -24,6 +25,7 @@ class AuthService implements AuthServiceInterface
         private readonly EmailVerificationService $emailVerificationService,
         private readonly DeviceService $deviceService,
         private readonly ProfileUpdateRequestService $profileUpdateRequestService,
+        private readonly NotificationCycleService $notificationCycleService,
     ) {}
 
     public function registerInvestor(RegisterInvestorDTO $dto): User
@@ -49,7 +51,10 @@ class AuthService implements AuthServiceInterface
                     'lang' => app()->getLocale(),
                 ]);
 
-                DB::afterCommit(fn () => $this->emailVerificationService->sendAfterRegistration($user));
+                DB::afterCommit(function () use ($user): void {
+                    $this->emailVerificationService->sendAfterRegistration($user);
+                    $this->notificationCycleService->adminNewUserRegistered($user);
+                });
 
                 return $this->loadUserWithRelations($user);
             });
@@ -74,7 +79,10 @@ class AuthService implements AuthServiceInterface
             'lang' => app()->getLocale(),
         ]);
 
-        DB::afterCommit(fn () => $this->emailVerificationService->sendAfterRegistration($user));
+        DB::afterCommit(function () use ($user): void {
+            $this->emailVerificationService->sendAfterRegistration($user);
+            $this->notificationCycleService->adminNewUserRegistered($user);
+        });
 
         return $this->loadUserWithRelations($user);
     }

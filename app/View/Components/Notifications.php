@@ -24,8 +24,12 @@ class Notifications extends Component
      */
     public function render()
     {
+        $admin = auth('admin')->user();
+
         return view('components.notifications',[
-            'notifications' => Notification::latest()->where('user_id',auth()->user()->id)->get(),
+            'notifications' => $admin
+                ? Notification::query()->latest()->where('admin_id', $admin->id)->get()
+                : collect(),
         ]);
     }
 }

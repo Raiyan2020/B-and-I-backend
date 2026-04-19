@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Enums\NotificationCategory;
+use App\Models\Admin;
 use App\Models\Notification as NotificationModel;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -56,6 +57,27 @@ class GeneralNotification
     {
         return [
             'user_id' => $user->id,
+            'admin_id' => null,
+            'title_ar' => $this->message()['title']['ar'],
+            'title_en' => $this->message()['title']['en'],
+            'body_ar' => $this->message()['body']['ar'],
+            'body_en' => $this->message()['body']['en'],
+            'notification_category' => $this->category()->value,
+            'notification_type' => $this->notificationType,
+            'model_type' => $this->resolveModelType(),
+            'model_id' => $this->resolveModelId(),
+            'payload' => $this->databasePayload(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function databaseAttributesForAdmin(Admin $admin): array
+    {
+        return [
+            'user_id' => null,
+            'admin_id' => $admin->id,
             'title_ar' => $this->message()['title']['ar'],
             'title_en' => $this->message()['title']['en'],
             'body_ar' => $this->message()['body']['ar'],
@@ -73,13 +95,29 @@ class GeneralNotification
      */
     public function pushData(NotificationModel $notification, User $user): array
     {
+        return $this->pushDataForNotifiable($notification, 'user_id', $user->id);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function pushDataForAdmin(NotificationModel $notification, Admin $admin): array
+    {
+        return $this->pushDataForNotifiable($notification, 'admin_id', $admin->id);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function pushDataForNotifiable(NotificationModel $notification, string $notifiableKey, int $notifiableId): array
+    {
         $payload = $this->databasePayload();
 
         return array_map(
             static fn ($value) => $value === null ? '' : (string) $value,
             array_filter([
                 'notification_id' => $notification->id,
-                'user_id' => $user->id,
+                $notifiableKey => $notifiableId,
                 'category' => $this->category()->value,
                 'notification_type' => $this->notificationType,
                 'model_type' => $this->resolveModelType(),

@@ -7,7 +7,7 @@
         </li>
         <li class="scrollable-container media-list">
             @foreach($notifications->where('seen',0) as $notification)
-            <a class="d-flex justify-content-between notification-link" id="{{$notification->id}}" href="{{$notification->order_id > 0?route('admin.orders.show',$notification->order_id):route('admin.notifications.read',$notification->id)}}">
+            <a class="d-flex justify-content-between notification-link" id="{{$notification->id}}" href="{{route('admin.notifications.read',$notification->id)}}">
                 <div class="media d-flex align-items-start">
                     <div class="media-left"><i class="feather icon-x-circle font-medium-5 primary"></i></div>
                     <div class="media-body">
@@ -19,7 +19,7 @@
             </a>
             @endforeach
             @foreach($notifications->where('seen',1) as $notification)
-            <a class="d-flex justify-content-between notification-link" id="{{$notification->id}}" href="{{$notification->order_id > 0?route('admin.orders.show',$notification->order_id):route('admin.notifications.read',$notification->id)}}">
+            <a class="d-flex justify-content-between notification-link" id="{{$notification->id}}" href="{{route('admin.notifications.read',$notification->id)}}">
                 <div class="media d-flex align-items-start">
                     <div class="media-left"><i class="feather icon-check-circle font-medium-5 info"></i></div>
                     <div class="media-body">
