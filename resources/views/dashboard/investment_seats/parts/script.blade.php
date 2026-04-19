@@ -1,5 +1,6 @@
 <script>
     $(document).ready(function() {
+        const canShow = @json(auth('admin')->user()?->can('show-investment-seat'));
         const opportunityShowRouteTemplate = '{{ route('admin.opportunities.show', ':id') }}';
         const opportunityId = @json($opportunityId);
 
@@ -39,6 +40,9 @@
                     orderable: false,
                     searchable: false,
                     render: function(data) {
+                        if (!canShow) {
+                            return '';
+                        }
                         let showRoute = '{{ route('admin.investment-seats.show', ':id') }}'.replace(':id', data);
                         return `<a class="btn btn-sm btn-outline-primary" href="${showRoute}"><i class="feather icon-eye"></i></a>`;
                     }

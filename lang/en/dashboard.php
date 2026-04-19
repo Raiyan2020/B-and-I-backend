@@ -576,4 +576,8 @@ return [
     'recent_investors' => 'Recent investors',
     'recent_advertisers_companies' => 'Recent advertisers / companies',
     'latest_advertisements' => 'Latest advertisements',
+    'platform_notifications' => 'Platform Notifications',
+    'send_to_group' => 'Send To',
+    'platform_notification_admins_except_me' => 'Admins except me',
+    'platform_notification_queued_successfully' => 'Platform notification queued successfully and will be sent in the background.',
 ];

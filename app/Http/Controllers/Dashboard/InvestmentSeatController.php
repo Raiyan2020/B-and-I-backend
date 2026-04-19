@@ -12,7 +12,8 @@ class InvestmentSeatController extends Controller
 {
     public function __construct()
     {
-        // $this->middleware('permission:investment-seats', ['only' => ['index', 'show']]);
+        $this->middleware('permission:investment-seats', ['only' => ['index']]);
+        $this->middleware('permission:show-investment-seat', ['only' => ['show']]);
     }
 
     public function index(): View|JsonResponse

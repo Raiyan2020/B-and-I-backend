@@ -10,6 +10,11 @@ use Illuminate\View\View;
 
 class CompanyInvestorInterestRequestController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:company-investor-interest-requests', ['only' => ['index']]);
+    }
+
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {

@@ -1,5 +1,6 @@
 <script>
     $(document).ready(function() {
+        const canShow = @json(auth('admin')->user()?->can('show-opportunity'));
         const investmentSeatsRouteTemplate = '{{ route('admin.investment-seats.index') }}';
         const interestRequestsRouteTemplate = '{{ route('admin.interest-requests.index') }}';
 
@@ -88,6 +89,9 @@
                     data: 'id',
                     orderable: false,
                     render: function(data) {
+                        if (!canShow) {
+                            return '';
+                        }
                         let showRoute = '{{ route('admin.opportunities.show', ':id') }}'.replace(':id', data);
                         return `<a class="btn btn-sm btn-outline-primary" href="${showRoute}"><i class="feather icon-eye"></i></a>`;
                     }

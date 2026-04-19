@@ -123,26 +123,28 @@
                                 <div class="col-md-6 mb-2"><strong>{{ __('dashboard.opportunity_reference') }}:</strong> #{{ $row->opportunity?->opportunity_number ?? $row->opportunity_id }}</div>
                             </div>
 
-                            <hr>
+                            @can('award-interest-request')
+                                <hr>
 
-                            <form class="form form-vertical store" method="POST" action="{{ route('admin.interest-requests.award', $row) }}">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>{{ __('dashboard.award_status') }}</label>
-                                            <select class="form-control" name="status" required>
-                                                @foreach($awardStatuses as $value => $label)
-                                                    <option value="{{ $value }}" {{ ($row->opportunity?->status?->value ?? null) === $value ? 'selected' : '' }}>{{ $label }}</option>
-                                                @endforeach
-                                            </select>
+                                <form class="form form-vertical store" method="POST" action="{{ route('admin.interest-requests.award', $row) }}">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>{{ __('dashboard.award_status') }}</label>
+                                                <select class="form-control" name="status" required>
+                                                    @foreach($awardStatuses as $value => $label)
+                                                        <option value="{{ $value }}" {{ ($row->opportunity?->status?->value ?? null) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-primary submit_button">{{ __('dashboard.award_investment') }}</button>
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        <button type="submit" class="btn btn-primary submit_button">{{ __('dashboard.award_investment') }}</button>
-                                    </div>
-                                </div>
-                            </form>
+                                </form>
+                            @endcan
                         </div>
                     </div>
                 </div>

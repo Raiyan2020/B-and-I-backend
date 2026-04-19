@@ -15,7 +15,9 @@ class InterestRequestController extends Controller
 {
     public function __construct(private readonly OpportunityService $opportunityService)
     {
-        // $this->middleware('permission:interest-requests', ['only' => ['index', 'show']]);
+        $this->middleware('permission:interest-requests', ['only' => ['index']]);
+        $this->middleware('permission:show-interest-request', ['only' => ['show']]);
+        $this->middleware('permission:award-interest-request', ['only' => ['award']]);
     }
 
     public function index(): View|JsonResponse

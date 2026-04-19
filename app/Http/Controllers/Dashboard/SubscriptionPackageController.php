@@ -15,10 +15,11 @@ class SubscriptionPackageController extends AdminBasicController
 {
     public function __construct()
     {
-        // $this->middleware('permission:subscription-packages', ['only' => ['index']]);
-        // $this->middleware('permission:add-subscription-package', ['only' => ['create', 'store']]);
-        // $this->middleware('permission:edit-subscription-package', ['only' => ['edit', 'update', 'updateSettings']]);
-        // $this->middleware('permission:delete-subscription-package', ['only' => ['destroy', 'destroyMultiple']]);
+        $this->middleware('permission:subscription-packages', ['only' => ['index']]);
+        $this->middleware('permission:add-subscription-package', ['only' => ['create', 'store']]);
+        $this->middleware('permission:edit-subscription-package', ['only' => ['edit', 'update', 'updateSettings', 'toggleStatus']]);
+        $this->middleware('permission:delete-subscription-package', ['only' => ['destroy', 'destroyMultiple']]);
+        $this->middleware('permission:show-subscription-package', ['only' => ['show']]);
 
         $this->model = SubscriptionPackage::class;
         $this->serviceName = new SubscriptionPackageService();

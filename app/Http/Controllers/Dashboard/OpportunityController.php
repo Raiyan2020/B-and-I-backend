@@ -15,8 +15,9 @@ class OpportunityController extends AdminBasicController
 {
     public function __construct(private readonly OpportunityService $opportunityService)
     {
-        // $this->middleware('permission:opportunities', ['only' => ['index', 'show']]);
-        // $this->middleware('permission:review-opportunity', ['only' => ['review']]);
+        $this->middleware('permission:opportunities', ['only' => ['index']]);
+        $this->middleware('permission:show-opportunity', ['only' => ['show']]);
+        $this->middleware('permission:review-opportunity', ['only' => ['review']]);
 
         $this->model = Opportunity::class;
         $this->directoryName = 'opportunities';

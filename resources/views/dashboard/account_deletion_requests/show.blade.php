@@ -229,6 +229,7 @@
                 </div>
 
                 @if($row->status === \App\Enums\AccountDeletionRequestStatus::Pending)
+                    @can('review-account-deletion-request')
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
@@ -263,6 +264,7 @@
                             </div>
                         </div>
                     </div>
+                    @endcan
                 @endif
 
                 @if($history->isNotEmpty())

@@ -210,37 +210,39 @@
                     </div>
                 </div>
 
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header"><h4 class="card-title">{{ __('dashboard.review_opportunity') }}</h4></div>
-                        <div class="card-body">
-                            <form class="form form-vertical store" method="POST" action="{{ route('admin.opportunities.review', $row) }}">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>{{ __('dashboard.table status') }}</label>
-                                            <select class="form-control" name="status" required>
-                                                @foreach($reviewStatuses as $value => $label)
-                                                    <option value="{{ $value }}" {{ $row->status->value === $value ? 'selected' : '' }}>{{ $label }}</option>
-                                                @endforeach
-                                            </select>
+                @can('review-opportunity')
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header"><h4 class="card-title">{{ __('dashboard.review_opportunity') }}</h4></div>
+                            <div class="card-body">
+                                <form class="form form-vertical store" method="POST" action="{{ route('admin.opportunities.review', $row) }}">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>{{ __('dashboard.table status') }}</label>
+                                                <select class="form-control" name="status" required>
+                                                    @foreach($reviewStatuses as $value => $label)
+                                                        <option value="{{ $value }}" {{ $row->status->value === $value ? 'selected' : '' }}>{{ $label }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label>{{ __('dashboard.review_note') }}</label>
+                                                <textarea class="form-control" name="review_note" rows="4">{{ $row->review_note }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-primary submit_button">{{ __('dashboard.save_review') }}</button>
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>{{ __('dashboard.review_note') }}</label>
-                                            <textarea class="form-control" name="review_note" rows="4">{{ $row->review_note }}</textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <button type="submit" class="btn btn-primary submit_button">{{ __('dashboard.save_review') }}</button>
-                                    </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endcan
             </div>
         </div>
     </div>

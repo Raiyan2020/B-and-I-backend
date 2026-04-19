@@ -23,7 +23,6 @@ class PermissionsSeeder extends Seeder
         DB::table('role_has_permissions')->truncate();
         Schema::enableForeignKeyConstraints();
         $permissions = [
-
             ['guard_name' => 'admin', 'name' => 'users'],
             ['guard_name' => 'admin', 'name' => 'add-user'],
             ['guard_name' => 'admin', 'name' => 'edit-user'],
@@ -67,14 +66,34 @@ class PermissionsSeeder extends Seeder
             ['guard_name' => 'admin', 'name' => 'features'],
             ['guard_name' => 'admin', 'name' => 'add-feature'],
             ['guard_name' => 'admin', 'name' => 'edit-feature'],
+            ['guard_name' => 'admin', 'name' => 'show-feature'],
             ['guard_name' => 'admin', 'name' => 'delete-feature'],
 
             ['guard_name' => 'admin', 'name' => 'subscription-packages'],
             ['guard_name' => 'admin', 'name' => 'add-subscription-package'],
             ['guard_name' => 'admin', 'name' => 'edit-subscription-package'],
+            ['guard_name' => 'admin', 'name' => 'show-subscription-package'],
             ['guard_name' => 'admin', 'name' => 'delete-subscription-package'],
+
+            ['guard_name' => 'admin', 'name' => 'opportunities'],
+            ['guard_name' => 'admin', 'name' => 'show-opportunity'],
+            ['guard_name' => 'admin', 'name' => 'review-opportunity'],
+
             ['guard_name' => 'admin', 'name' => 'investment-seats'],
+            ['guard_name' => 'admin', 'name' => 'show-investment-seat'],
+
             ['guard_name' => 'admin', 'name' => 'interest-requests'],
+            ['guard_name' => 'admin', 'name' => 'show-interest-request'],
+            ['guard_name' => 'admin', 'name' => 'award-interest-request'],
+
+            ['guard_name' => 'admin', 'name' => 'company-investor-interest-requests'],
+            ['guard_name' => 'admin', 'name' => 'profile-update-requests'],
+            ['guard_name' => 'admin', 'name' => 'review-profile-update-request'],
+            ['guard_name' => 'admin', 'name' => 'account-deletion-requests'],
+            ['guard_name' => 'admin', 'name' => 'review-account-deletion-request'],
+
+            ['guard_name' => 'admin', 'name' => 'platform-notifications'],
+            ['guard_name' => 'admin', 'name' => 'send-platform-notification'],
 
         ];
 

@@ -14,8 +14,8 @@ class AccountDeletionRequestController extends Controller
 {
     public function __construct(private readonly AccountDeletionRequestService $accountDeletionRequestService)
     {
-        $this->middleware('permission:users', ['only' => ['show']]);
-        $this->middleware('permission:edit-user', ['only' => ['review']]);
+        $this->middleware('permission:account-deletion-requests', ['only' => ['show']]);
+        $this->middleware('permission:review-account-deletion-request', ['only' => ['review']]);
     }
 
     public function show(AccountDeletionRequest $accountDeletionRequest): View

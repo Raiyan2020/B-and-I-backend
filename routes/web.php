@@ -16,6 +16,7 @@ use App\Http\Controllers\Dashboard\NotificationsController;
 use App\Http\Controllers\Dashboard\OpportunityController;
 use App\Http\Controllers\Dashboard\ProfileUpdateRequestController;
 use App\Http\Controllers\Dashboard\PreferredSectorController;
+use App\Http\Controllers\Dashboard\PlatformNotificationController;
 use App\Http\Controllers\Dashboard\RolesController;
 use App\Http\Controllers\Dashboard\SubscriptionPackageController;
 use App\Http\Controllers\Dashboard\UserController;
@@ -68,6 +69,11 @@ Route::group([
             Route::post('store', 'store')->name('generalSetting.store');
             Route::patch('terms', 'updateTerms')->name('generalSetting.terms.update');
             Route::patch('privacy', 'updatePrivacy')->name('generalSetting.privacy.update');
+        });
+
+        Route::controller(PlatformNotificationController::class)->group(function () {
+            Route::get('platform-notifications', 'index')->name('platform-notifications.index');
+            Route::post('platform-notifications', 'store')->name('platform-notifications.store');
         });
 
         // Admin specific routes (must be before Route::resources to avoid route conflict)

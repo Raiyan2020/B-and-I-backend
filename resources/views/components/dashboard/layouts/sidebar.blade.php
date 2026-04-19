@@ -36,92 +36,122 @@
 
             <li class=" navigation-header"><span></span></li>
 
-            <li class="{{ Route::is('admin.admins.*') ? 'active' : '' }} nav-item">
-                <a href="{{ route('admin.admins.index') }}"><i class="feather icon-shield"></i>
-                    <span class="menu-title" data-i18n="Admins">{{ __('dashboard.admins') }}</span></a>
-            </li>
+            @can('admins')
+                <li class="{{ Route::is('admin.admins.*') ? 'active' : '' }} nav-item">
+                    <a href="{{ route('admin.admins.index') }}"><i class="feather icon-shield"></i>
+                        <span class="menu-title" data-i18n="Admins">{{ __('dashboard.admins') }}</span></a>
+                </li>
+            @endcan
 
-            <li class="{{ Route::is('admin.roles.*') ? 'active' : '' }} nav-item">
-                <a href="{{ route('admin.roles.index') }}"><i class="feather icon-lock"></i>
-                    <span class="menu-title" data-i18n="Roles">{{ __('dashboard.roles list') }}</span></a>
-            </li>
+            @can('roles')
+                <li class="{{ Route::is('admin.roles.*') ? 'active' : '' }} nav-item">
+                    <a href="{{ route('admin.roles.index') }}"><i class="feather icon-lock"></i>
+                        <span class="menu-title" data-i18n="Roles">{{ __('dashboard.roles list') }}</span></a>
+                </li>
+            @endcan
 
-            <li class="{{ Route::is('admin.advertisers.*') ? 'active' : '' }} nav-item">
-                <a href="{{ route('admin.advertisers.index') }}"><i class="feather icon-briefcase"></i>
-                    <span class="menu-title" data-i18n="Advertisers">{{ __('dashboard.advertisers_companies') }}</span></a>
-            </li>
+            @can('users')
+                <li class="{{ Route::is('admin.advertisers.*') ? 'active' : '' }} nav-item">
+                    <a href="{{ route('admin.advertisers.index') }}"><i class="feather icon-briefcase"></i>
+                        <span class="menu-title" data-i18n="Advertisers">{{ __('dashboard.advertisers_companies') }}</span></a>
+                </li>
+            @endcan
 
-            <li class="{{ Route::is('admin.investors.*') ? 'active' : '' }} nav-item">
-                <a href="{{ route('admin.investors.index') }}"><i class="feather icon-trending-up"></i>
-                    <span class="menu-title" data-i18n="Investors">{{ __('dashboard.investors') }}</span></a>
-            </li>
+            @can('users')
+                <li class="{{ Route::is('admin.investors.*') ? 'active' : '' }} nav-item">
+                    <a href="{{ route('admin.investors.index') }}"><i class="feather icon-trending-up"></i>
+                        <span class="menu-title" data-i18n="Investors">{{ __('dashboard.investors') }}</span></a>
+                </li>
+            @endcan
             {{--            start new side bar--}}
 
 
-            <li class=" nav-item {{ Route::is('admin.categories.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.categories.index') }}">
-                    <i class="feather icon-list"></i>
-                    <span class="menu-title" data-i18n="Wish List">{{ __('dashboard.categories') }}</span></a>
-            </li>
+            @can('categories')
+                <li class=" nav-item {{ Route::is('admin.categories.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.categories.index') }}">
+                        <i class="feather icon-list"></i>
+                        <span class="menu-title" data-i18n="Wish List">{{ __('dashboard.categories') }}</span></a>
+                </li>
+            @endcan
 
-            {{-- @can('preferred-sectors') --}}
+            @can('preferred-sectors')
                 <li class=" nav-item {{ Route::is('admin.preferred_sectors.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.preferred_sectors.index') }}">
                         <i class="feather icon-target"></i>
                         <span class="menu-title">{{ __('dashboard.preferred sectors') }}</span></a>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
-            {{-- @can('about-us-items') --}}
+            @can('about-us-items')
                 <li class=" nav-item {{ Route::is('admin.about_us_items.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.about_us_items.index') }}">
                         <i class="feather icon-info"></i>
                         <span class="menu-title">{{ __('dashboard.about_us_management') }}</span></a>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
-            {{-- @can('features') --}}
+            @can('features')
                 <li class=" nav-item {{ Route::is('admin.features.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.features.index') }}">
                         <i class="feather icon-star"></i>
                         <span class="menu-title">{{ __('dashboard.features') }}</span></a>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
-            <li class=" nav-item {{ Route::is('admin.subscription_packages.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.subscription_packages.index') }}">
-                    <i class="feather icon-layers"></i>
-                    <span class="menu-title">{{ __('dashboard.subscription_packages_menu') }}</span></a>
-            </li>
+            @can('subscription-packages')
+                <li class=" nav-item {{ Route::is('admin.subscription_packages.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.subscription_packages.index') }}">
+                        <i class="feather icon-layers"></i>
+                        <span class="menu-title">{{ __('dashboard.subscription_packages_menu') }}</span></a>
+                </li>
+            @endcan
 
-            <li class=" nav-item {{ Route::is('admin.opportunities.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.opportunities.index') }}">
-                    <i class="feather icon-briefcase"></i>
-                    <span class="menu-title">{{ __('dashboard.opportunities_menu') }}</span></a>
-            </li>
+            @can('opportunities')
+                <li class=" nav-item {{ Route::is('admin.opportunities.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.opportunities.index') }}">
+                        <i class="feather icon-briefcase"></i>
+                        <span class="menu-title">{{ __('dashboard.opportunities_menu') }}</span></a>
+                </li>
+            @endcan
 
-            <li class=" nav-item {{ Route::is('admin.investment-seats.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.investment-seats.index') }}">
-                    <i class="feather icon-file-text"></i>
-                    <span class="menu-title">{{ __('dashboard.investment_seats_menu') }}</span></a>
-            </li>
+            @can('investment-seats')
+                <li class=" nav-item {{ Route::is('admin.investment-seats.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.investment-seats.index') }}">
+                        <i class="feather icon-file-text"></i>
+                        <span class="menu-title">{{ __('dashboard.investment_seats_menu') }}</span></a>
+                </li>
+            @endcan
 
-            <li class=" nav-item {{ Route::is('admin.interest-requests.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.interest-requests.index') }}">
-                    <i class="feather icon-mail"></i>
-                    <span class="menu-title">{{ __('dashboard.interest_requests_menu') }}</span></a>
-            </li>
+            @can('interest-requests')
+                <li class=" nav-item {{ Route::is('admin.interest-requests.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.interest-requests.index') }}">
+                        <i class="feather icon-mail"></i>
+                        <span class="menu-title">{{ __('dashboard.interest_requests_menu') }}</span></a>
+                </li>
+            @endcan
 
-            <li class=" nav-item {{ Route::is('admin.company-investor-interest-requests.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.company-investor-interest-requests.index') }}">
-                    <i class="feather icon-user-check"></i>
-                    <span class="menu-title">{{ __('dashboard.company_investor_interest_requests_menu') }}</span></a>
-            </li>
+            @can('company-investor-interest-requests')
+                <li class=" nav-item {{ Route::is('admin.company-investor-interest-requests.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.company-investor-interest-requests.index') }}">
+                        <i class="feather icon-user-check"></i>
+                        <span class="menu-title">{{ __('dashboard.company_investor_interest_requests_menu') }}</span></a>
+                </li>
+            @endcan
 
-            <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
-                <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>
-                    <span class="menu-title" data-i18n="Ecommerce">{{ __('dashboard.general settings') }}</span></a>
-            </li>
+            @can('show-settings')
+                <li class="{{ Route::is('admin.generalSetting.index') ? 'active' : '' }} nav-item">
+                    <a href="{{ route('admin.generalSetting.index') }}"><i class="feather icon-settings"></i>
+                        <span class="menu-title" data-i18n="Ecommerce">{{ __('dashboard.general settings') }}</span></a>
+                </li>
+            @endcan
+
+            @can('platform-notifications')
+                <li class=" nav-item {{ Route::is('admin.platform-notifications.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.platform-notifications.index') }}">
+                        <i class="feather icon-bell"></i>
+                        <span class="menu-title">{{ __('dashboard.platform_notifications') }}</span></a>
+                </li>
+            @endcan
 
         </ul>
     </div>

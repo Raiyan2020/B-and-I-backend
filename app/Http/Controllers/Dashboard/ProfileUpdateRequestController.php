@@ -15,8 +15,8 @@ class ProfileUpdateRequestController extends Controller
 {
     public function __construct(private readonly ProfileUpdateRequestService $profileUpdateRequestService)
     {
-        $this->middleware('permission:users', ['only' => ['show']]);
-        $this->middleware('permission:edit-user', ['only' => ['review']]);
+        $this->middleware('permission:profile-update-requests', ['only' => ['show']]);
+        $this->middleware('permission:review-profile-update-request', ['only' => ['review']]);
     }
 
     public function show(ProfileUpdateRequest $profileUpdateRequest): View

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Admin;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Role;
@@ -37,6 +38,7 @@ class AdminSeeder extends Seeder
             'is_blocked' => false,
         ]);
         $superAdmin->assignRole($superAdminRole);
+        $superAdmin->syncPermissions(Permission::query()->where('guard_name', 'admin')->get());
 
         // إنشاء admin عادي
         $admin = Admin::create([

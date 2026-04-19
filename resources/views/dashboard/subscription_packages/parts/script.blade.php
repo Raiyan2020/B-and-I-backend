@@ -1,5 +1,7 @@
 <script>
     $(document).ready(function() {
+        const canEdit = @json(auth('admin')->user()?->can('edit-subscription-package'));
+        const canDelete = @json(auth('admin')->user()?->can('delete-subscription-package'));
         var settingsPanelSelector = '#subscription-packages-settings-panel';
 
         function initPackagesPageEditorsOnce() {
@@ -124,22 +126,26 @@
                     data: 'id',
                     orderable: false,
                     render: function(data, type, row) {
+                        let actions = [];
                         let editRoute = '{{ route('admin.subscription_packages.edit', ':id') }}'.replace(':id', data);
                         let deleteRoute = '{{ route('admin.subscription_packages.destroy', ':id') }}'.replace(':id', data);
                         let toggleRoute = '{{ route('admin.subscription_packages.toggleStatus', ':id') }}'.replace(':id', data);
                         let statusTitle = row.status == 1 ?
                             '{{ __('dashboard.deactivate') }}' : '{{ __('dashboard.activate') }}';
-                        return `<div class="d-flex align-items-center gap-2">
-                            <a class="btn btn-sm btn-icon btn-outline-primary" href="${editRoute}" title="{{ __('dashboard.edit') }}">
+                        if (canEdit) {
+                            actions.push(`<a class="btn btn-sm btn-icon btn-outline-primary" href="${editRoute}" title="{{ __('dashboard.edit') }}">
                                 <i class="feather icon-edit text-primary"></i>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-icon btn-outline-${row.status == 1 ? 'warning' : 'success'} toggle-status-btn" data-url="${toggleRoute}" data-status="${row.status}" title="${statusTitle}">
+                            </a>`);
+                            actions.push(`<button type="button" class="btn btn-sm btn-icon btn-outline-${row.status == 1 ? 'warning' : 'success'} toggle-status-btn" data-url="${toggleRoute}" data-status="${row.status}" title="${statusTitle}">
                                 <i class="feather icon-${row.status == 1 ? 'x-circle' : 'check-circle'} text-${row.status == 1 ? 'warning' : 'success'}"></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger delete-row" data-url="${deleteRoute}" title="{{ __('dashboard.delete') }}">
+                            </button>`);
+                        }
+                        if (canDelete) {
+                            actions.push(`<button type="button" class="btn btn-sm btn-icon btn-outline-danger delete-row" data-url="${deleteRoute}" title="{{ __('dashboard.delete') }}">
                                 <i class="feather icon-trash-2 text-danger"></i>
-                            </button>
-                        </div>`;
+                            </button>`);
+                        }
+                        return `<div class="d-flex align-items-center gap-2">${actions.join('')}</div>`;
                     }
                 }
             ]
@@ -229,6 +235,9 @@
         });
 
         $('#save-settings-btn').on('click', function() {
+            if (!canEdit) {
+                return;
+            }
             if (typeof CKEDITOR !== 'undefined') {
                 ['packages_page_description_ar', 'packages_page_description_en'].forEach(function(id) {
                     if (CKEDITOR.instances[id]) {

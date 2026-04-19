@@ -579,4 +579,8 @@ return [
     'recent_investors' => 'أحدث المستثمرين',
     'recent_advertisers_companies' => 'أحدث المعلنين / الشركات',
     'latest_advertisements' => 'أحدث الإعلانات',
+    'platform_notifications' => 'إشعارات المنصة',
+    'send_to_group' => 'إرسال إلى',
+    'platform_notification_admins_except_me' => 'المشرفين عدا أنا',
+    'platform_notification_queued_successfully' => 'تمت جدولة إشعار المنصة وسيتم إرساله في الخلفية.',
 ];

@@ -60,17 +60,17 @@
                                     <div class="card-header">
                                         <h4 class="card-title mb-0">{{ __('dashboard.subscription_packages_list') }}
                                         </h4>
-                                        {{-- @can('add-subscription-package') --}}
-                                        <div class="row mb-2">
-                                            <div class="col-12 d-flex justify-content-end">
-                                                <a href="{{ route('admin.subscription_packages.create') }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    <i
-                                                        class="mr-1 feather icon-plus"></i>{{ __('dashboard.add_subscription_package') }}
-                                                </a>
+                                        @can('add-subscription-package')
+                                            <div class="row mb-2">
+                                                <div class="col-12 d-flex justify-content-end">
+                                                    <a href="{{ route('admin.subscription_packages.create') }}"
+                                                        class="btn btn-primary btn-sm">
+                                                        <i
+                                                            class="mr-1 feather icon-plus"></i>{{ __('dashboard.add_subscription_package') }}
+                                                    </a>
+                                                </div>
                                             </div>
-                                        </div>
-                                        {{-- @endcan --}}
+                                        @endcan
                                     </div>
                                     <div class="card-content">
                                         <div class="card-body card-dashboard">
