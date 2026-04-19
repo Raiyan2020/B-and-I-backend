@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\DeviceType;
 use App\Enums\NotificationCategory;
+use App\Enums\NotificationType;
 use App\Enums\OpportunityGoal;
 use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
@@ -21,6 +22,7 @@ use App\Models\Opportunity;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
+use App\Notifications\GeneralNotification;
 use Illuminate\Database\Seeder;
 
 class MarketplaceScenarioSeeder extends Seeder
@@ -335,64 +337,105 @@ class MarketplaceScenarioSeeder extends Seeder
     {
         $notifications = [
             [
-                'user_id' => $advertisers[1]->id,
-                'title_ar' => 'الإعلان يحتاج تعديل',
-                'title_en' => 'Opportunity needs revision',
-                'body_ar' => 'يرجى تحديث مؤشرات الأداء المالية في فرصة FleetOps Dispatch Platform ثم إعادة الإرسال.',
-                'body_en' => 'Please update the financial KPI section for FleetOps Dispatch Platform and submit it again.',
+                'notifiable_id' => $advertisers[1]->id,
+                'notifiable_type' => User::class,
+                'title' => [
+                    'ar' => 'الإعلان يحتاج تعديل',
+                    'en' => 'Opportunity needs revision',
+                ],
+                'body' => [
+                    'ar' => 'يرجى تحديث مؤشرات الأداء المالية في فرصة FleetOps Dispatch Platform ثم إعادة الإرسال.',
+                    'en' => 'Please update the financial KPI section for FleetOps Dispatch Platform and submit it again.',
+                ],
                 'notification_category' => NotificationCategory::System->value,
-                'notification_type' => 'opportunity.reviewed',
-                'model_type' => Opportunity::class,
+                'notification_type' => NotificationType::ChangeOpportunityStatus->value,
+                'model_type' => 'Opportunity',
                 'model_id' => $opportunities['fleetops']->id,
-                'payload' => ['status' => OpportunityStatus::NeedsRevision->value],
-                'seen' => false,
+                'payload' => [
+                    'status' => OpportunityStatus::NeedsRevision->value,
+                ],
+                'read_at' => null,
             ],
             [
-                'user_id' => $advertisers[1]->id,
-                'title_ar' => 'تم حجز الصفقة',
-                'title_en' => 'Deal moved to reserved',
-                'body_ar' => 'تمت ترقية فرصة Smart Logistics Hub إلى حالة reserved بعد دفعة أولية من المستثمر.',
-                'body_en' => 'Smart Logistics Hub has moved to reserved after an investor paid the initial deposit.',
+                'notifiable_id' => $advertisers[1]->id,
+                'notifiable_type' => User::class,
+                'title' => [
+                    'ar' => 'تم حجز الصفقة',
+                    'en' => 'Deal moved to reserved',
+                ],
+                'body' => [
+                    'ar' => 'تمت ترقية فرصة Smart Logistics Hub إلى حالة reserved بعد دفعة أولية من المستثمر.',
+                    'en' => 'Smart Logistics Hub has moved to reserved after an investor paid the initial deposit.',
+                ],
                 'notification_category' => NotificationCategory::Interest->value,
-                'notification_type' => 'opportunity.reserved',
-                'model_type' => Opportunity::class,
+                'notification_type' => NotificationType::ChangeOpportunityStatus->value,
+                'model_type' => 'Opportunity',
                 'model_id' => $opportunities['smart_logistics']->id,
-                'payload' => ['status' => OpportunityStatus::Reserved->value],
-                'seen' => false,
+                'payload' => [
+                    'status' => OpportunityStatus::Reserved->value,
+                ],
+                'read_at' => null,
             ],
             [
-                'user_id' => $investors[1]->id,
-                'title_ar' => 'تم إرسال طلب الاهتمام',
-                'title_en' => 'Interest request submitted',
-                'body_ar' => 'تم تسجيل طلب اهتمامك في فرصة Wellness Clinic Rollout بنجاح.',
-                'body_en' => 'Your interest request for Wellness Clinic Rollout has been recorded successfully.',
+                'notifiable_id' => $investors[1]->id,
+                'notifiable_type' => User::class,
+                'title' => [
+                    'ar' => 'تم إرسال طلب الاهتمام',
+                    'en' => 'Interest request submitted',
+                ],
+                'body' => [
+                    'ar' => 'تم تسجيل طلب اهتمامك في فرصة Wellness Clinic Rollout بنجاح.',
+                    'en' => 'Your interest request for Wellness Clinic Rollout has been recorded successfully.',
+                ],
                 'notification_category' => NotificationCategory::Interest->value,
-                'notification_type' => 'interest_request.created',
-                'model_type' => Opportunity::class,
+                'notification_type' => NotificationType::Generic->value,
+                'model_type' => 'Opportunity',
                 'model_id' => $opportunities['wellness_clinic']->id,
-                'payload' => ['status' => OpportunityStatus::Published->value],
-                'seen' => true,
+                'payload' => [
+                    'status' => OpportunityStatus::Published->value,
+                ],
+                'read_at' => now()->subDay(),
             ],
             [
-                'user_id' => $investors[3]->id,
-                'title_ar' => 'مقعدك مفعل',
-                'title_en' => 'Your seat is active',
-                'body_ar' => 'يمكنك الآن متابعة تفاصيل Precision Parts Manufacturing وتقديم اهتمامك عند الجاهزية.',
-                'body_en' => 'You can now review Precision Parts Manufacturing in more detail and submit your interest when ready.',
+                'notifiable_id' => $investors[3]->id,
+                'notifiable_type' => User::class,
+                'title' => [
+                    'ar' => 'مقعدك مفعل',
+                    'en' => 'Your seat is active',
+                ],
+                'body' => [
+                    'ar' => 'يمكنك الآن متابعة تفاصيل Precision Parts Manufacturing وتقديم اهتمامك عند الجاهزية.',
+                    'en' => 'You can now review Precision Parts Manufacturing in more detail and submit your interest when ready.',
+                ],
                 'notification_category' => NotificationCategory::Orders->value,
-                'notification_type' => 'seat.created',
-                'model_type' => Opportunity::class,
+                'notification_type' => NotificationType::PurchaseOpportunityBooklet->value,
+                'model_type' => 'Opportunity',
                 'model_id' => $opportunities['precision_parts']->id,
-                'payload' => ['status' => OpportunityStatus::Published->value],
-                'seen' => false,
+                'payload' => [
+                    'status' => OpportunityStatus::Published->value,
+                ],
+                'read_at' => null,
             ],
         ];
 
         foreach ($notifications as $notification) {
-            Notification::query()->create(array_merge($notification, [
+            Notification::query()->create([
+                'type' => GeneralNotification::class,
+                'notifiable_id' => $notification['notifiable_id'],
+                'notifiable_type' => $notification['notifiable_type'],
+                'notification_category' => $notification['notification_category'],
+                'data' => array_merge([
+                    'notification_type' => $notification['notification_type'],
+                    'notification_category' => $notification['notification_category'],
+                    'title' => $notification['title'],
+                    'body' => $notification['body'],
+                    'model_type' => $notification['model_type'],
+                    'model_id' => $notification['model_id'],
+                ], $notification['payload']),
+                'read_at' => $notification['read_at'],
                 'created_at' => now()->subDays(2),
                 'updated_at' => now()->subDays(2),
-            ]));
+            ]);
         }
     }
 
