@@ -19,6 +19,12 @@
                                 'completed' => 'secondary',
                                 default => 'primary',
                             };
+                            $statusValue = $row->status?->value;
+                            $shouldShowDeal = in_array($statusValue, ['reserved', 'completed'], true);
+                            $dealTitle = $statusValue === 'completed'
+                                ? __('dashboard.winning_deal')
+                                : __('dashboard.proposed_deal');
+                            $dealInterestRequest = $row->getRelation('dealInterestRequest');
                         @endphp
                         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                             <div class="d-flex align-items-center flex-wrap">
@@ -57,6 +63,62 @@
                         </div>
                     </div>
                 </div>
+
+                @if($shouldShowDeal)
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="card-title mb-0">
+                                    <i class="feather icon-award text-{{ $statusValue === 'completed' ? 'success' : 'info' }} mr-1"></i>
+                                    {{ $dealTitle }}
+                                </h4>
+                                <span class="badge badge-{{ $statusValue === 'completed' ? 'success' : 'info' }} badge-pill px-2 py-1 mt-1 mt-sm-0">
+                                    {{ __('dashboard.opportunity_status_'.$statusValue) }}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive overflow-auto">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr class="text text-center">
+                                                <th>#</th>
+                                                <th>{{ __('dashboard.investor') }}</th>
+                                                <th>{{ __('dashboard.table email') }}</th>
+                                                <th>{{ __('dashboard.table phone') }}</th>
+                                                <th>{{ __('dashboard.seat_reference') }}</th>
+                                                <th>{{ __('dashboard.price_paid') }}</th>
+                                                <th>{{ __('dashboard.submitted_at') }}</th>
+                                                <th>{{ __('dashboard.actions') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text text-center">
+                                            @if($dealInterestRequest)
+                                                <tr>
+                                                    <td>{{ $dealInterestRequest->id }}</td>
+                                                    <td>{{ $dealInterestRequest->user?->name ?: '-' }}</td>
+                                                    <td>{{ $dealInterestRequest->user?->email ?: '-' }}</td>
+                                                    <td>{{ $dealInterestRequest->user?->full_phone ?: '-' }}</td>
+                                                    <td>#{{ $dealInterestRequest->investment_seat_id }}</td>
+                                                    <td>{{ number_format((float) ($dealInterestRequest->investmentSeat?->price_paid ?? 0), 2) }}</td>
+                                                    <td>{{ $dealInterestRequest->created_at?->timezone(config('app.timezone'))->locale(app()->getLocale())->translatedFormat('d M Y - h:i A') ?? '-' }}</td>
+                                                    <td>
+                                                        <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.interest-requests.show', $dealInterestRequest) }}">
+                                                            <i class="feather icon-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @else
+                                                <tr>
+                                                    <td colspan="8">-</td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 <div class="col-lg-6 col-12">
                     <div class="card">

@@ -139,7 +139,7 @@ class OpportunityService
 
     public function findForDashboard(int $id): Opportunity
     {
-        return Opportunity::query()
+        $opportunity = Opportunity::query()
             ->with([
                 'category',
                 'user',
@@ -149,6 +149,22 @@ class OpportunityService
                 'interestRequests' => fn ($query) => $query->with(['user', 'investmentSeat'])->latest('id')->limit(10),
             ])
             ->findOrFail($id);
+
+        $dealInterestRequest = null;
+        $status = $opportunity->status?->value ?? $opportunity->status;
+
+        if (
+            $opportunity->investor_id
+            && in_array($status, [OpportunityStatus::Reserved->value, OpportunityStatus::Completed->value], true)
+        ) {
+            $dealInterestRequest = $opportunity->interestRequests()
+                ->with(['user', 'investmentSeat'])
+                ->where('user_id', $opportunity->investor_id)
+                ->latest('id')
+                ->first();
+        }
+
+        return $opportunity->setRelation('dealInterestRequest', $dealInterestRequest);
     }
 
     public function awardInterestRequest(

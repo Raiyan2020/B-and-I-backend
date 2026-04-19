@@ -18,10 +18,17 @@
         $myAdsCount = (int) ($row->my_ads_count ?? 0);
         $successfulDealsOnAdsCount = (int) ($row->successful_deals_on_ads_count ?? 0);
         $successfulDealsAsInvestorCount = (int) ($row->successful_deals_as_investor_count ?? 0);
+        $investmentSeatsCount = (int) ($row->investment_seats_count ?? 0);
+        $interestRequestsCount = (int) ($row->interest_requests_count ?? 0);
+        $reservedDealsCount = (int) ($row->reserved_deals_count ?? 0);
+        $successfulDealsCount = (int) ($row->successful_deals_count ?? 0);
         $latestInterestRequestsByUser = $latestInterestRequestsByUser ?? collect();
         $latestInvestmentSeatsByUser = $latestInvestmentSeatsByUser ?? collect();
         $latestSuccessfulDealsOnAds = $latestSuccessfulDealsOnAds ?? collect();
         $latestSuccessfulDealsAsInvestor = $latestSuccessfulDealsAsInvestor ?? collect();
+        $latestInvestorSuccessfulDeals = $latestInvestorSuccessfulDeals ?? collect();
+        $latestInvestorInvestmentSeats = $latestInvestorInvestmentSeats ?? collect();
+        $latestInvestorInterestRequests = $latestInvestorInterestRequests ?? collect();
         $walletTransactions = $row->walletTransactions ?? collect();
         $walletTransactionsCount = $row->wallet_transactions_count ?? $walletTransactions->count();
         $fullPhone = $row->full_phone ?: $notSpecified;
@@ -219,18 +226,12 @@
                             'value' => $companyInterestCount,
                             'tone' => 'info',
                         ],
-                        // [
-                        //     'icon' => 'shopping-cart',
-                        //     'label' => __('dashboard.total_orders'),
-                        //     'value' => $row->orders_count ?? 0,
-                        //     'tone' => 'success',
-                        // ],
                     ],
             ],
         ];
 
-        $stats = $isCompany
-            ? [
+        if ($isCompany) {
+            $stats = [
                 [
                     'label' => __('dashboard.investor_outreach_requests'),
                     'value' => $companyInterestCount,
@@ -267,8 +268,48 @@
                     'icon' => 'trash-2',
                     'tone' => 'danger',
                 ],
-            ]
-            : [
+            ];
+        } elseif ($isInvestor) {
+            $stats = [
+                [
+                    'label' => __('dashboard.investment_seats_count'),
+                    'value' => $investmentSeatsCount,
+                    'icon' => 'shopping-cart',
+                    'tone' => 'primary',
+                ],
+                [
+                    'label' => __('dashboard.interest_requests_count'),
+                    'value' => $interestRequestsCount,
+                    'icon' => 'send',
+                    'tone' => 'info',
+                ],
+                [
+                    'label' => __('dashboard.reserved_deals_for_investor'),
+                    'value' => $reservedDealsCount,
+                    'icon' => 'clock',
+                    'tone' => 'warning',
+                ],
+                [
+                    'label' => __('dashboard.successful_deals'),
+                    'value' => $successfulDealsCount,
+                    'icon' => 'award',
+                    'tone' => 'success',
+                ],
+                [
+                    'label' => __('dashboard.profile_update_requests'),
+                    'value' => $profileUpdateCount,
+                    'icon' => 'refresh-cw',
+                    'tone' => 'secondary',
+                ],
+                [
+                    'label' => __('dashboard.account_deletion_requests'),
+                    'value' => $accountDeletionCount,
+                    'icon' => 'trash-2',
+                    'tone' => 'danger',
+                ],
+            ];
+        } else {
+            $stats = [
                 [
                     'label' => __('dashboard.total_orders'),
                     'value' => $row->orders_count ?? 0,
@@ -300,6 +341,7 @@
                     'tone' => 'danger',
                 ],
             ];
+        }
     @endphp
 
     <div class="app-content content user-show-page">
@@ -515,30 +557,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        {{-- <div class="col-12 col-xl-4">
-                            <div class="card profile-section-card profile-wallet-card">
-                                <div class="card-header border-0 pb-0">
-                                    <h4 class="card-title mb-0">
-                                        <i class="feather icon-wallet text-primary mr-1"></i>
-                                        {{ __('dashboard.wallet_balance') }}
-                                    </h4>
-                                </div>
-
-                                <div class="card-body text-center">
-                                    <div class="profile-wallet-balance" id="wallet-balance-display">
-                                        {{ $row?->wallet?->available_balance ?? 0 }}
-                                        <span>{{ __('dashboard.currency') }}</span>
-                                    </div>
-                                    <p class="profile-stat-label mb-1">{{ __('dashboard.current_balance') }}</p>
-                                    <p class="profile-wallet-reserved mb-0">
-                                        {{ __('dashboard.reserved_balance') }}:
-                                        <strong id="reserved-balance-value">{{ $row?->wallet?->reserved_balance ?? 0 }}</strong>
-                                        {{ __('dashboard.currency') }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div> --}}
 
                         <div class="col-12 col-xl-12">
                             <div class="card profile-section-card profile-stats-card">
@@ -800,6 +818,189 @@
                                 </div>
                             </div>
                         @endif
+
+                        @if ($isInvestor)
+                            <div class="col-12">
+                                <div class="card profile-section-card">
+                                    <div class="card-header">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap w-100">
+                                            <h4 class="card-title mb-0">
+                                                <i class="feather icon-award text-success mr-1"></i>
+                                                {{ __('dashboard.successful_deals') }}
+                                            </h4>
+                                            <span
+                                                class="badge badge-pill badge-primary mt-1 mt-sm-0">{{ $successfulDealsCount }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body">
+                                        @if ($latestInvestorSuccessfulDeals->isNotEmpty())
+                                            <div class="table-responsive">
+                                                <table class="table table-hover profile-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>{{ __('dashboard.opportunity_reference') }}</th>
+                                                            <th>{{ __('dashboard.company_name') }}</th>
+                                                            <th>{{ __('dashboard.investment_required') }}</th>
+                                                            <th>{{ __('dashboard.deal_date') }}</th>
+                                                            <th>{{ __('dashboard.actions') }}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($latestInvestorSuccessfulDeals as $opportunity)
+                                                            <tr>
+                                                                <td>#{{ $opportunity->id }}</td>
+                                                                <td>{{ $opportunity->opportunity_number ? '#' . $opportunity->opportunity_number : ($opportunity->company_name ?? '-') }}
+                                                                </td>
+                                                                <td>{{ $opportunity->company_name ?? ($opportunity->user?->name ?? '-') }}
+                                                                </td>
+                                                                <td>{{ $opportunity->investment_required ?? '-' }}</td>
+                                                                <td>{{ $opportunity->reviewed_at?->format('Y-m-d H:i') ?? ($opportunity->updated_at?->format('Y-m-d H:i') ?? '-') }}
+                                                                </td>
+                                                                <td>
+                                                                    <a href="{{ route('admin.opportunities.show', $opportunity) }}"
+                                                                        class="btn btn-sm btn-outline-info"
+                                                                        title="{{ __('dashboard.show') }}">
+                                                                        <i class="feather icon-eye"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @else
+                                            <div class="profile-empty-state">
+                                                <i class="feather icon-inbox"></i>
+                                                <p>{{ __('dashboard.no_successful_deals_as_investor') }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-xl-6">
+                                <div class="card profile-section-card">
+                                    <div class="card-header">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap w-100">
+                                            <h4 class="card-title mb-0">
+                                                <i class="feather icon-shopping-cart text-primary mr-1"></i>
+                                                {{ __('dashboard.latest_investment_seats_by_user') }}
+                                            </h4>
+                                            <span
+                                                class="badge badge-pill badge-primary mt-1 mt-sm-0">{{ $latestInvestorInvestmentSeats->count() }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body">
+                                        @if ($latestInvestorInvestmentSeats->isNotEmpty())
+                                            <div class="table-responsive">
+                                                <table class="table table-hover profile-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>{{ __('dashboard.opportunity_reference') }}</th>
+                                                            <th>{{ __('dashboard.company_name') }}</th>
+                                                            <th>{{ __('dashboard.price_paid') }}</th>
+                                                            <th>{{ __('dashboard.purchased_at') }}</th>
+                                                            <th>{{ __('dashboard.actions') }}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($latestInvestorInvestmentSeats as $seat)
+                                                            <tr>
+                                                                <td>#{{ $seat->id }}</td>
+                                                                <td>{{ $seat->opportunity?->opportunity_number ? '#' . $seat->opportunity->opportunity_number : '-' }}
+                                                                </td>
+                                                                <td>{{ $seat->opportunity?->company_name ?? '-' }}</td>
+                                                                <td>{{ number_format((float) ($seat->price_paid ?? 0), 2) }}
+                                                                </td>
+                                                                <td>{{ $seat->purchased_at?->format('Y-m-d H:i') ?? '-' }}
+                                                                </td>
+                                                                <td>
+                                                                    <a href="{{ route('admin.investment-seats.show', $seat) }}"
+                                                                        class="btn btn-sm btn-outline-info"
+                                                                        title="{{ __('dashboard.show') }}">
+                                                                        <i class="feather icon-eye"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @else
+                                            <div class="profile-empty-state">
+                                                <i class="feather icon-inbox"></i>
+                                                <p>{{ __('dashboard.no_investment_seats_by_user') }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-xl-6">
+                                <div class="card profile-section-card">
+                                    <div class="card-header">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap w-100">
+                                            <h4 class="card-title mb-0">
+                                                <i class="feather icon-send text-info mr-1"></i>
+                                                {{ __('dashboard.latest_interest_requests_by_user') }}
+                                            </h4>
+                                            <span
+                                                class="badge badge-pill badge-primary mt-1 mt-sm-0">{{ $latestInvestorInterestRequests->count() }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body">
+                                        @if ($latestInvestorInterestRequests->isNotEmpty())
+                                            <div class="table-responsive">
+                                                <table class="table table-hover profile-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>{{ __('dashboard.opportunity_reference') }}</th>
+                                                            <th>{{ __('dashboard.company_name') }}</th>
+                                                            <th>{{ __('dashboard.seat_reference') }}</th>
+                                                            <th>{{ __('dashboard.submitted_at') }}</th>
+                                                            <th>{{ __('dashboard.actions') }}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($latestInvestorInterestRequests as $interestRequest)
+                                                            <tr>
+                                                                <td>#{{ $interestRequest->id }}</td>
+                                                                <td>{{ $interestRequest->opportunity?->opportunity_number ? '#' . $interestRequest->opportunity->opportunity_number : '-' }}
+                                                                </td>
+                                                                <td>{{ $interestRequest->opportunity?->company_name ?? '-' }}
+                                                                </td>
+                                                                <td>#{{ $interestRequest->investment_seat_id }}</td>
+                                                                <td>{{ $interestRequest->created_at?->format('Y-m-d H:i') ?? '-' }}
+                                                                </td>
+                                                                <td>
+                                                                    <a href="{{ route('admin.interest-requests.show', $interestRequest) }}"
+                                                                        class="btn btn-sm btn-outline-info"
+                                                                        title="{{ __('dashboard.show') }}">
+                                                                        <i class="feather icon-eye"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @else
+                                            <div class="profile-empty-state">
+                                                <i class="feather icon-inbox"></i>
+                                                <p>{{ __('dashboard.no_interest_requests_by_user') }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="col-12">
                             <div class="card profile-section-card">
                                 <div class="card-header">
@@ -873,81 +1074,6 @@
                             </div>
                         </div>
 
-                        {{-- <div class="col-12">
-                                <div class="card profile-section-card">
-                                    <div class="card-header">
-                                        <div class="d-flex align-items-center justify-content-between flex-wrap w-100">
-                                            <h4 class="card-title mb-0">
-                                                <i class="feather icon-credit-card text-success mr-1"></i>
-                                                {{ __('dashboard.recent_wallet_transactions') }}
-                                            </h4>
-
-                                            <span class="badge badge-pill badge-primary mt-1 mt-sm-0" id="wallet-transactions-count">{{ $walletTransactionsCount }}</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="card-body">
-                                        <div
-                                            class="table-responsive"
-                                            id="transactions-table-wrapper"
-                                            style="{{ $walletTransactions->isNotEmpty() ? '' : 'display: none;' }}"
-                                        >
-                                            <table class="table table-hover profile-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>{{ __('dashboard.transaction_type') }}</th>
-                                                        <th>{{ __('dashboard.amount') }}</th>
-                                                        <th>{{ __('dashboard.balance_after') }}</th>
-                                                        <th>{{ __('dashboard.date') }}</th>
-                                                        <th>{{ __('dashboard.status') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="wallet-transactions-tbody">
-                                                    @foreach ($walletTransactions->take(10) as $transaction)
-                                                        @php
-                                                            $typeValue = $transaction->type instanceof \App\Enums\WalletTransactionTypeEnum
-                                                                ? $transaction->type->value
-                                                                : (is_object($transaction->type) && isset($transaction->type->value)
-                                                                    ? $transaction->type->value
-                                                                    : (int) $transaction->type);
-                                                            $typeObj = \App\Enums\WalletTransactionTypeEnum::getFullObj($typeValue);
-                                                            $isCharge = $typeValue === \App\Enums\WalletTransactionTypeEnum::CHARGE->value;
-                                                            $isPayment = $typeValue === \App\Enums\WalletTransactionTypeEnum::PAYMENT->value;
-                                                        @endphp
-                                                        <tr>
-                                                            <td>
-                                                                <span class="badge badge-{{ $isCharge ? 'success' : ($isPayment ? 'danger' : 'warning') }}">
-                                                                    {{ $typeObj['label'] }}
-                                                                </span>
-                                                            </td>
-                                                            <td>
-                                                                <strong class="text-{{ $isCharge ? 'success' : ($isPayment ? 'danger' : 'warning') }}">
-                                                                    {{ $isCharge ? '+' : '-' }}{{ $transaction?->amount }} {{ __('dashboard.currency') }}
-                                                                </strong>
-                                                            </td>
-                                                            <td>{{ $transaction?->balance_after ?? 0 }} {{ __('dashboard.currency') }}</td>
-                                                            <td>{{ $transaction?->created_at?->format('Y-m-d H:i') ?? '-' }}</td>
-                                                            <td>
-                                                                <span class="badge badge-success">{{ __('dashboard.completed') }}</span>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <div
-                                            class="profile-empty-state"
-                                            id="no-transactions-message"
-                                            style="{{ $walletTransactions->isNotEmpty() ? 'display: none;' : '' }}"
-                                        >
-                                            <i class="feather icon-inbox"></i>
-                                            <p>{{ __('dashboard.no_wallet_transactions') }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
-
                         <div class="col-12">
                             <div class="card profile-section-card">
                                 <div class="card-header">
@@ -1020,63 +1146,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        {{-- <div class="col-12">
-                            <div class="card profile-section-card">
-                                <div class="card-header">
-                                    <h4 class="card-title mb-0">
-                                        <i class="feather icon-shopping-cart text-primary mr-1"></i>
-                                        {{ __('dashboard.recent_orders') }}
-                                    </h4>
-                                </div>
-
-                                <div class="card-body">
-                                    @if (isset($row->orders) && $row->orders && $row->orders->count() > 0)
-                                        <div class="table-responsive">
-                                            <table class="table table-hover profile-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>{{ __('dashboard.order_number') }}</th>
-                                                        <th>{{ __('dashboard.order status') }}</th>
-                                                        <th>{{ __('dashboard.total price') }}</th>
-                                                        <th>{{ __('dashboard.date') }}</th>
-                                                        <th>{{ __('dashboard.actions') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($row->orders->take(10) as $order)
-                                                        <tr>
-                                                            <td>#{{ $order->id }}</td>
-                                                            <td>
-                                                                <span
-                                                                    class="badge badge-{{ $order->status === 'completed' ? 'success' : ($order->status === 'pending' ? 'warning' : 'danger') }}">
-                                                                    {{ __('dashboard.' . $order->status) }}
-                                                                </span>
-                                                            </td>
-                                                            <td>{{ $order->total_price ?? 0 }}
-                                                                {{ __('dashboard.currency') }}</td>
-                                                            <td>{{ $order->created_at ? $order->created_at->format('Y-m-d H:i') : '-' }}
-                                                            </td>
-                                                            <td>
-                                                                <a href="#"
-                                                                    class="btn btn-sm btn-outline-primary">
-                                                                    <i class="feather icon-eye"></i>
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    @else
-                                        <div class="profile-empty-state">
-                                            <i class="feather icon-shopping-cart"></i>
-                                            <p>{{ __('dashboard.no_orders') }}</p>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div> --}}
                     </div>
                 </section>
             </div>

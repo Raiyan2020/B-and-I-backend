@@ -240,11 +240,14 @@ class UserController extends AdminBasicController
             $row->setAttribute('pending_orders_count', 0);
         }
 
-        $companyDashboardData = [
+        $userShowData = [
             'latestInterestRequestsByUser' => collect(),
             'latestInvestmentSeatsByUser' => collect(),
             'latestSuccessfulDealsOnAds' => collect(),
             'latestSuccessfulDealsAsInvestor' => collect(),
+            'latestInvestorSuccessfulDeals' => collect(),
+            'latestInvestorInvestmentSeats' => collect(),
+            'latestInvestorInterestRequests' => collect(),
         ];
 
         if ($row->isCompany()) {
@@ -266,7 +269,7 @@ class UserController extends AdminBasicController
                 $row->setAttribute('successful_deals_as_investor_count', 0);
             }
 
-            $companyDashboardData = [
+            $userShowData = [
                 'latestInterestRequestsByUser' => $row->interestRequests()
                     ->with(['opportunity.user', 'investmentSeat'])
                     ->whereHas('opportunity', fn ($query) => $query->where('user_id', '!=', $row->id))
@@ -292,12 +295,56 @@ class UserController extends AdminBasicController
                     ->latest('id')
                     ->take(5)
                     ->get(),
+                'latestInvestorSuccessfulDeals' => collect(),
+                'latestInvestorInvestmentSeats' => collect(),
+                'latestInvestorInterestRequests' => collect(),
+            ];
+        } elseif ($this->resolveRole($row->role) === UserRole::Investor) {
+            try {
+                $row->loadCount([
+                    'investmentSeats as investment_seats_count',
+                    'interestRequests as interest_requests_count',
+                    'awardedOpportunities as reserved_deals_count' => function ($query) {
+                        $query->where('status', OpportunityStatus::Reserved->value);
+                    },
+                    'awardedOpportunities as successful_deals_count' => function ($query) {
+                        $query->where('status', OpportunityStatus::Completed->value);
+                    },
+                ]);
+            } catch (\Exception $e) {
+                $row->setAttribute('investment_seats_count', 0);
+                $row->setAttribute('interest_requests_count', 0);
+                $row->setAttribute('reserved_deals_count', 0);
+                $row->setAttribute('successful_deals_count', 0);
+            }
+
+            $userShowData = [
+                'latestInterestRequestsByUser' => collect(),
+                'latestInvestmentSeatsByUser' => collect(),
+                'latestSuccessfulDealsOnAds' => collect(),
+                'latestSuccessfulDealsAsInvestor' => collect(),
+                'latestInvestorSuccessfulDeals' => $row->awardedOpportunities()
+                    ->with('user')
+                    ->where('status', OpportunityStatus::Completed->value)
+                    ->latest('id')
+                    ->take(5)
+                    ->get(),
+                'latestInvestorInvestmentSeats' => $row->investmentSeats()
+                    ->with(['opportunity.user'])
+                    ->latest('id')
+                    ->take(5)
+                    ->get(),
+                'latestInvestorInterestRequests' => $row->interestRequests()
+                    ->with(['opportunity.user', 'investmentSeat'])
+                    ->latest('id')
+                    ->take(5)
+                    ->get(),
             ];
         }
 
         return view('dashboard.' . $this->directoryName . '.show', array_merge(
             ['row' => $row],
-            $companyDashboardData,
+            $userShowData,
             $this->roleContext($this->resolveRole($row->role)),
             $this->roleSpecificContext($this->resolveRole($row->role)),
         ));
