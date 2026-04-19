@@ -105,6 +105,97 @@
 
 
 <x-dashboard.layouts.footer />
+// Firebase Admin Dashboard Setup //
+@php
+    $firebaseConfig = [
+        'apiKey' => config('services.firebase.api_key'),
+        'authDomain' => config('services.firebase.auth_domain'),
+        'projectId' => config('services.firebase.project_id'),
+        'storageBucket' => config('services.firebase.storage_bucket'),
+        'messagingSenderId' => config('services.firebase.messaging_sender_id'),
+        'appId' => config('services.firebase.app_id'),
+        'vapidKey' => config('services.firebase.vapid_key'),
+        'tokenEndpoint' => route('admin.fcmToken'),
+        'locale' => app()->getLocale(),
+        'csrfToken' => csrf_token(),
+    ];
+@endphp
+@if (filled(config('services.firebase.api_key')) && filled(config('services.firebase.messaging_sender_id')) && filled(config('services.firebase.app_id')))
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js';
+        import { getMessaging, getToken, isSupported, onMessage } from 'https://www.gstatic.com/firebasejs/12.12.0/firebase-messaging.js';
+
+        const firebaseConfig = @json($firebaseConfig);
+
+        async function registerAdminFirebaseToken() {
+            if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+                return;
+            }
+
+            const supported = await isSupported().catch(() => false);
+            if (!supported) {
+                return;
+            }
+
+            const app = initializeApp(firebaseConfig);
+            const messaging = getMessaging(app);
+            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+
+            if (Notification.permission === 'default') {
+                await Notification.requestPermission();
+            }
+
+            if (Notification.permission !== 'granted') {
+                return;
+            }
+
+            const tokenOptions = {
+                serviceWorkerRegistration: registration,
+            };
+
+            if (firebaseConfig.vapidKey) {
+                tokenOptions.vapidKey = firebaseConfig.vapidKey;
+            }
+
+            const token = await getToken(messaging, tokenOptions);
+            if (!token) {
+                return;
+            }
+
+            await fetch(firebaseConfig.tokenEndpoint, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': firebaseConfig.csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    token,
+                    device_type: 'web',
+                    locale: firebaseConfig.locale,
+                }),
+            });
+
+            onMessage(messaging, ({ notification, data }) => {
+                if (Notification.permission !== 'granted') {
+                    return;
+                }
+
+                const title = notification?.title || data?.title || 'New notification';
+                new Notification(title, {
+                    body: notification?.body || data?.body || '',
+                    icon: notification?.icon || data?.icon || '/favicon.ico',
+                });
+            });
+        }
+
+        registerAdminFirebaseToken().catch((error) => {
+            console.warn('Firebase admin dashboard setup failed:', error);
+        });
+    </script>
+@endif
+// End Firebase Admin Dashboard Setup //
 </body>
 <!-- END: Body-->
 

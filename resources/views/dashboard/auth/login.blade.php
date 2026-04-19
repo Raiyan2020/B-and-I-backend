@@ -528,7 +528,10 @@
                                         <div class="card-content">
                                             <div class="card-body pt-1">
                                                 <form action="{{ route('admin.startSession') }}" method="POST">
-                                                    @csrf
+                                                     @csrf
+                                                    {{--// Firebase Admin Dashboard Setup--}}
+                                                    <input type="hidden" name="device_token" id="device-token">
+                                                    <input type="hidden" name="device_type" value="web">
                                                     <fieldset
                                                         class="form-label-group form-group position-relative has-icon-left">
                                                         <input type="email" class="form-control" id="user-name"
@@ -600,6 +603,19 @@
     <script src="{{ asset('dashboardAssets/custom/js/html-validation.js') }}"></script>
 
     <!-- BEGIN: Page JS-->
+    {{-- // Firebase Admin Dashboard Setup --}}
+    @php
+        $firebaseConfig = [
+            'apiKey' => config('services.firebase.api_key'),
+            'authDomain' => config('services.firebase.auth_domain'),
+            'projectId' => config('services.firebase.project_id'),
+            'storageBucket' => config('services.firebase.storage_bucket'),
+            'messagingSenderId' => config('services.firebase.messaging_sender_id'),
+            'appId' => config('services.firebase.app_id'),
+            'vapidKey' => config('services.firebase.vapid_key'),
+        ];
+    @endphp
+    {{-- // Firebase Admin Dashboard Setup --}}
     <script>
         $(document).ready(function() {
             // Dark Mode Toggle
@@ -635,6 +651,55 @@
             });
         });
     </script>
+    {{-- // Firebase Admin Dashboard Setup --}}
+    @if (filled(config('services.firebase.api_key')) && filled(config('services.firebase.messaging_sender_id')) && filled(config('services.firebase.app_id')))
+        <script type="module">
+            import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js';
+            import { getMessaging, getToken, isSupported } from 'https://www.gstatic.com/firebasejs/12.12.0/firebase-messaging.js';
+
+            const firebaseConfig = @json($firebaseConfig);
+            const deviceTokenInput = document.getElementById('device-token');
+
+            async function setupAdminWebPush() {
+                if (!deviceTokenInput || !('serviceWorker' in navigator) || !('Notification' in window)) {
+                    return;
+                }
+
+                const supported = await isSupported().catch(() => false);
+                if (!supported) {
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                const messaging = getMessaging(app);
+                const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                const permission = await Notification.requestPermission();
+
+                if (permission !== 'granted') {
+                    return;
+                }
+
+                const tokenOptions = {
+                    serviceWorkerRegistration: registration,
+                };
+
+                if (firebaseConfig.vapidKey) {
+                    tokenOptions.vapidKey = firebaseConfig.vapidKey;
+                }
+
+                const token = await getToken(messaging, tokenOptions);
+
+                if (token) {
+                    deviceTokenInput.value = token;
+                }
+            }
+
+            setupAdminWebPush().catch((error) => {
+                console.warn('Firebase admin login setup failed:', error);
+            });
+        </script>
+    @endif
+    {{-- // Firebase Admin Dashboard Setup --}}
     <!-- END: Page JS-->
 
 </body>

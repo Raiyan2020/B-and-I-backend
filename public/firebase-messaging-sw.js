@@ -1,14 +1,50 @@
+// // Firebase Admin Dashboard Setup
 importScripts('https://www.gstatic.com/firebasejs/8.3.2/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.3.2/firebase-messaging.js');
 
 firebase.initializeApp({
-    apiKey: "AIzaSyAKYL_WxuH0krn4e1wbwwJTUUEWoIZbQIY",
-    projectId: "restaurants-f7a7e",
-    messagingSenderId: "747019248975",
-    appId: "1:747019248975:web:9869b9fbac45d09fecd13a",
+    apiKey: "AIzaSyCKgdoyzkATKnK1hY_pfCciSzMdkj0GCQ0",
+    authDomain: "bandi-c8de1.firebaseapp.com",
+    projectId: "bandi-c8de1",
+    storageBucket: "bandi-c8de1.firebasestorage.app",
+    messagingSenderId: "1081174689553",
+    appId: "1:1081174689553:web:8596f2da5ca687a5c1aeb0",
 });
 
 const messaging = firebase.messaging();
-messaging.setBackgroundMessageHandler(function({data:{title,body,icon}}) {
-    return self.registration.showNotification(title,{body,icon});
+messaging.setBackgroundMessageHandler(function(payload) {
+    const notification = payload.notification || {};
+    const data = payload.data || {};
+    const title = notification.title || data.title || 'New notification';
+
+    return self.registration.showNotification(title, {
+        body: notification.body || data.body || '',
+        icon: notification.icon || data.icon || '/favicon.ico',
+        data: {
+            click_action: data.click_action || notification.click_action || '/',
+        },
+    });
+});
+
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+
+    const targetUrl = event.notification?.data?.click_action || "/";
+
+    event.waitUntil(
+        clients
+            .matchAll({ type: "window", includeUncontrolled: true })
+            .then(function (clientList) {
+                for (const client of clientList) {
+                    if (client.url === targetUrl && "focus" in client) {
+                        return client.focus();
+                    }
+                }
+
+                if (clients.openWindow) {
+                    return clients.openWindow(targetUrl);
+                }
+            }),
+    );
+    // End Firebase Admin Dashboard Setup
 });

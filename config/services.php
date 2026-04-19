@@ -29,13 +29,19 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-
+    // // Firebase Admin Dashboard Setup
     'firebase' => [
         'project_id' => env('FIREBASE_PROJECT_ID'),
+        'api_key' => env('FIREBASE_API_KEY'),
+        'auth_domain' => env('FIREBASE_AUTH_DOMAIN'),
+        'storage_bucket' => env('FIREBASE_STORAGE_BUCKET'),
+        'messaging_sender_id' => env('FIREBASE_MESSAGING_SENDER_ID'),
+        'app_id' => env('FIREBASE_APP_ID'),
+        'vapid_key' => env('FIREBASE_VAPID_KEY'),
         'credentials_path' => env('FIREBASE_CREDENTIALS_PATH'),
         'credentials_json' => env('FIREBASE_CREDENTIALS_JSON'),
         'legacy_server_key' => env('FIREBASE_LEGACY_SERVER_KEY'),
         'timeout' => env('FIREBASE_TIMEOUT', 10),
     ],
-
+    // End Firebase Admin Dashboard Setup
 ];
