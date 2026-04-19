@@ -67,7 +67,14 @@ class AuthController extends Controller
         return back()->with(['error'=>__('dashboard.email or password or both are wrong')]);
     }
 
-    public function logout(){
+    public function logout(Request $request){
+        if (auth('admin')->check() && $request->filled('device_token')) {
+            $this->deviceService->forgetAdminDevice(
+                auth('admin')->user(),
+                $request->string('device_token')->toString(),
+            );
+        }
+
         Auth::logout();
         return redirect()-> route('admin.login');
     }

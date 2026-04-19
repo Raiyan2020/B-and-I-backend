@@ -105,7 +105,6 @@
 
 
 <x-dashboard.layouts.footer />
-// Firebase Admin Dashboard Setup //
 @php
     $firebaseConfig = [
         'apiKey' => config('services.firebase.api_key'),
@@ -116,6 +115,8 @@
         'appId' => config('services.firebase.app_id'),
         'vapidKey' => config('services.firebase.vapid_key'),
         'tokenEndpoint' => route('admin.fcmToken'),
+        'deleteTokenEndpoint' => route('admin.fcmToken.destroy'),
+        'logoutUrl' => route('admin.logout'),
         'locale' => app()->getLocale(),
         'csrfToken' => csrf_token(),
     ];
@@ -126,6 +127,60 @@
         import { getMessaging, getToken, isSupported, onMessage } from 'https://www.gstatic.com/firebasejs/12.12.0/firebase-messaging.js';
 
         const firebaseConfig = @json($firebaseConfig);
+        const adminTokenStorageKey = 'admin_firebase_device_token';
+        const notificationCounter = document.getElementById('notification-counter');
+        const notificationHeaderCount = document.getElementById('notification-header-count');
+        const notificationList = document.getElementById('notification-list');
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function incrementNotificationCounter() {
+            if (!notificationCounter || !notificationHeaderCount) {
+                return;
+            }
+
+            const currentCount = Number.parseInt(notificationCounter.textContent || '0', 10) || 0;
+            const nextCount = currentCount + 1;
+
+            notificationCounter.textContent = String(nextCount);
+
+            const newLabel = notificationHeaderCount.textContent?.trim().replace(/^\d+/, String(nextCount));
+            notificationHeaderCount.textContent = newLabel || String(nextCount);
+        }
+
+        function prependNotificationItem({ notificationId, title, body, clickAction }) {
+            if (!notificationList || !notificationId) {
+                return;
+            }
+
+            if (document.getElementById(`notification-${notificationId}`)) {
+                return;
+            }
+
+            const item = document.createElement('a');
+            item.className = 'd-flex justify-content-between notification-link';
+            item.id = `notification-${notificationId}`;
+            item.href = clickAction || `/admin/notifications/${notificationId}/read`;
+            item.innerHTML = `
+                <div class="media d-flex align-items-start">
+                    <div class="media-left"><i class="feather icon-x-circle font-medium-5 primary"></i></div>
+                    <div class="media-body">
+                        <h6 class="primary media-heading">${escapeHtml(title)}!</h6>
+                        <small class="notification-text">${escapeHtml(body)}</small>
+                    </div>
+                    <small><time class="media-meta">${escapeHtml(new Date().toLocaleString())}</time></small>
+                </div>
+            `;
+
+            notificationList.prepend(item);
+        }
 
         async function registerAdminFirebaseToken() {
             if (!('serviceWorker' in navigator) || !('Notification' in window)) {
@@ -162,7 +217,7 @@
                 return;
             }
 
-            await fetch(firebaseConfig.tokenEndpoint, {
+            const response = await fetch(firebaseConfig.tokenEndpoint, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -177,25 +232,84 @@
                 }),
             });
 
+            if (!response.ok) {
+                throw new Error(`Failed to sync admin Firebase token: ${response.status}`);
+            }
+
+            localStorage.setItem(adminTokenStorageKey, token);
+
             onMessage(messaging, ({ notification, data }) => {
                 if (Notification.permission !== 'granted') {
                     return;
                 }
 
                 const title = notification?.title || data?.title || 'New notification';
-                new Notification(title, {
-                    body: notification?.body || data?.body || '',
+                const body = notification?.body || data?.body || '';
+                const notificationId = data?.notification_id || '';
+                const clickAction = notificationId
+                    ? `/admin/notifications/${notificationId}/read`
+                    : (data?.click_action || notification?.click_action || '/');
+
+                incrementNotificationCounter();
+                prependNotificationItem({
+                    notificationId,
+                    title,
+                    body,
+                    clickAction,
+                });
+
+                registration.showNotification(title, {
+                    body,
                     icon: notification?.icon || data?.icon || '/favicon.ico',
+                    data: {
+                        click_action: clickAction,
+                    },
                 });
             });
         }
+
+        async function deleteAdminFirebaseToken() {
+            const token = localStorage.getItem(adminTokenStorageKey);
+            if (!token) {
+                return;
+            }
+
+            const response = await fetch(firebaseConfig.deleteTokenEndpoint, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': firebaseConfig.csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ token }),
+                keepalive: true,
+            });
+
+            if (response.ok) {
+                localStorage.removeItem(adminTokenStorageKey);
+            }
+        }
+
+        document.querySelectorAll('.js-admin-logout').forEach((link) => {
+            link.addEventListener('click', async (event) => {
+                event.preventDefault();
+
+                try {
+                    await deleteAdminFirebaseToken();
+                } catch (error) {
+                    console.warn('Firebase admin logout cleanup failed:', error);
+                }
+
+                window.location.href = `${firebaseConfig.logoutUrl}?device_token=${encodeURIComponent(localStorage.getItem(adminTokenStorageKey) || '')}`;
+            });
+        });
 
         registerAdminFirebaseToken().catch((error) => {
             console.warn('Firebase admin dashboard setup failed:', error);
         });
     </script>
 @endif
-// End Firebase Admin Dashboard Setup //
 </body>
 <!-- END: Body-->
 

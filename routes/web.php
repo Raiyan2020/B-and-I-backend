@@ -163,5 +163,6 @@ Route::group([
         Route::get('notifications/read-all', [NotificationsController::class, 'readAll'])->name('notifications.read_all');
         Route::get('notifications/{notification}/read', [NotificationsController::class, 'read'])->name('notifications.read');
         Route::patch('/fcm-token', [NotificationsController::class, 'updateToken'])->name('fcmToken');
+        Route::delete('/fcm-token', [NotificationsController::class, 'destroyToken'])->name('fcmToken.destroy');
     });
 });

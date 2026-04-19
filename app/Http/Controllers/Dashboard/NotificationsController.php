@@ -53,4 +53,28 @@ class NotificationsController extends Controller
             ],500);
         }
     }
+
+    public function destroyToken(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'token' => ['required', 'string', 'max:2048'],
+            ]);
+
+            $this->deviceService->forgetAdminDevice(
+                auth('admin')->user(),
+                $validated['token'],
+            );
+
+            return response()->json([
+                'success' => true,
+            ]);
+        } catch (\Exception $e) {
+            report($e);
+
+            return response()->json([
+                'success' => false,
+            ], 500);
+        }
+    }
 }

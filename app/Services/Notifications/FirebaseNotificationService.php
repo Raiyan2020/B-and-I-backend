@@ -4,6 +4,7 @@ namespace App\Services\Notifications;
 
 use App\Enums\DeviceType;
 use App\Models\Admin;
+use App\Models\GeneralSetting;
 use App\Models\User;
 use App\Services\Devices\DeviceService;
 use App\Traits\SendsFirebaseNotifications;
@@ -64,12 +65,24 @@ class FirebaseNotificationService
     private function resolveLocalizedMessage(array $message, string $locale): array
     {
         $resolvedLocale = in_array($locale, ['ar', 'en'], true) ? $locale : app()->getLocale();
+        $defaultIcon = $this->defaultNotificationIcon();
 
         return [
             'title' => $message['title'][$resolvedLocale] ?? $message['title']['en'] ?? $message['title']['ar'] ?? '',
             'body' => $message['body'][$resolvedLocale] ?? $message['body']['en'] ?? $message['body']['ar'] ?? '',
             'click_action' => $message['click_action'] ?? null,
-            'icon' => $message['icon'] ?? null,
+            'icon' => $message['icon'] ?? $defaultIcon,
         ];
+    }
+
+    private function defaultNotificationIcon(): string
+    {
+        $favicon = GeneralSetting::getValueForKey('favicon2');
+
+        if (filled($favicon)) {
+            return asset('Site/assets/images/logo/'.$favicon);
+        }
+
+        return asset('dashboardAssets/app-assets/images/logo/N-FAVICON.png');
     }
 }

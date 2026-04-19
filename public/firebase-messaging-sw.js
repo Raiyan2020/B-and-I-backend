@@ -1,6 +1,6 @@
 // // Firebase Admin Dashboard Setup
-importScripts('https://www.gstatic.com/firebasejs/8.3.2/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/8.3.2/firebase-messaging.js');
+importScripts('https://www.gstatic.com/firebasejs/12.12.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.12.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
     apiKey: "AIzaSyCKgdoyzkATKnK1hY_pfCciSzMdkj0GCQ0",
@@ -12,7 +12,8 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
-messaging.setBackgroundMessageHandler(function(payload) {
+
+messaging.onBackgroundMessage(function(payload) {
     const notification = payload.notification || {};
     const data = payload.data || {};
     const title = notification.title || data.title || 'New notification';

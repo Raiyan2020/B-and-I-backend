@@ -2,12 +2,12 @@
     <ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
         <li class="dropdown-menu-header">
             <div class="dropdown-header m-0 p-2">
-                <h3 class="white">{{$notifications->where('seen',0)->count() .' '.__('dashboard.New')}}</h3><span class="notification-title">{{__('dashboard.App Notifications')}}</span>
+                <h3 class="white" id="notification-header-count">{{$notifications->where('seen',0)->count() .' '.__('dashboard.New')}}</h3><span class="notification-title">{{__('dashboard.App Notifications')}}</span>
             </div>
         </li>
-        <li class="scrollable-container media-list">
+        <li class="scrollable-container media-list" id="notification-list">
             @foreach($notifications->where('seen',0) as $notification)
-            <a class="d-flex justify-content-between notification-link" id="{{$notification->id}}" href="{{route('admin.notifications.read',$notification->id)}}">
+            <a class="d-flex justify-content-between notification-link" id="notification-{{$notification->id}}" href="{{route('admin.notifications.read',$notification->id)}}">
                 <div class="media d-flex align-items-start">
                     <div class="media-left"><i class="feather icon-x-circle font-medium-5 primary"></i></div>
                     <div class="media-body">
@@ -19,7 +19,7 @@
             </a>
             @endforeach
             @foreach($notifications->where('seen',1) as $notification)
-            <a class="d-flex justify-content-between notification-link" id="{{$notification->id}}" href="{{route('admin.notifications.read',$notification->id)}}">
+            <a class="d-flex justify-content-between notification-link" id="notification-{{$notification->id}}" href="{{route('admin.notifications.read',$notification->id)}}">
                 <div class="media d-flex align-items-start">
                     <div class="media-left"><i class="feather icon-check-circle font-medium-5 info"></i></div>
                     <div class="media-body">

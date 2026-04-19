@@ -48,7 +48,7 @@
                                                                           href="{{route('admin.profile')}}"><i
                                     class="feather icon-user"></i> {{__('dashboard.Edit Profile')}}</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{route('admin.logout')}}"><i
+                            <a class="dropdown-item js-admin-logout" href="{{route('admin.logout')}}"><i
                                     class="feather icon-power"></i> {{__('dashboard.Logout')}}</a>
                         </div>
                     </li>

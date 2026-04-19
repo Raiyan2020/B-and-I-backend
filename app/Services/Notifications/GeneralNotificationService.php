@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\User;
 use App\Notifications\GeneralNotification;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class GeneralNotificationService
 {
@@ -20,13 +21,9 @@ class GeneralNotificationService
         $stored = Notification::query()->create(
             $notification->databaseAttributesFor($user)
         );
-
+        // Firebase Admin Dashboard Setup
         if ($this->notificationPreferenceService->isPushEnabled($user, $notification->category())) {
-            $this->firebaseNotificationService->sendToUser(
-                $user,
-                $notification->message(),
-                data: $notification->pushData($stored, $user),
-            );
+            $this->dispatchUserPushSafely($user, $notification, $stored);
         }
 
         return $stored;
@@ -37,12 +34,8 @@ class GeneralNotificationService
         $stored = Notification::query()->create(
             $notification->databaseAttributesForAdmin($admin)
         );
-
-        $this->firebaseNotificationService->sendToAdmin(
-            $admin,
-            $notification->message(),
-            data: $notification->pushDataForAdmin($stored, $admin),
-        );
+        // Firebase Admin Dashboard Setup
+        $this->dispatchAdminPushSafely($admin, $notification, $stored);
 
         return $stored;
     }
@@ -84,4 +77,45 @@ class GeneralNotificationService
 
         return $stored;
     }
+    // Firebase Admin Dashboard Setup
+    private function dispatchUserPushSafely(User $user, GeneralNotification $notification, Notification $stored): void
+    {
+        try {
+            $result = $this->firebaseNotificationService->sendToUser(
+                $user,
+                $notification->message(),
+                data: $notification->pushData($stored, $user),
+            );
+
+            Log::info('Firebase user push dispatch result', [
+                'user_id' => $user->id,
+                'notification_id' => $stored->id,
+                'category' => $notification->category()?->value ?? (string) $notification->category(),
+                'result' => $result,
+            ]);
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+    }
+
+    private function dispatchAdminPushSafely(Admin $admin, GeneralNotification $notification, Notification $stored): void
+    {
+        try {
+            $result = $this->firebaseNotificationService->sendToAdmin(
+                $admin,
+                $notification->message(),
+                data: $notification->pushDataForAdmin($stored, $admin),
+            );
+
+            Log::info('Firebase admin push dispatch result', [
+                'admin_id' => $admin->id,
+                'notification_id' => $stored->id,
+                'category' => $notification->category()?->value ?? (string) $notification->category(),
+                'result' => $result,
+            ]);
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+    }
+    //End Firebase Admin Dashboard Setup
 }

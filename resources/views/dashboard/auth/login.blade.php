@@ -659,6 +659,7 @@
 
             const firebaseConfig = @json($firebaseConfig);
             const deviceTokenInput = document.getElementById('device-token');
+            const adminTokenStorageKey = 'admin_firebase_device_token';
 
             async function setupAdminWebPush() {
                 if (!deviceTokenInput || !('serviceWorker' in navigator) || !('Notification' in window)) {
@@ -691,6 +692,7 @@
 
                 if (token) {
                     deviceTokenInput.value = token;
+                    localStorage.setItem(adminTokenStorageKey, token);
                 }
             }
 

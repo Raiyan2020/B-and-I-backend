@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 
 trait SendsFirebaseNotifications
 {
+     // Firebase Admin Dashboard Setup
     protected function sendWebNotifications(array $tokens, array $notification, array $data = []): array
     {
         return $this->sendFirebaseNotifications(DeviceType::Web, $tokens, $notification, $data);
@@ -135,23 +136,27 @@ trait SendsFirebaseNotifications
         ];
 
         if ($deviceType === DeviceType::Web) {
-            $message['webpush'] = [
-                'notification' => array_filter([
-                    'title' => $notification['title'],
-                    'body' => $notification['body'],
-                    'icon' => $notification['icon'] ?? null,
-                ]),
-                'fcm_options' => array_filter([
-                    'link' => $notification['click_action'] ?? null,
-                ]),
-            ];
+            $webpushNotification = array_filter([
+                'title' => $notification['title'],
+                'body'  => $notification['body'],
+                'icon'  => $notification['icon'] ?? null,
+            ]);
+
+            $webpush = ['notification' => $webpushNotification];
+
+            // Only include fcm_options when there is actually a link to send
+            if (filled($notification['click_action'] ?? null)) {
+                $webpush['fcm_options'] = ['link' => $notification['click_action']];
+            }
+
+            $message['webpush'] = $webpush;
         }
 
         if ($deviceType === DeviceType::Android) {
             $message['android'] = [
                 'priority' => 'high',
                 'notification' => array_filter([
-                    'click_action' => $notification['click_action'] ?? null,
+                    'clickAction' => $notification['click_action'] ?? null,
                     'sound' => 'default',
                 ]),
             ];
