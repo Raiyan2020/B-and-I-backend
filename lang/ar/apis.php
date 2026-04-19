@@ -85,4 +85,6 @@ return [
     'interest_submitted_successfully' => 'تم تسجيل الاهتمام بنجاح، وسيقوم فريقنا بالتواصل معك قريباً.',
     'company_investor_interest_request_created' => 'تم إرسال طلب اهتمام الشركة بالمستثمر بنجاح.',
     'success' => 'تم بنجاح',
+    'account_blocked' => 'تم حظر حسابك من قبل الإدارة.',
+    'account_inactive' => 'تم تعطيل حسابك من قبل الإدارة.',
 ];

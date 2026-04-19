@@ -32,6 +32,10 @@ class Admin extends Authenticatable
         'is_blocked',
     ];
 
+    protected $casts = [
+        'is_blocked' => 'boolean',
+    ];
+
     public function setPasswordAttribute($value)
     {
         if ($value) {

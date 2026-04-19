@@ -62,6 +62,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'set.locale.from.header' => \App\Http\Middleware\SetLocaleFromHeader::class,
+            'admin.not_blocked' => \App\Http\Middleware\EnsureAdminIsNotBlocked::class,
+            'api.account.access' => \App\Http\Middleware\EnsureApiUserHasAccess::class,
         ]);
 
         $middleware->throttleApi();

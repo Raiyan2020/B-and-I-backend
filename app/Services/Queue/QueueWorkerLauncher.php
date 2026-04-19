@@ -11,9 +11,10 @@ class QueueWorkerLauncher
         try {
             $phpBinary = escapeshellarg(PHP_BINARY);
             $artisan = escapeshellarg(base_path('artisan'));
+            $basePath = escapeshellarg(base_path());
 
             if (PHP_OS_FAMILY === 'Windows') {
-                $command = "start /B \"\" {$phpBinary} {$artisan} platform-notifications:work";
+                $command = "cmd /c \"cd /d {$basePath} && start \"\" /B {$phpBinary} {$artisan} platform-notifications:work\"";
                 @pclose(@popen($command, 'r'));
 
                 return;

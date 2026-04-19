@@ -85,10 +85,9 @@
                                             <select
                                                 id="send_to"
                                                 name="send_to"
-                                                class="form-control @error('send_to') is-invalid @enderror"
-                                                required
-                                            >
-                                                <option value="admins" @selected(old('send_to') === 'admins')>{{ __('dashboard.platform_notification_admins_except_me') }}</option>
+                                                class="form-control select2 @error('send_to') is-invalid @enderror"
+                                                required                                            >
+                                                <option value="admins" @selected(old('send_to') === 'admins')>{{ __('dashboard.platform_notification_admins') }}</option>
                                                 <option value="investors" @selected(old('send_to') === 'investors')>{{ __('dashboard.investors') }}</option>
                                                 <option value="advertisers" @selected(old('send_to') === 'advertisers')>{{ __('dashboard.advertisers_companies') }}</option>
                                             </select>

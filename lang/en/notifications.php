@@ -9,6 +9,12 @@ return [
     'user_notification_body' => 'You have a new notification.',
     'admin_notification_title' => 'Admin notification',
     'admin_notification_body' => 'You have a new notification from the admin.',
+    'user_blocked_title' => 'Account blocked',
+    'user_blocked_body' => 'Your account has been blocked by the administration.',
+    'user_deactivated_title' => 'Account deactivated',
+    'user_deactivated_body' => 'Your account has been deactivated by the administration.',
+    'admin_blocked_title' => 'Admin account blocked',
+    'admin_blocked_body' => 'Your admin account has been blocked by the administration.',
 
     'register_user_for_admin_title' => 'New user registration',
     'register_user_for_admin_body' => 'A new :role account has been registered.',

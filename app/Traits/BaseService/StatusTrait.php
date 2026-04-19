@@ -2,9 +2,10 @@
 
 namespace App\Traits\BaseService;
 
+use App\Models\Admin;
+use App\Models\User;
+use App\Services\Auth\AccountAccessService;
 use App\Services\Core\WalletService;
-use App\Notifications\BlockUser;
-use Illuminate\Support\Facades\Notification;
 
 trait StatusTrait
 {
@@ -32,8 +33,15 @@ trait StatusTrait
             $user = $this->find($id);
             $user->update(['is_blocked' => !$user->is_blocked]);
 
-            if ($user->is_blocked) {
-                // Notification::send($user, new BlockUser());
+            if ($user instanceof User && $user->is_blocked) {
+                app(AccountAccessService::class)->blockUser($user, auth('admin')->user());
+
+                return ['msg' => __('dashboard.blocked')];
+            }
+
+            if ($user instanceof Admin && $user->is_blocked) {
+                app(AccountAccessService::class)->blockAdmin($user, auth('admin')->user());
+
                 return ['msg' => __('dashboard.blocked')];
             }
 
@@ -56,6 +64,10 @@ trait StatusTrait
 
             if ($user->is_active) {
                 return ['msg' => __('dashboard.active')];
+            }
+
+            if ($user instanceof User) {
+                app(AccountAccessService::class)->deactivateUser($user, auth('admin')->user());
             }
 
             return ['msg' => __('dashboard.inactive')];

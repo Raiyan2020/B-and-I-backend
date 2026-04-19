@@ -55,7 +55,7 @@ Route::group([
         Route::post('', 'login')->name('startSession');
     });
 
-    Route::group(['middleware' => 'auth:admin'], function () {
+    Route::group(['middleware' => ['auth:admin', 'admin.not_blocked']], function () {
         Route::get('home', [HomeController::class, 'index'])->name('home');
         Route::get('destroy', [AuthController::class, 'logout'])->name('logout');
 

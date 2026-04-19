@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class SendPlatformNotificationJob implements ShouldQueue
 {
@@ -32,6 +33,11 @@ class SendPlatformNotificationJob implements ShouldQueue
 
     public function handle(GeneralNotificationService $notificationService): void
     {
+        Log::info('Processing platform notification job', [
+            'send_to' => $this->sendTo,
+            'actor_admin_id' => $this->actorAdminId,
+        ]);
+
         $notification = new GeneralNotification(
             title: $this->title,
             body: $this->body,

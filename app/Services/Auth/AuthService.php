@@ -26,6 +26,7 @@ class AuthService implements AuthServiceInterface
         private readonly DeviceService $deviceService,
         private readonly ProfileUpdateRequestService $profileUpdateRequestService,
         private readonly NotificationCycleService $notificationCycleService,
+        private readonly AccountAccessService $accountAccessService,
     ) {}
 
     public function registerInvestor(RegisterInvestorDTO $dto): User
@@ -106,6 +107,18 @@ class AuthService implements AuthServiceInterface
 
         if (! Hash::check($dto->password, $user->password)) {
             return ['status' => 'invalid_credentials'];
+        }
+
+        if ($user->is_blocked) {
+            $this->accountAccessService->revokeUserAccess($user);
+
+            return ['status' => 'blocked'];
+        }
+
+        if (! $user->is_active) {
+            $this->accountAccessService->revokeUserAccess($user);
+
+            return ['status' => 'inactive'];
         }
 
         if (! $user->hasVerifiedEmail()) {

@@ -580,7 +580,11 @@ return [
     'recent_advertisers_companies' => 'أحدث المعلنين / الشركات',
     'latest_advertisements' => 'أحدث الإعلانات',
     'platform_notifications' => 'إشعارات المنصة',
+    'subscription_packages' => 'الباقات',
+    'opportunities' => 'الإعلانات',
+    'investment_seats' => 'كراسات الاستثمار',
+    'interest_requests' => 'طلبات الاهتمام',
     'send_to_group' => 'إرسال إلى',
-    'platform_notification_admins_except_me' => 'المشرفين عدا أنا',
+    'platform_notification_admins' => 'المشرفين',
     'platform_notification_queued_successfully' => 'تمت جدولة إشعار المنصة وسيتم إرساله في الخلفية.',
 ];

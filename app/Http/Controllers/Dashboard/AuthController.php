@@ -8,6 +8,7 @@ use App\Enums\DeviceType;
 use App\Models\Admin;
 use App\Services\Devices\DeviceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -45,12 +46,18 @@ class AuthController extends Controller
             return back()->withErrors($validator);
         }
         $credentials = $validator->safe()->only(['email', 'password']);
+        $admin = Admin::query()->where('email', $credentials['email'])->first();
 
-        if(auth('admin')->attempt($credentials)){
-            if(!auth('admin')->user()->hasRole('super_admin')){
-                auth('admin')->logout();
-                abort(403);
+        if ($admin && Hash::check($credentials['password'], $admin->password)) {
+            if ($admin->is_blocked) {
+                return back()->with(['error' => __('auth.admin_blocked')]);
             }
+
+            auth('admin')->login($admin);
+            // if(!auth('admin')->user()->hasRole('super_admin')){
+            //     auth('admin')->logout();
+            //     abort(403);
+            // }
             session()->regenerate();
 
             if ($request->filled('device_token')) {

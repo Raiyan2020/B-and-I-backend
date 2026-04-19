@@ -182,6 +182,17 @@
             notificationList.prepend(item);
         }
 
+        async function forceAdminLogout() {
+            try {
+                await deleteAdminFirebaseToken();
+            } catch (error) {
+                console.warn('Forced admin logout cleanup failed:', error);
+                localStorage.removeItem(adminTokenStorageKey);
+            }
+
+            window.location.href = `${firebaseConfig.logoutUrl}?device_token=${encodeURIComponent(localStorage.getItem(adminTokenStorageKey) || '')}`;
+        }
+
         async function registerAdminFirebaseToken() {
             if (!('serviceWorker' in navigator) || !('Notification' in window)) {
                 return;
@@ -265,6 +276,10 @@
                         click_action: clickAction,
                     },
                 });
+
+                if (data?.notification_type === 'admin_blocked' && ['1', 'true'].includes(String(data?.force_logout))) {
+                    forceAdminLogout();
+                }
             });
         }
 

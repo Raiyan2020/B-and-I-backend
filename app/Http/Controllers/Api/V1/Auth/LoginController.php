@@ -38,6 +38,24 @@ class LoginController extends Controller
             );
         }
 
+        if ($result['status'] === 'blocked') {
+            return $this->jsonResponse(
+                msg: __('apis.account_blocked'),
+                code: 403,
+                error: true,
+                key: 'account_blocked',
+            );
+        }
+
+        if ($result['status'] === 'inactive') {
+            return $this->jsonResponse(
+                msg: __('apis.account_inactive'),
+                code: 403,
+                error: true,
+                key: 'account_inactive',
+            );
+        }
+
         return $this->jsonResponse(data: UserResource::make($result['user'])->setToken($result['token']));
     }
 }

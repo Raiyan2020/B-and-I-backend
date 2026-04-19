@@ -9,6 +9,12 @@ return [
     'user_notification_body' => 'لديك إشعار جديد.',
     'admin_notification_title' => 'إشعار من الإدارة',
     'admin_notification_body' => 'لديك إشعار جديد من الإدارة.',
+    'user_blocked_title' => 'تم حظر الحساب',
+    'user_blocked_body' => 'تم حظر حسابك من قبل الإدارة.',
+    'user_deactivated_title' => 'تم تعطيل الحساب',
+    'user_deactivated_body' => 'تم تعطيل حسابك من قبل الإدارة.',
+    'admin_blocked_title' => 'تم حظر حساب المشرف',
+    'admin_blocked_body' => 'تم حظر حسابك الإداري من قبل الإدارة.',
 
     'register_user_for_admin_title' => 'تسجيل مستخدم جديد',
     'register_user_for_admin_body' => 'تم تسجيل حساب جديد من نوع :role.',

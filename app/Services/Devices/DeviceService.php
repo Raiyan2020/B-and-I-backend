@@ -83,6 +83,13 @@ class DeviceService
             ->delete();
     }
 
+    public function forgetAllAdminDevices(Admin $admin): void
+    {
+        Device::query()
+            ->where('admin_id', $admin->id)
+            ->delete();
+    }
+
     public function getUserDevices(User $user, ?string $deviceType = null): Collection
     {
         return $this->getDevicesForOwner('user_id', $user->id, $deviceType);

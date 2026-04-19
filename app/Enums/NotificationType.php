@@ -8,6 +8,9 @@ enum NotificationType: string
     case LegacyNotification = 'legacy_notification';
     case UserNotification = 'user_notification';
     case AdminNotification = 'admin_notification';
+    case UserBlocked = 'user_blocked';
+    case UserDeactivated = 'user_deactivated';
+    case AdminBlocked = 'admin_blocked';
     case RegisterUserForAdmin = 'register_user_for_admin';
     case CreateProfileUpdateRequestForAdmin = 'create_profile_update_request_for_admin';
     case ApproveProfileUpdateRequest = 'approve_profile_update_request';

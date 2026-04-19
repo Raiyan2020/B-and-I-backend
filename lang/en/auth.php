@@ -22,5 +22,6 @@ return [
     'email' => 'E-Mail',
     'password' => 'Password',
     'register_success' => 'Your account has been created successfully. We have sent a verification link to your email. Please check your inbox to activate your account.',
+    'admin_blocked' => 'Your admin account has been blocked.',
 
 ];

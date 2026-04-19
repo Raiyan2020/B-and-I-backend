@@ -87,6 +87,8 @@ return [
     'password_updated_logged_out_all_devices' => 'Password updated successfully. We logged you out from all linked devices for your security.',
     'current_password_incorrect' => 'The current password is incorrect.',
     'logged_out_successfully' => 'You have been logged out successfully.',
+    'account_blocked' => 'Your account has been blocked by the administration.',
+    'account_inactive' => 'Your account has been deactivated by the administration.',
     'notification_settings_updated' => 'Notification settings updated successfully.',
     'file_open' => 'File Open',
     'file_locked' => 'File Locked',

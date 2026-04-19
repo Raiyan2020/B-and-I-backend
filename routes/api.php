@@ -56,7 +56,7 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
         Route::post('verify-code', [VerifyEmailController::class, '__invoke']);
     });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'api.account.access'])->group(function () {
 
         Route::prefix('auth')->group(function () {
             Route::post('logout', [LogoutController::class, '__invoke']);
