@@ -57,6 +57,7 @@ class OpportunityController extends Controller
             $user,
             $this->baseInvestorQuery($user)
                 ->whereHas('interestRequests', fn (Builder $query) => $query->where('user_id', $user->id))
+                ->whereNotIn('status', [OpportunityStatus::Completed->value, OpportunityStatus::Reserved->value])
                 ->orderByDesc(
                     InterestRequest::query()
                         ->select('created_at')

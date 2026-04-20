@@ -87,15 +87,11 @@ class OpportunityService
 
     public function listWithPurchasedSeatsForCompany(User $user, int $perPage = 15): LengthAwarePaginator
     {
-        return $user->opportunities()
+        return Opportunity::query()
             ->with(['category', 'reviewer'])
             ->withCount(['investmentSeats', 'interestRequests'])
-            ->whereHas('investmentSeats', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->whereDoesntHave('interestRequests', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
+            ->whereHas('investmentSeats', fn ($query) => $query->where('user_id', $user->id))
+            ->whereDoesntHave('interestRequests', fn ($query) => $query->where('user_id', $user->id))
             ->latest()
             ->paginate($perPage)
             ->withQueryString();

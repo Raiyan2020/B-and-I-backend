@@ -99,6 +99,8 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
         Route::group(['prefix' => 'company/opportunities', 'controller' => OpportunityController::class], function () {
             Route::get('/', 'index');
             Route::get('/purchased-seats', 'purchasedSeats');
+            Route::get('/sent-interests', 'sentInterests');
+            Route::get('/current-requests', 'currentRequests');
             Route::post('/', 'store');
             Route::get('/{opportunity}', 'show');
             Route::put('/{opportunity}', 'update');
