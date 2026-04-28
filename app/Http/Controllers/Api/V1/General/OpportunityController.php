@@ -30,6 +30,18 @@ class OpportunityController extends Controller
 
         $opportunities = Opportunity::query()
             ->with('category')
+            ->when($request->has('goal'), function ($query) use ($request) {
+                $query->where('goal', $request->input('goal'));
+            })
+            ->when($request->has('category_id'), function ($query) use ($request) {
+                $query->where('category_id', $request->input('category_id'));
+            })
+            ->when($request->has('order'), function ($query) use ($request) {
+                $order = $request->input('order');
+                if (in_array($order, ['price_asc', 'price_desc'])) {
+                    $query->orderBy('investment_required', $order == 'price_asc' ? 'asc' : 'desc');
+                }
+            })
             ->withCount(['investmentSeats', 'interestRequests'])
             ->whereIn('status', [
                 OpportunityStatus::Published->value,
@@ -45,7 +57,9 @@ class OpportunityController extends Controller
                         ->where('user_id', $user->id),
                 ]);
             })
-            ->latest()
+            ->when($request->has('order') && $request->order == 'latest', function ($query) {
+                $query->latest();
+            })
             ->paginate(15);
 
         return $this->jsonResponse(data: [
