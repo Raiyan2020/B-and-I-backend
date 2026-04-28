@@ -30,7 +30,7 @@ class OpportunityController extends Controller
 
         $opportunities = Opportunity::query()
             ->with('category')
-            ->when($request->has('goal'), function ($query) use ($request) {
+            ->when($request->goal, function ($query) use ($request) {
                 $query->where('goal', $request->input('goal'));
             })
             ->when($request->has('category_id'), function ($query) use ($request) {
