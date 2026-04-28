@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('opportunity_id')->constrained('opportunities')->cascadeOnDelete();
             $table->decimal('price_paid', 12, 2)->nullable();
             $table->timestamp('purchased_at')->nullable();
+            $table->string('payment_id')->nullable();
             $table->timestamps();
 
             $table->unique(['user_id', 'opportunity_id']);

@@ -16,6 +16,7 @@ class InvestmentSeat extends Model
         'opportunity_id',
         'price_paid',
         'purchased_at',
+        'payment_id',
     ];
 
     protected $casts = [

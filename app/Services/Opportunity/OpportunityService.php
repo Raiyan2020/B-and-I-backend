@@ -230,7 +230,7 @@ class OpportunityService
         });
     }
 
-    public function purchaseSeat(User $user, Opportunity $opportunity): InvestmentSeat
+    public function purchaseSeat(User $user, Opportunity $opportunity,null|string $paymentId): InvestmentSeat
     {
         $this->assertOpportunityAvailableForSeatPurchase($opportunity);
 
@@ -248,13 +248,13 @@ class OpportunityService
             ]);
         }
 
-        // TODO:: Handle payment processing here before creating the seat
-        $seat = DB::transaction(function () use ($user, $opportunity, $seatPrice) {
+        $seat = DB::transaction(function () use ($user, $opportunity, $seatPrice, $paymentId) {
             return InvestmentSeat::query()->create([
                 'user_id' => $user->id,
                 'opportunity_id' => $opportunity->id,
                 'price_paid' => (float) $seatPrice,
                 'purchased_at' => now(),
+                'payment_id' => $paymentId,
             ]);
         });
 

@@ -131,7 +131,7 @@ class OpportunityController extends Controller
                 code: 402,
             );
         }
-        $seat = $this->service->purchaseSeat($request->user(), $opportunity);
+        $seat = $this->service->purchaseSeat($request->user(), $opportunity, $request->payment_id);
 
         $opportunity->load([
             'category',
