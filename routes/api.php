@@ -1,20 +1,21 @@
 <?php
 
 
-use App\Http\Controllers\Api\V1\Auth\ChangeEmailController;
 use App\Http\Controllers\Api\V1\Auth\AccountDeletionRequestController;
+use App\Http\Controllers\Api\V1\Auth\ChangeEmailController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
-use App\Http\Controllers\Api\V1\Auth\NotificationSettingsController;
 use App\Http\Controllers\Api\V1\Auth\NotificationController;
+use App\Http\Controllers\Api\V1\Auth\NotificationSettingsController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\ProfileUpdateRequestController;
 use App\Http\Controllers\Api\V1\Auth\ResendVerificationController;
 use App\Http\Controllers\Api\V1\Auth\UserPasswordController;
 use App\Http\Controllers\Api\V1\Auth\UserRegisterController;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
-use App\Http\Controllers\Api\V1\Company\OpportunityController;
 use App\Http\Controllers\Api\V1\Company\InvestorInterestRequestController;
+use App\Http\Controllers\Api\V1\Company\OpportunityController;
+use App\Http\Controllers\Api\V1\General\MyFatoorahSessionController;
 use App\Http\Controllers\Api\V1\General\OpportunityController as GeneralOpportunityController;
 use App\Http\Controllers\Api\V1\Investor\OpportunityController as InvestorOpportunityController;
 use Illuminate\Support\Facades\Route;
@@ -120,5 +121,7 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
             Route::post('seats',  'purchaseSeat');
             Route::post('interest-requests',  'submitInterest');
         });
+
+        Route::post('create-my-fatoorah-session', [MyFatoorahSessionController::class, '__invoke']);
     });
 });

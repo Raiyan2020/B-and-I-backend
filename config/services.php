@@ -44,4 +44,18 @@ return [
         'timeout' => env('FIREBASE_TIMEOUT', 10),
     ],
     // End Firebase Admin Dashboard Setup
+
+    'myfatoorah' => [
+        'mode' => env('MYFATOORAH_MODE', 'test'), // 'test' or 'live'
+        'credentials' => [
+            'test' => [
+                'token' => env('MYFATOORAH_TEST_TOKEN'),
+                'base_url' => env('MYFATOORAH_TEST_BASE_URL', 'https://apitest.myfatoorah.com/v3'),
+            ],
+            'live' => [
+                'token' => env('MYFATOORAH_LIVE_TOKEN'),
+                'base_url' => env('MYFATOORAH_LIVE_BASE_URL', 'https://api.myfatoorah.com/v3'),
+            ],
+        ],
+    ],
 ];
