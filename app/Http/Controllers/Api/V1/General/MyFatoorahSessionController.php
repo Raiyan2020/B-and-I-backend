@@ -42,4 +42,20 @@ class MyFatoorahSessionController extends Controller
             'currency' => $response->json('Data.Order.Currency'),
         ]);
     }
+
+    public function getStatus(string $paymentId)
+    {
+        $response = Http::withHeaders([
+            'accept' => 'application/json',
+            'authorization' => 'Bearer ' . $this->credentials['token'],
+            'content-type' => 'application/json',
+        ])->get($this->credentials['base_url'] . '/payments/' . $paymentId);
+
+        $jsonResponse = $response->json();
+        return [
+            'key' => $jsonResponse['IsSuccess'] ? 'success' : 'fail',
+            'invoice_status' => $jsonResponse['Data']['Invoice']['Status'] ?? null,
+            'transaction_status' => $jsonResponse['Data']['Transaction']['Status'] ?? null,
+        ];
+    }
 }

@@ -19,6 +19,7 @@ return [
     'continue to complete the registration process' => 'واصل عملية التسجيل',
     'no such this data' => 'لا توجد بيانات مطابقة لهذه المعلومات',
     'token is invalid' => 'الرمز غير صالح',
+    'payment_failed' => 'فشل عملية الدفع، يرجى المحاولة مرة أخرى.',
     'something went wrong' => 'حدث خطأ ما، يرجى المحاولة مرة أخرى',
     'item added successfully' => 'تمت الإضافة بنجاح',
     'cart cleared successfully' => 'تم تفريغ السلة بنجاح',

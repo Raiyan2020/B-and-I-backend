@@ -21,6 +21,7 @@ return [
     'continue to complete the registration process' => 'Continue To Complete The Registration Process',
     'no such this data' => 'No such output equal this data',
     'token is invalid' => 'Token is Invalid',
+    'payment_failed' => 'Payment Failed, Please Try Again',
     'something went wrong' => 'Something Went Wrong',
     'item added successfully' => 'Item Added Successfully',
     'cart cleared successfully' => 'Cart Cleared Successfully',
