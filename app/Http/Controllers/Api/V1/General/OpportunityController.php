@@ -111,6 +111,13 @@ class OpportunityController extends Controller
     {
         $request->attributes->set('seat_price', GeneralSetting::getValueForKey('seat_price'));
 
+        if(!$request->payment_id) {
+            return $this->jsonResponse(
+                key: 'fail',
+                msg: __('apis.payment_failed'),
+                code: 402,
+            );
+        }
         $paymentService = app(MyFatoorahSessionController::class);
         $paymentResponse = $paymentService->getStatus($request->payment_id);
         if (
