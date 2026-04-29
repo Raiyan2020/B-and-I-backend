@@ -104,6 +104,9 @@ class AuthService implements AuthServiceInterface
         if (! $user) {
             return ['status' => 'invalid_credentials'];
         }
+        if ($user->role != $dto->role) {
+            return ['status' => 'invalid_credentials'];
+        }
 
         if (! Hash::check($dto->password, $user->password)) {
             return ['status' => 'invalid_credentials'];
