@@ -21,7 +21,7 @@ use Illuminate\Validation\ValidationException;
 class OpportunityService
 {
     public function __construct(
-        private readonly ?NotificationCycleService $notificationCycleService = null,
+        private readonly NotificationCycleService $notificationCycleService,
     ) {}
 
     public function createForCompany(User $user, array $data): Opportunity
@@ -37,7 +37,7 @@ class OpportunityService
             'status' => OpportunityStatus::Pending,
         ]));
 
-        DB::afterCommit(fn () => $this->notificationCycleService?->adminOpportunityCreated(
+        DB::afterCommit(fn () => $this->notificationCycleService->adminOpportunityCreated(
             $opportunity->fresh(['category', 'user'])
         ));
 
@@ -66,7 +66,7 @@ class OpportunityService
 
         $opportunity = $opportunity->refresh(['category', 'reviewer', 'user']);
 
-        DB::afterCommit(fn () => $this->notificationCycleService?->adminOpportunityUpdated($opportunity));
+        DB::afterCommit(fn () => $this->notificationCycleService->adminOpportunityUpdated($opportunity));
 
         return $opportunity;
     }
@@ -134,10 +134,10 @@ class OpportunityService
 
         if ($oldStatus !== $status->value) {
             DB::afterCommit(function () use ($opportunity, $status): void {
-                $this->notificationCycleService?->userOpportunityStatusChanged($opportunity);
+                $this->notificationCycleService->userOpportunityStatusChanged($opportunity);
 
                 if ($status === OpportunityStatus::Published) {
-                    $this->notificationCycleService?->usersOpportunityPublished($opportunity);
+                    $this->notificationCycleService->usersOpportunityPublished($opportunity);
                 }
             });
         }
@@ -223,7 +223,7 @@ class OpportunityService
             $opportunity = $opportunity->fresh(['category', 'user', 'reviewer', 'investor']);
 
             if ($oldStatus !== $status->value) {
-                DB::afterCommit(fn () => $this->notificationCycleService?->userOpportunityStatusChanged($opportunity));
+                DB::afterCommit(fn () => $this->notificationCycleService->userOpportunityStatusChanged($opportunity));
             }
 
             return $opportunity;
@@ -261,8 +261,8 @@ class OpportunityService
         $seat = $seat->refresh(['user', 'opportunity.user']);
 
         DB::afterCommit(function () use ($seat): void {
-            $this->notificationCycleService?->adminInvestmentSeatPurchased($seat);
-            $this->notificationCycleService?->opportunityOwnerSeatPurchased($seat);
+            $this->notificationCycleService->adminInvestmentSeatPurchased($seat);
+            $this->notificationCycleService->opportunityOwnerSeatPurchased($seat);
         });
 
         return $seat;
@@ -299,8 +299,8 @@ class OpportunityService
         $interestRequest = $interestRequest->refresh(['user', 'opportunity.user', 'investmentSeat']);
 
         DB::afterCommit(function () use ($interestRequest): void {
-            $this->notificationCycleService?->adminInterestRequestSubmitted($interestRequest);
-            $this->notificationCycleService?->opportunityOwnerInterestSubmitted($interestRequest);
+            $this->notificationCycleService->adminInterestRequestSubmitted($interestRequest);
+            $this->notificationCycleService->opportunityOwnerInterestSubmitted($interestRequest);
         });
 
         return $interestRequest;

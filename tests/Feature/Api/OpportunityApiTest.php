@@ -4,9 +4,11 @@ namespace Tests\Feature\Api;
 
 use App\Enums\OpportunityStatus;
 use App\Enums\UserRole;
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\GeneralSetting;
 use App\Models\InvestmentSeat;
+use App\Models\Notification;
 use App\Models\Opportunity;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,6 +21,8 @@ class OpportunityApiTest extends TestCase
 
     public function test_company_can_create_opportunity_in_pending_status(): void
     {
+        Admin::factory()->count(2)->create();
+
         $company = User::factory()->create([
             'role' => UserRole::Advertiser,
         ]);
@@ -57,6 +61,24 @@ class OpportunityApiTest extends TestCase
             'status' => OpportunityStatus::Pending->value,
             'company_name' => 'Restaurant Opportunity No. 10',
         ]);
+
+        $createdOpportunity = Opportunity::query()
+            ->where('user_id', $company->id)
+            ->where('company_name', 'Restaurant Opportunity No. 10')
+            ->firstOrFail();
+
+        $adminNotifications = Notification::query()
+            ->where('notifiable_type', Admin::class)
+            ->where('data->notification_type', 'create_opportunity_for_admin')
+            ->get();
+
+        $this->assertCount(2, $adminNotifications);
+        $this->assertTrue(
+            $adminNotifications->every(
+                fn (Notification $notification) => data_get($notification->data, 'model_id') === $createdOpportunity->id
+                    && data_get($notification->data, 'owner_id') === $company->id
+            )
+        );
     }
 
     public function test_only_published_and_reserved_opportunities_are_visible_publicly(): void
