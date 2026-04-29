@@ -503,7 +503,7 @@
                                             <div class="dropdown dropdown-language">
                                                 <a class="dropdown-toggle btn btn-sm btn-outline-primary" id="dropdown-flag" href="#" data-toggle="dropdown"
                                                    aria-haspopup="true" aria-expanded="false">
-                                                    <i class="flag-icon {{ app()->getLocale() == 'ar' ? 'flag-icon-eg' : 'flag-icon-us' }}"></i>
+                                                    <i class="flag-icon {{ app()->getLocale() == 'ar' ? 'flag-icon-kw' : 'flag-icon-us' }}"></i>
                                                     <span class="selected-language">{{ app()->getLocale() == 'ar' ? 'AR' : 'EN' }}</span>
                                                 </a>
                                                 <div class="dropdown-menu" aria-labelledby="dropdown-flag">
@@ -513,7 +513,7 @@
                                                     </a>
                                                     <a class="dropdown-item" href="{{ LaravelLocalization::getLocalizedURL('ar') }}"
                                                        data-language="ar">
-                                                        <i class="flag-icon flag-icon-eg"></i> AR
+                                                        <i class="flag-icon flag-icon-kw"></i> AR
                                                     </a>
                                                 </div>
                                             </div>
