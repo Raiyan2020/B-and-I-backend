@@ -104,7 +104,7 @@ class AuthService implements AuthServiceInterface
         if (! $user) {
             return ['status' => 'invalid_credentials'];
         }
-        if ($user->role != $dto->role) {
+        if ($user->role->value != $dto->role) {
             return ['status' => 'invalid_credentials'];
         }
 
