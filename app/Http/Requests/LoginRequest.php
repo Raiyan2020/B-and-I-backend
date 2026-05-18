@@ -16,9 +16,12 @@ class LoginRequest extends FormRequest
 
     public function rules(): array
     {
+        $countryCode = $this->input('country_code');
+        $digitsRule = ($countryCode === '+965' || $countryCode === '965') ? 'digits:8' : 'digits_between:8,15';
+
         return [
             'email' => ['nullable', 'email', 'required_without:phone'],
-            'phone' => ['nullable', 'regex:/^[4569]\d{7}$/', 'required_without:email'],
+            'phone' => ['nullable', $digitsRule, 'required_without:email'],
             'country_code' => ['nullable', 'string', 'digits_between:1,5', 'required_with:phone'],
             'password' => ['required', 'string'],
             'role' => ['required', 'string',Rule::in([UserRole::Investor->value,UserRole::Advertiser->value])],

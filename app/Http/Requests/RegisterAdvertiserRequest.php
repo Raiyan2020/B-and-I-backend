@@ -14,14 +14,16 @@ class RegisterAdvertiserRequest extends FormRequest
 
     public function rules(): array
     {
+        $countryCode = $this->input('country_code');
+        $digitsRule = ($countryCode === '+965' || $countryCode === '965') ? 'digits:8' : 'digits_between:8,15';
+
         return [
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
-            'email' => ['required', 'email:dns,rfc', Rule::unique('users', 'email')
-                ->whereNull('deleted_at')],
+            'email' => ['required', 'email:dns,rfc', Rule::unique('users', 'email')],
             'phone' => [
                 'required',
-                'regex:/^[4569]\d{7}$/',
+                $digitsRule,
                 Rule::unique('users', 'phone')->whereNull('deleted_at')
             ],
             'country_code' => ['required', 'string', 'digits_between:1,5'],
