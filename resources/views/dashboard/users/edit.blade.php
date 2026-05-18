@@ -77,7 +77,7 @@
                                                 <div class="position-relative has-icon-left">
                                                     <input type="text" id="phone-input" class="form-control phone-input"
                                                         value="{{ old('phone', $row->phone) }}"
-                                                        name="phone" placeholder="{{ __('dashboard.table phone') }}" required>
+                                                        name="phone" placeholder="{{ __('dashboard.table phone') }}" >
                                                     <div class="form-control-position">
                                                         <i class="fa fa-phone"></i>
                                                     </div>

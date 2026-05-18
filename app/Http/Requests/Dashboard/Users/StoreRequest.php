@@ -35,11 +35,13 @@ class StoreRequest extends FormRequest
             $phoneStart = $country['phone_start'] ?? null;
         }
 
-        $phoneRules = ['required', 'digits_between:8,15', Rule::unique('users', 'phone')->whereNull('deleted_at')];
+        $digitsRule = ($countryCode === '+965' || $countryCode === '965') ? 'digits:8' : 'digits_between:8,15';
 
-        if ($phoneStart && $this->input('phone')) {
-            $phoneRules[] = 'regex:/^' . preg_quote($phoneStart, '/') . '/';
-        }
+        $phoneRules = ['required', $digitsRule, Rule::unique('users', 'phone')->whereNull('deleted_at')];
+
+        // if ($phoneStart && $this->input('phone')) {
+        //     $phoneRules[] = 'regex:/^' . preg_quote($phoneStart, '/') . '/';
+        // }
 
         return [
             'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
@@ -50,15 +52,15 @@ class StoreRequest extends FormRequest
             'phone' => $phoneRules,
             'country_code' => ['required', 'string', 'max:5'],
             'lang' => ['required', Rule::in(['ar', 'en'])],
-            'company_license' => [Rule::requiredIf(fn () => $this->input('role') === UserRole::Advertiser->value), 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
-            'investor_type' => [Rule::requiredIf(fn () => $role === UserRole::Investor->value), Rule::in(\App\Enums\InvestorType::values())],
-            'capital' => [Rule::requiredIf(fn () => $role === UserRole::Investor->value), 'nullable', 'numeric', 'min:1000'],
-            'available_capital' => [Rule::requiredIf(fn () => $role === UserRole::Investor->value), 'nullable', 'numeric', 'min:1000'],
-            'preferred_sector_id' => [Rule::requiredIf(fn () => $role === UserRole::Investor->value), 'nullable', 'integer', Rule::exists('preferred_sectors', 'id')->where('status', true)],
-            'category_id' => [Rule::requiredIf(fn () => $role === UserRole::Investor->value), 'nullable', 'integer', Rule::exists('categories', 'id')->where('status', true)],
-            'experience_level' => [Rule::requiredIf(fn () => $role === UserRole::Investor->value), 'nullable', 'numeric', 'min:0', 'max:100'],
-            'previous_investments_count' => [Rule::requiredIf(fn () => $role === UserRole::Investor->value), 'nullable', 'integer', 'min:0'],
-            'investor_experience' => [Rule::requiredIf(fn () => $role === UserRole::Investor->value), Rule::in(\App\Enums\InvestorExperience::values())],
+            'company_license' => [Rule::requiredIf(fn() => $this->input('role') === UserRole::Advertiser->value), 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'investor_type' => [Rule::requiredIf(fn() => $role === UserRole::Investor->value), Rule::in(\App\Enums\InvestorType::values())],
+            'capital' => [Rule::requiredIf(fn() => $role === UserRole::Investor->value), 'nullable', 'numeric', 'min:1000'],
+            'available_capital' => [Rule::requiredIf(fn() => $role === UserRole::Investor->value), 'nullable', 'numeric', 'min:1000'],
+            'preferred_sector_id' => [Rule::requiredIf(fn() => $role === UserRole::Investor->value), 'nullable', 'integer', Rule::exists('preferred_sectors', 'id')->where('status', true)],
+            'category_id' => [Rule::requiredIf(fn() => $role === UserRole::Investor->value), 'nullable', 'integer', Rule::exists('categories', 'id')->where('status', true)],
+            'experience_level' => [Rule::requiredIf(fn() => $role === UserRole::Investor->value), 'nullable', 'numeric', 'min:0', 'max:100'],
+            'previous_investments_count' => [Rule::requiredIf(fn() => $role === UserRole::Investor->value), 'nullable', 'integer', 'min:0'],
+            'investor_experience' => [Rule::requiredIf(fn() => $role === UserRole::Investor->value), Rule::in(\App\Enums\InvestorExperience::values())],
             'password' => ['required', 'confirmed', 'min:6', 'max:100'],
         ];
     }

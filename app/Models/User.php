@@ -380,7 +380,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     protected function applyColumnFilter(Builder $query, string $column, $value, ?string $op = null): void
     {
         if ($column === 'name') {
-            $like = '%'.$value.'%';
+            $like = '%' . $value . '%';
             $query->where(function (Builder $q) use ($like): void {
                 $q->where('first_name', 'like', $like)
                     ->orWhere('last_name', 'like', $like)
@@ -394,10 +394,10 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         if ($column === 'phone') {
             $normalizedValue = preg_replace('/\s+/', '', (string) $value);
             $query->where(function (Builder $q) use ($normalizedValue): void {
-                $q->where('phone', 'like', '%'.$normalizedValue.'%')
+                $q->where('phone', 'like', '%' . $normalizedValue . '%')
                     ->orWhereRaw(
                         "REPLACE(CONCAT(COALESCE(country_code, ''), COALESCE(phone, '')), ' ', '') LIKE ?",
-                        ['%'.$normalizedValue.'%']
+                        ['%' . $normalizedValue . '%']
                     );
             });
 

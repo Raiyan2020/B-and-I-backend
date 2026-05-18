@@ -41,17 +41,19 @@ class UpdateRequest extends FormRequest
             $phoneStart = $country['phone_start'] ?? null;
         }
 
-        $phoneRules = ['required', 'digits_between:8,15', Rule::unique('users', 'phone')->whereNull('deleted_at')->ignore($userId)];
+        $digitsRule = ($countryCode === '+965' || $countryCode === '965') ? 'digits:8' : 'digits_between:8,15';
 
-        if ($phoneStart && $this->input('phone')) {
-            $phoneRules[] = 'regex:/^' . preg_quote($phoneStart, '/') . '/';
-        }
+        $phoneRules = ['required', $digitsRule, Rule::unique('users', 'phone')->whereNull('deleted_at')->ignore($userId)];
+
+        // if ($phoneStart && $this->input('phone')) {
+        //     $phoneRules[] = 'regex:/^' . preg_quote($phoneStart, '/') . '/';
+        // }
 
         return [
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($userId)],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($userId)],
             'phone' => $phoneRules,
             'country_code' => ['required', 'string', 'max:5'],
             'lang' => ['required', Rule::in(['ar', 'en'])],
