@@ -52,4 +52,7 @@ return [
     'create_interest_request_for_admin_body' => 'A new interest request has been created.',
     'create_interest_request_for_opportunity_owner_title' => 'Interest request received',
     'create_interest_request_for_opportunity_owner_body' => 'A new interest request was sent for your opportunity.',
+
+    'delete_account_title' => 'Your account has been deleted',
+    'delete_account_body' => 'Your account has been deleted by the administration.',
 ];

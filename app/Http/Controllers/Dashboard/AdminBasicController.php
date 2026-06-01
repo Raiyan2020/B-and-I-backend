@@ -63,7 +63,7 @@ class AdminBasicController extends Controller
                 ->scopes($this->indexScopes ?? 'search')
                 ->conditions($this->indexConditions ?? [])
                 ->with($this->with ?? [])
-                ->latest(false);
+                ->latest(true);
             $rows = $this->serviceName->all($limitOptions);
             return DataTables::of($rows)->make(true);
         }

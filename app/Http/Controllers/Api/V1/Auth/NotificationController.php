@@ -75,4 +75,19 @@ class NotificationController extends Controller
     {
         return max(1, min((int) $request->query('per_page', 15), 100));
     }
+
+    public function markAsRead(Request $request, Notification $notification): JsonResponse
+    {
+        abort_unless(
+            $notification->notifiable_type === $request->user()::class
+            && (int) $notification->notifiable_id === (int) $request->user()->id,
+            404
+        );
+
+        $notification->update(['read_at' => now()]);
+
+        return $this->jsonResponse(msg: __('apis.success'), data: [
+            'unread_notifications_count' => $request->user()->notifications()->whereNull('read_at')->count(),
+        ]);
+    }
 }

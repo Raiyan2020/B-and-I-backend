@@ -27,6 +27,7 @@ enum NotificationType: string
     case PurchaseOpportunityBooklet = 'purchase_opportunity_booklet';
     case CreateInterestRequestForAdmin = 'create_interest_request_for_admin';
     case CreateInterestRequestForOpportunityOwner = 'create_interest_request_for_opportunity_owner';
+    case DeleteAccount = 'delete_account';
 
     public static function normalize(self|string|null $value): self
     {

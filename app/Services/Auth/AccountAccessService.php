@@ -62,8 +62,19 @@ class AccountAccessService
         $this->revokeAdminAccess($admin);
     }
 
-    public function revokeUserAccess(User $user): void
+    public function revokeUserAccess(User $user, ?Admin $actor = null): void
     {
+
+        $this->notifications->sendToUser($user, new GeneralNotification(
+            notificationType: NotificationType::DeleteAccount,
+            category: NotificationCategory::System,
+            payload: [
+                'force_logout' => true,
+                'actor_admin_id' => $actor?->id,
+                'actor_name' => $actor?->name,
+            ],
+        ));
+
         $user->tokens()->delete();
         $this->deviceService->forgetAllUserDevices($user);
     }

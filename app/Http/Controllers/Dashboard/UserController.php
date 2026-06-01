@@ -527,7 +527,7 @@ class UserController extends AdminBasicController
                     ->scopes($this->indexScopes ?? 'search')
                     ->conditions($conditions)
                     ->with(array_merge($this->with ?? [], ['latestPendingProfileUpdateRequest', 'latestPendingAccountDeletionRequest']))
-                    ->latest(false)
+                    ->latest(true)
             );
 
             return DataTables::of($rows)

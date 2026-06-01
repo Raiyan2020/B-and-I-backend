@@ -2,6 +2,8 @@
 
 namespace App\Traits\BaseService;
 
+use App\Models\User;
+use App\Services\Auth\AccountAccessService;
 use Illuminate\Database\Eloquent\Model;
 
 trait CrudTrait
@@ -44,6 +46,12 @@ trait CrudTrait
         try {
             // Find the record or fail
             $record = $this->find(id: $id, conditions: $conditions);
+
+            if ($record instanceof User) {
+                app(AccountAccessService::class)->revokeUserAccess($record, auth('admin')->user());
+            }
+
+           
 
             // Check if any of the specified relations exist
             foreach ($relationsToCheck as $relation) {

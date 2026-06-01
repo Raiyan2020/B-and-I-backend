@@ -89,6 +89,8 @@ Route::prefix('v1')->middleware('set.locale.from.header')->group(function () {
                 Route::patch('/read-all', 'markAllAsRead');
                 Route::delete('/delete-all', 'destroyAll');
                 Route::delete('/{notification}', 'destroy');
+                Route::post('/{notification}/read', 'markAsRead');
+
             });
 
             Route::group(['prefix' => 'account-deletion-requests', 'controller' => AccountDeletionRequestController::class], function () {

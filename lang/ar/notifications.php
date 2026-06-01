@@ -52,4 +52,7 @@ return [
     'create_interest_request_for_admin_body' => 'تم إنشاء طلب اهتمام جديد.',
     'create_interest_request_for_opportunity_owner_title' => 'استلام طلب اهتمام',
     'create_interest_request_for_opportunity_owner_body' => 'تم إرسال طلب اهتمام جديد على فرصتك.',
+
+    'delete_account_title' => 'تم حذف حسابك',
+    'delete_account_body' => 'تم حذف حسابك من قبل الإدارة.',
 ];

@@ -53,7 +53,7 @@ class UpdateRequest extends FormRequest
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($userId)],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($userId)],
             'phone' => $phoneRules,
             'country_code' => ['required', 'string', 'max:5'],
             'lang' => ['required', Rule::in(['ar', 'en'])],
