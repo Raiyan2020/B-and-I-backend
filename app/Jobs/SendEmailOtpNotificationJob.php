@@ -29,12 +29,17 @@ class SendEmailOtpNotificationJob implements ShouldQueue
 
     public function handle(): void
     {
-        Notification::route('mail', $this->email)
-            ->notify(new EmailOtpNotification(
-                $this->otp,
-                $this->section,
-                $this->userName,
+        try{
+            Notification::route('mail', $this->email)
+                ->notify(new EmailOtpNotification(
+                    $this->otp,
+                    $this->section,
+                    $this->userName,
                 $this->locale,
             ));
+        } catch (\Exception $e) {
+            //Log 
+            \Log::error($e->getMessage());
+        }
     }
 }
