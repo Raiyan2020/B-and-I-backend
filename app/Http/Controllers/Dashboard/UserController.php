@@ -531,6 +531,7 @@ class UserController extends AdminBasicController
             );
 
             return DataTables::of($rows)
+                ->order(function () {})
                 ->addColumn('latest_pending_profile_update_request', function (User $user): ?array {
                     $request = $user->latestPendingProfileUpdateRequest;
 

@@ -42,6 +42,7 @@ class CategoryController extends AdminBasicController
             );
 
             return DataTables::of($rows)
+                ->order(function () {})
                 ->editColumn('image', fn (Category $category): ?string => $this->categoryImageUrl($category))
                 ->make(true);
         }

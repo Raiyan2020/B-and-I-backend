@@ -32,6 +32,7 @@ class RolesController extends Controller
             try {
                 $data = Role::where('id','!=',1)
                     ->where('guard_name', 'admin')
+                    ->orderByDesc('id')
                     ->get()
                     ->map(function ($role) {
                         $role->users_count = DB::table('model_has_roles')
@@ -42,6 +43,7 @@ class RolesController extends Controller
                     });
 
                 return Datatables::of($data)
+                    ->order(function () {})
                     ->addColumn('created_at', function ($role) {
                         return $role->created_at ? $role->created_at->format('Y-m-d H:i:s') : '';
                     })

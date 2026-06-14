@@ -55,9 +55,7 @@
                 }
             },
             paging: true,
-            order: [
-                [5, 'desc']
-            ],
+            ordering: false,
             columns: [{
                     data: 'id',
                     orderable: false,

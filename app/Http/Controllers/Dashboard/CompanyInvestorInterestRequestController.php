@@ -56,6 +56,7 @@ class CompanyInvestorInterestRequestController extends Controller
                 ->latest('id');
 
             return DataTables::eloquent($query)
+                ->order(function () {})
                 ->addColumn('company_name', fn (CompanyInvestorInterestRequest $row): string => $row->company?->name ?: '-')
                 ->addColumn('company_show_url', fn (CompanyInvestorInterestRequest $row): string => route('admin.users.show', $row->company_id))
                 ->addColumn('investor_name', fn (CompanyInvestorInterestRequest $row): string => $row->investor?->name ?: '-')

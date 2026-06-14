@@ -4,6 +4,7 @@
             processing: true,
             serverSide: true,
             searching: false,
+            ordering: false,
             ajax: {
                 url: "{{ route('admin.company-investor-interest-requests.index') }}",
                 data: function(d) {

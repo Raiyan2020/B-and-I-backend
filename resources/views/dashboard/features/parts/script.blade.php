@@ -21,6 +21,7 @@
                 }
             },
             "paging": true,
+            ordering: false,
             columns: [{
                     // Checkbox column (rendered by DataTables with row ID)
                     data: 'id',

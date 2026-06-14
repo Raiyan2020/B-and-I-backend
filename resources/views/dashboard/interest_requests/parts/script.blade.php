@@ -7,6 +7,7 @@
         $('#interest-requests-table').DataTable({
             processing: true,
             serverSide: true,
+            ordering: false,
             ajax: {
                 url: "{{ route('admin.interest-requests.index') }}",
                 data: function(d) {

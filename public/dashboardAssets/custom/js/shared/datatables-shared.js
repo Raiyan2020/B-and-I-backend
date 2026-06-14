@@ -43,6 +43,7 @@
                 }
             },
             order: [[0, 'desc']],
+            ordering: false,
             autoWidth: false,
             responsive: true,
         },
@@ -138,16 +139,20 @@
         },
 
         /**
-         * Sync DataTables sort direction with the order filter dropdown.
+         * Reload table so backend filter ordering is applied.
          */
-        syncOrderFilter: function(table, columnIndex, filterSelector) {
-            if (!table) {
-                return;
+        syncOrderFilter: function(table) {
+            if (table) {
+                table.ajax.reload(null, false);
             }
+        },
 
+        /**
+         * Read sort direction from the order filter dropdown.
+         */
+        getOrderFilterValue: function(filterSelector) {
             filterSelector = filterSelector || '#order-filter';
-            var dir = ($(filterSelector).val() || 'ASC').toLowerCase();
-            table.order([columnIndex, dir]).draw(false);
+            return ($(filterSelector).val() || 'DESC').toUpperCase();
         },
 
         /**

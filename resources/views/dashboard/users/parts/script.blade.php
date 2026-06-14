@@ -18,13 +18,16 @@
                         name: $('#search-name').val() || '',
                         phone: $('#search-phone').val() || '',
                         email: $('#search-email').val() || '',
-                        order: $('#order-filter').val() || 'ASC',
+                        order: window.DataTablesShared
+                            ? window.DataTablesShared.getOrderFilterValue()
+                            : ($('#order-filter').val() || 'DESC'),
                         is_blocked: $('#block-status-filter').val() || '',
                         is_active: $('#account-status-filter').val() || ''
                     };
                 }
             },
             "paging": true,
+            ordering: false,
             columns: [{
                     // Checkbox column (rendered by DataTables with row ID)
                     data: 'id',
@@ -170,7 +173,7 @@
             $('#search-email').val('');
             $('#block-status-filter').val('');
             $('#account-status-filter').val('');
-            $('#order-filter').val('ASC');
+            $('#order-filter').val('DESC');
             // Reload table with reset filters
             table.ajax.reload(null, false);
         });

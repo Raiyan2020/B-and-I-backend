@@ -63,7 +63,7 @@
                                             <x-dashboard.tables.bulk-actions-bar />
                                             @can('add-subscription-package')
                                                 <a href="{{ route('admin.subscription_packages.create') }}"
-                                                    class="btn btn-primary btn-sm">
+                                                    class="btn btn-primary">
                                                     <i class="mr-1 feather icon-plus"></i>{{ __('dashboard.add_subscription_package') }}
                                                 </a>
                                             @endcan

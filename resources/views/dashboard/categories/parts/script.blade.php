@@ -17,13 +17,15 @@
                     d.filters = {
                         name: $('#search-name').val() || '',
                         status: $('#status-filter').val() || '',
-                        order: $('#order-filter').val() || 'ASC',
-                        order_by: 'order',
+                        order: window.DataTablesShared
+                            ? window.DataTablesShared.getOrderFilterValue()
+                            : ($('#order-filter').val() || 'DESC'),
+                        order_by: 'created_at',
                     };
                 }
             },
             "paging": true,
-            order: [[3, 'asc']],
+            ordering: false,
             columns: [{
                     // Checkbox column (rendered by DataTables with row ID)
                     data: 'id',
@@ -136,7 +138,7 @@
         // Filter button click
         $('#filter-btn').on('click', function() {
             if (window.DataTablesShared) {
-                window.DataTablesShared.syncOrderFilter(table, 3);
+                window.DataTablesShared.syncOrderFilter(table);
             } else {
                 table.ajax.reload(null, false);
             }
@@ -147,9 +149,9 @@
             // Reset all filter fields
             $('#search-name').val('');
             $('#status-filter').val('');
-            $('#order-filter').val('ASC');
+            $('#order-filter').val('DESC');
             if (window.DataTablesShared) {
-                window.DataTablesShared.syncOrderFilter(table, 3);
+                window.DataTablesShared.syncOrderFilter(table);
             } else {
                 table.ajax.reload(null, false);
             }

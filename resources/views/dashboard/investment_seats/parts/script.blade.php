@@ -7,6 +7,7 @@
         $('#investment-seats-table').DataTable({
             processing: true,
             serverSide: true,
+            ordering: false,
             ajax: {
                 url: "{{ route('admin.investment-seats.index') }}",
                 data: function(d) {

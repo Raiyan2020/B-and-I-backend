@@ -15,7 +15,9 @@
                     var st = $('#status-filter').val();
                     d.filters = {
                         name: $('#search-name').val() || '',
-                        order: $('#order-filter').val() || 'ASC',
+                        order: window.DataTablesShared
+                            ? window.DataTablesShared.getOrderFilterValue()
+                            : ($('#order-filter').val() || 'DESC'),
                         order_by: 'created_at',
                     };
                     if (st !== '') {
@@ -24,7 +26,7 @@
                 }
             },
             paging: true,
-            order: [[3, 'asc']],
+            ordering: false,
             columns: [{
                     data: 'id',
                     orderable: false,
@@ -108,7 +110,7 @@
 
         $('#filter-btn').on('click', function() {
             if (window.DataTablesShared) {
-                window.DataTablesShared.syncOrderFilter(table, 3);
+                window.DataTablesShared.syncOrderFilter(table);
             } else {
                 table.ajax.reload(null, false);
             }
@@ -117,9 +119,9 @@
         $('#reset-filter-btn').on('click', function() {
             $('#search-name').val('');
             $('#status-filter').val('');
-            $('#order-filter').val('ASC');
+            $('#order-filter').val('DESC');
             if (window.DataTablesShared) {
-                window.DataTablesShared.syncOrderFilter(table, 3);
+                window.DataTablesShared.syncOrderFilter(table);
             } else {
                 table.ajax.reload(null, false);
             }
