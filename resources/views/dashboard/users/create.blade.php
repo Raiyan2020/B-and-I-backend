@@ -18,7 +18,8 @@
                         <div class="card-body">
                             <form class="form form-vertical store" method="POST"
                                 action="{{ route($storeRouteName ?? 'admin.users.store') }}"
-                                enctype="multipart/form-data">
+                                enctype="multipart/form-data"
+                                novalidate>
                                 @csrf
                                 <input type="hidden" name="role" value="{{ old('role', $roleValue ?? '') }}">
                                 <div class="form-body">
@@ -91,6 +92,9 @@
                                                     <option value="ar" {{ old('lang') === 'ar' ? 'selected' : '' }}>{{ __('api.language_arabic') }}</option>
                                                     <option value="en" {{ old('lang') === 'en' ? 'selected' : '' }}>{{ __('api.language_english') }}</option>
                                                 </select>
+                                                @error('lang')
+                                                    <span class="text text-danger">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                         </div>
 
@@ -106,6 +110,9 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
+                                                    @error('investor_type')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 
@@ -113,6 +120,9 @@
                                                 <div class="form-group">
                                                     <label>{{ __('dashboard.capital') }}</label>
                                                     <input type="number" step="0.001" min="1000" class="form-control" name="capital" value="{{ old('capital') }}" required>
+                                                    @error('capital')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 
@@ -120,6 +130,9 @@
                                                 <div class="form-group">
                                                     <label>{{ __('dashboard.available_capital') }}</label>
                                                     <input type="number" step="0.001" min="1000" class="form-control" name="available_capital" value="{{ old('available_capital') }}" required>
+                                                    @error('available_capital')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 
@@ -134,6 +147,9 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
+                                                    @error('preferred_sector_id')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 
@@ -148,6 +164,9 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
+                                                    @error('category_id')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 
@@ -155,6 +174,9 @@
                                                 <div class="form-group">
                                                     <label>{{ __('dashboard.experience_level') }}</label>
                                                     <input type="number" step="0.001" min="0" max="100" class="form-control" name="experience_level" value="{{ old('experience_level') }}" required>
+                                                    @error('experience_level')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 
@@ -162,6 +184,9 @@
                                                 <div class="form-group">
                                                     <label>{{ __('dashboard.previous_investments_count') }}</label>
                                                     <input type="number" min="0" class="form-control" name="previous_investments_count" value="{{ old('previous_investments_count') }}" required>
+                                                    @error('previous_investments_count')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 
@@ -176,6 +201,9 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
+                                                    @error('investor_experience')
+                                                        <span class="text text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </div>
                                             </div>
                                         @else
@@ -206,6 +234,9 @@
                                                         <i class="fa fa-envelope"></i>
                                                     </div>
                                                 </div>
+                                                @error('email')
+                                                    <span class="text text-danger">{{ $message }}</span>
+                                                @enderror
 
                                             </div>
                                         </div>
@@ -219,6 +250,9 @@
                                                         <i class="fa fa-pencil"></i>
                                                     </div>
                                                 </div>
+                                                @error('password')
+                                                    <span class="text text-danger">{{ $message }}</span>
+                                                @enderror
 
                                             </div>
                                         </div>
@@ -234,6 +268,9 @@
                                                         <i class="fa fa-pencil"></i>
                                                     </div>
                                                 </div>
+                                                @error('password_confirmation')
+                                                    <span class="text text-danger">{{ $message }}</span>
+                                                @enderror
 
                                             </div>
                                         </div>

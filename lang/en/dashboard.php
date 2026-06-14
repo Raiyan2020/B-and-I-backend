@@ -188,6 +188,8 @@ return [
     'twitter link' => 'Twitter Link',
     'unavailable' => 'Unavailable',
     'uploaded_file_image' => 'Uploaded File Must Be Image',
+    'image_file_size_error' => 'The image size must not exceed 2 megabytes.',
+    'image_file_type_error' => 'Please make sure to upload an image file.',
     'users' => 'Customers',
     'users attract' => 'A tool to attract a customer',
     'users count' => 'Users Count',

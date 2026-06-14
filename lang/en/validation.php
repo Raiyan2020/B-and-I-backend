@@ -163,6 +163,25 @@ return [
     */
 
     'attributes' => [
+        'role' => 'Role',
+        'image' => 'Profile image',
+        'first_name' => 'First name',
+        'last_name' => 'Last name',
+        'email' => 'Email',
+        'phone' => 'Phone number',
+        'country_code' => 'Country code',
+        'lang' => 'Language',
+        'password' => 'Password',
+        'password_confirmation' => 'Password confirmation',
+        'investor_type' => 'Investor type',
+        'investor_experience' => 'Investment experience',
+        'experience_level' => 'Experience level',
+        'capital' => 'Capital',
+        'available_capital' => 'Available capital',
+        'preferred_sector_id' => 'Preferred sector',
+        'category_id' => 'Focus sector',
+        'previous_investments_count' => 'Previous investments count',
+        'company_license' => 'Company License',
         'investor_id' => 'Investor ID',
         'title_ar' => 'Role name (Arabic)',
         'title_en' => 'Role name (English)',
@@ -178,7 +197,6 @@ return [
         'email_verification_code' => 'Email verification code',
         'change_email_code' => 'Change email code',
         'status' => 'Status',
-        'company_license' => 'Company License',
     ],
 
 ];

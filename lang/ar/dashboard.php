@@ -190,6 +190,8 @@ return [
     'twitter link' => 'لينك تويتر',
     'unavailable' => 'غير متاح',
     'uploaded_file_image' => 'الملف المرفق يجب ان يكون صورة',
+    'image_file_size_error' => 'يجب ألا يزيد حجم الصورة عن 2 ميجابايت.',
+    'image_file_type_error' => 'يرجى التأكد من رفع ملف صورة.',
     'users' => 'العملاء',
     'users attract' => 'أداه لجذب العميل',
     'users count' => 'عدد المستخدمين',

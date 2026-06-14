@@ -186,6 +186,7 @@ return [
         'email' => 'البريد الإلكتروني',
         'password' => 'كلمة المرور',
         'country_code' => 'رمز الدولة',
+        'lang' => 'اللغة',
         'company_license' => 'ترخيص الشركة',
         'agreed_to_terms' => 'الموافقة على الشروط',
         'title_ar' => 'اسم الدور (العربية)',
