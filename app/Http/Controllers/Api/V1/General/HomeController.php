@@ -158,6 +158,9 @@ class HomeController extends Controller
                         \App\Enums\OpportunityStatus::Published->value,
                         \App\Enums\OpportunityStatus::Reserved->value,
                     ])
+                    ->when(auth('sanctum')->check(), function ($query) {
+                        $query->where('user_id', '!=', auth('sanctum')->user()->id);
+                    })
                     ->latest()
                     ->limit(6)
                     ->get()
