@@ -135,7 +135,9 @@ class HomeController extends Controller
                 (new QueryOptions())
                     ->latest()
                     ->conditions(['status' => true])
-                    ->withCount(['opportunities'])
+                    ->withCount(['opportunities' => function ($query) {
+                        $query->whereIn('status', [OpportunityStatus::Published->value, OpportunityStatus::Reserved->value]);
+                    }])
             );
         $data = [
             'website_name'         => $websiteName ?? '',
