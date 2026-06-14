@@ -35,6 +35,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     window.dashboardValidationTitle = @json(__('dashboard.validation_errors_title'));
+    window.dashboardRequiredFieldMessage = @json(__('dashboard.required_field_message'));
     if (typeof toastr !== 'undefined') {
         toastr.options = {
             closeButton: true,
@@ -51,6 +52,7 @@
         };
     }
 </script>
+<script src="{{ asset('dashboardAssets/custom/js/html-validation.js') }}"></script>
 
 <!-- Dashboard Core JS (Extracted from inline scripts)-->
 <script src="{{ asset('dashboardAssets/custom/js/dashboard-core.js') }}"></script>

@@ -150,6 +150,7 @@ return [
     'select role' => 'Select Role',
     'send' => 'Send',
     'validation_errors_title' => 'Please check the form',
+    'required_field_message' => 'This field is required',
     'phone_without_code' => 'Mobile number without country code',
     'choose_country_code' => 'Country code',
     'send to' => 'Send To',

@@ -594,6 +594,10 @@
     <script src="{{ asset('dashboardAssets/app-assets/js/core/app.js') }}"></script>
     <script src="{{ asset('dashboardAssets/app-assets/js/scripts/components.js') }}"></script>
     <!-- END: Theme JS-->
+    <script>
+        window.dashboardRequiredFieldMessage = @json(__('dashboard.required_field_message'));
+    </script>
+    <script src="{{ asset('dashboardAssets/custom/js/html-validation.js') }}"></script>
 
     <!-- BEGIN: Page JS-->
     <script>

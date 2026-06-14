@@ -151,6 +151,7 @@ return [
     'select role' => 'اختر الرول',
     'send' => 'إرسال',
     'validation_errors_title' => 'تحقق من البيانات',
+    'required_field_message' => 'هذا الحقل مطلوب',
     'phone_without_code' => 'رقم الجوال بدون المفتاح',
     'choose_country_code' => 'اختر رمز الدولة',
     'send to' => 'إرسال إلي',

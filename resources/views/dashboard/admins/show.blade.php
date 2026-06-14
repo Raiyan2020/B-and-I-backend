@@ -89,7 +89,7 @@
                                                             <p class="mb-0 font-weight-bold text-muted">{{ __('dashboard.role name') }}</p>
                                                             <h5 class="mb-0">
                                                                 @if($row->roles && $row->roles->count() > 0)
-                                                                    <span class="badge badge-primary">{{ $row->roles->first()->name }}</span>
+                                                                    <span class="badge badge-primary">{{ $row->roles->first()->display_name }}</span>
                                                                 @else
                                                                     <span class="badge badge-secondary">{{ __('dashboard.no role') }}</span>
                                                                 @endif
