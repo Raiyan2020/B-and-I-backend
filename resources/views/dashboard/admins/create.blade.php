@@ -99,8 +99,8 @@
                                         <div class="col-12">
                                             <button type="submit"
                                                 class="btn btn-primary mr-1 mb-1 submit_button">{{ __('dashboard.submit') }}</button>
-                                            <button type="reset"
-                                                class="btn btn-outline-warning mr-1 mb-1">{{ __('dashboard.reset') }}</button>
+                                            <button type="button"
+                                                class="btn btn-outline-warning mr-1 mb-1 btn-reset-form">{{ __('dashboard.reset') }}</button>
                                         </div>
                                     </div>
                                 </div>

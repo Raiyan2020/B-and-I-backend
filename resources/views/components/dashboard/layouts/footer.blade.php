@@ -83,6 +83,9 @@
 <script src="{{ asset('dashboardAssets/custom/js/datatable-initializer.js') }}"></script>
 <script src="{{ asset('dashboardAssets/custom/js/admin-collapsible-panels.js') }}"></script>
 
+<!-- Form Reset Handler (Global - Used on create forms)-->
+<script src="{{ asset('dashboardAssets/custom/js/form-reset.js') }}"></script>
+
 <!-- Submit Add Form Handler (Global - Used across forms)-->
 <script src="{{ asset('dashboardAssets/custom/js/submit-add-form.js') }}"></script>
 

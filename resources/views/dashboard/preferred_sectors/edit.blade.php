@@ -80,7 +80,7 @@
                                             <button type="submit"
                                                 class="btn btn-primary mr-1 mb-1 submit_button">{{ __('dashboard.submit') }}</button>
                                             <a href="{{ route('admin.preferred_sectors.index') }}"
-                                                class="btn btn-outline-secondary mr-1 mb-1">{{ __('dashboard.back') }}</a>
+                                                class="btn btn-outline-secondary mr-1 mb-1">{{ __('dashboard.cancel') }}</a>
                                         </div>
                                     </div>
                                 </div>

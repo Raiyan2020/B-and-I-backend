@@ -45,7 +45,11 @@
                     } else if (response.redirect === false) {
                         return;
                     } else {
-                        $form.trigger("reset");
+                        if (typeof window.resetDashboardForm === 'function') {
+                            window.resetDashboardForm($form);
+                        } else {
+                            $form.trigger("reset");
+                        }
                         // Reload DataTable if exists
                         var $table = $form.closest('.card').next().find('table');
                         if ($.fn.DataTable && $.fn.DataTable.isDataTable($table)) {

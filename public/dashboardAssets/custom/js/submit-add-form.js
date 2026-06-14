@@ -99,7 +99,11 @@
                         if (response.redirect === false) {
                             return;
                         } else {
-                            $('.store').trigger("reset");
+                            if (typeof window.resetDashboardForm === 'function') {
+                                window.resetDashboardForm(form);
+                            } else {
+                                form.trigger('reset');
+                            }
                             var table = form.closest('.card').next().find('table');
                             if ($.fn.DataTable && $.fn.DataTable.isDataTable(table)) {
                                 table.DataTable().ajax.reload(null, false);

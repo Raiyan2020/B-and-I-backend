@@ -83,6 +83,8 @@
 
                                         <div class="col-12">
                                             <button type="submit" class="btn btn-primary mr-1 mb-1 submit_button">{{ __('dashboard.submit') }}</button>
+                                            <a href="{{ route('admin.subscription_packages.index') }}"
+                                                class="btn btn-outline-secondary mr-1 mb-1">{{ __('dashboard.cancel') }}</a>
                                         </div>
                                     </div>
                                 </div>
