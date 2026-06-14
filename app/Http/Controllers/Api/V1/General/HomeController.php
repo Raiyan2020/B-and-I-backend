@@ -135,11 +135,9 @@ class HomeController extends Controller
                     ->conditions(['status' => true])
                     ->withCount(['opportunities' => function ($query) {
                         $query->whereIn('status', [OpportunityStatus::Published->value, OpportunityStatus::Reserved->value]);
-                    }])
-                    ->custom(function ($query) {
                         if (auth('sanctum')->check())
-                            $query->whereRelation('opportunities', 'user_id', '!=', auth('sanctum')->user()->id);
-                    })
+                            $query->where('user_id', '!=', auth('sanctum')->user()->id);
+                    }])
             );
         $data = [
             'website_name'         => $websiteName ?? '',
