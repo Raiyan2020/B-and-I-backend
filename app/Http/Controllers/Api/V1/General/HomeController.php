@@ -138,7 +138,7 @@ class HomeController extends Controller
                     }])
                     ->custom(function ($query) {
                         if (auth('sanctum')->check())
-                            $query->where('user_id', '!=', auth('sanctum')->user()->id);
+                            $query->whereRelation('opportunities', 'user_id', '!=', auth('sanctum')->user()->id);
                     })
             );
         $data = [

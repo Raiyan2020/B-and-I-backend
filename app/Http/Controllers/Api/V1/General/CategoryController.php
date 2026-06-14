@@ -23,7 +23,7 @@ class CategoryController extends Controller
         }]);
         $options->custom(function ($query) {
             if (auth('sanctum')->check())
-                $query->where('user_id', '!=', auth('sanctum')->user()->id);
+                $query->whereRelation('opportunities', 'user_id', '!=', auth('sanctum')->user()->id);
         });
         $categories = BaseService::setModel(Category::class)->limit($options);
 
