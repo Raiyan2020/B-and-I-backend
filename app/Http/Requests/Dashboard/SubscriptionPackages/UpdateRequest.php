@@ -20,7 +20,7 @@ class UpdateRequest extends FormRequest
             'name' => ['required', 'array'],
             'name.ar' => ['required', 'string', 'max:255'],
             'name.en' => ['required', 'string', 'max:255'],
-            'price_monthly' => ['required', 'numeric', 'min:0'],
+            'price_monthly' => ['required', 'numeric', 'min:0', 'max:999999999.999'],
             'description' => ['required', 'array'],
             'description.ar' => ['required', 'string', 'max:65000'],
             'description.en' => ['required', 'string', 'max:65000'],
