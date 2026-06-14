@@ -54,7 +54,7 @@ class AdResource extends JsonResource
         $canBuySeat = $user
             ? (
                 ! $isOwner
-                && $isInvestor
+                // && $isInvestor
                 && ! $hasSeat
                 && $status === OpportunityStatus::Published->value
             )
@@ -62,7 +62,7 @@ class AdResource extends JsonResource
         $canSubmitInterest = $user
             ? (
                 ! $isOwner
-                && $isInvestor
+                // && $isInvestor
                 && $hasSeat
                 && ! $hasSubmittedInterest
                 && in_array($status, [
