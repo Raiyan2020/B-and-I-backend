@@ -85,7 +85,7 @@ class AdResource extends JsonResource
             ]),
             'business_age_years' => $this->business_age_years,
             'investment_required' => $this->investment_required !== null ? (float) $this->investment_required : null,
-            'business_stage' => $this->business_stage,
+            'business_stage' => $this->localizedOptionPayload($this->business_stage, 'business_stage'),
             'sale_percentage' => $this->sale_percentage !== null ? (float) $this->sale_percentage : null,
             'seat_price' => $seatPrice !== null ? (float) $seatPrice : null,
             'completed_deals_commission' => $completedDealsCommission !== null ? (float) $completedDealsCommission : null,
@@ -107,7 +107,7 @@ class AdResource extends JsonResource
             ]),
             $this->mergeWhen($canViewSectionB, [
                 'legal_entity' => $this->legal_entity,
-                'financial_status' => $this->financial_status,
+                'financial_status' => $this->localizedOptionPayload($this->financial_status, 'financial_status'),
                 'investment_reason' => $this->investment_reason,
                 'full_description' => $this->full_description,
             ]),

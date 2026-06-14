@@ -21,6 +21,10 @@ class CategoryController extends Controller
         $options->withCount(['opportunities' => function ($query) {
             $query->whereIn('status', [OpportunityStatus::Published->value, OpportunityStatus::Reserved->value]);
         }]);
+        $options->custom(function ($query) {
+            if (auth('sanctum')->check())
+                $query->where('user_id', '!=', auth('sanctum')->user()->id);
+        });
         $categories = BaseService::setModel(Category::class)->limit($options);
 
         return $this->jsonResponse(data: [

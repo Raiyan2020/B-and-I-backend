@@ -30,9 +30,7 @@ class HomeController extends Controller
 {
     use ResponseTrait;
 
-    public function __construct(private readonly DeviceService $deviceService)
-    {
-    }
+    public function __construct(private readonly DeviceService $deviceService) {}
 
     /**
      * Change application language (ar/en only)
@@ -138,6 +136,10 @@ class HomeController extends Controller
                     ->withCount(['opportunities' => function ($query) {
                         $query->whereIn('status', [OpportunityStatus::Published->value, OpportunityStatus::Reserved->value]);
                     }])
+                    ->custom(function ($query) {
+                        if (auth('sanctum')->check())
+                            $query->where('user_id', '!=', auth('sanctum')->user()->id);
+                    })
             );
         $data = [
             'website_name'         => $websiteName ?? '',

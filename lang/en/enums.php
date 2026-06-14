@@ -27,4 +27,23 @@ return [
         'Reserved' => 'Reserved',
         'Completed' => 'Completed',
     ],
+    'business_stage' => [
+        'company' => 'Company',
+        'establishment' => 'Establishment',
+        'operational' => 'Operational',
+        'pre_operational' => 'Pre-operational',
+        'growth' => 'Growth stage',
+        'expansion' => 'Expansion stage',
+    ],
+    'financial_status' => [
+        'very_strong' => 'Very strong',
+        'strong' => 'Strong',
+        'stable' => 'Stable',
+        'moderate' => 'Moderate',
+        'needs_improvement' => 'Needs improvement',
+        'weak' => 'Weak',
+        'critical' => 'Critical',
+        'not_disclosed' => 'Not disclosed',
+        'healthy' => 'Healthy',
+    ],
 ];
