@@ -59,7 +59,7 @@
 
 <!-- Flash Messages Handler (Global - Handles Laravel flash messages)-->
 <script>
-    // Pass Laravel flash messages to JavaScript (validation errors show inline via @error)
+    // Pass Laravel flash messages to JavaScript; validation errors are rendered inline.
     window.dashboardErrors = '';
     window.dashboardSuccess = @json(session('success') ?: '');
     window.dashboardError = @json(session('error') ?: '');
