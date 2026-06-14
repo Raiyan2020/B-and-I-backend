@@ -90,8 +90,8 @@ class OpportunityService
         return Opportunity::query()
             ->with(['category', 'reviewer'])
             ->withCount(['investmentSeats', 'interestRequests'])
-            ->whereHas('investmentSeats', fn ($query) => $query->where('investment_seats.user_id', $user->id))
-            ->whereDoesntHave('interestRequests', fn ($query) => $query->where('interest_requests.user_id', $user->id))
+            ->whereHas('investmentSeats', fn ($query) => $query->where('user_id', $user->id))
+            ->whereDoesntHave('interestRequests', fn ($query) => $query->where('user_id', $user->id))
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
