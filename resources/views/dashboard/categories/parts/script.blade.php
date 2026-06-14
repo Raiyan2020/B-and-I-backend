@@ -18,11 +18,12 @@
                         name: $('#search-name').val() || '',
                         status: $('#status-filter').val() || '',
                         order: $('#order-filter').val() || 'ASC',
+                        order_by: 'order',
                     };
                 }
             },
             "paging": true,
-            order: [[3, 'asc']], // Sort by order column (index 3) ascending by default
+            order: [[3, 'asc']],
             columns: [{
                     // Checkbox column (rendered by DataTables with row ID)
                     data: 'id',
@@ -134,7 +135,11 @@
 
         // Filter button click
         $('#filter-btn').on('click', function() {
-            table.ajax.reload(null, false);
+            if (window.DataTablesShared) {
+                window.DataTablesShared.syncOrderFilter(table, 3);
+            } else {
+                table.ajax.reload(null, false);
+            }
         });
 
         // Reset filter button (Refresh icon)
@@ -143,8 +148,11 @@
             $('#search-name').val('');
             $('#status-filter').val('');
             $('#order-filter').val('ASC');
-            // Reload table with reset filters
-            table.ajax.reload(null, false);
+            if (window.DataTablesShared) {
+                window.DataTablesShared.syncOrderFilter(table, 3);
+            } else {
+                table.ajax.reload(null, false);
+            }
         });
 
         // Prevent form submission on Enter key

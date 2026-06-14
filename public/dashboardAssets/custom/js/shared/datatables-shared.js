@@ -138,6 +138,19 @@
         },
 
         /**
+         * Sync DataTables sort direction with the order filter dropdown.
+         */
+        syncOrderFilter: function(table, columnIndex, filterSelector) {
+            if (!table) {
+                return;
+            }
+
+            filterSelector = filterSelector || '#order-filter';
+            var dir = ($(filterSelector).val() || 'ASC').toLowerCase();
+            table.order([columnIndex, dir]).draw(false);
+        },
+
+        /**
          * Initialize DataTable with common options
          */
         init: function(tableSelector, customOptions) {

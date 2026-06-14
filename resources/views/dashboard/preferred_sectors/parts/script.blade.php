@@ -24,7 +24,7 @@
                 }
             },
             paging: true,
-            order: [[3, 'desc']],
+            order: [[3, 'asc']],
             columns: [{
                     data: 'id',
                     orderable: false,
@@ -107,14 +107,22 @@
         });
 
         $('#filter-btn').on('click', function() {
-            table.ajax.reload(null, false);
+            if (window.DataTablesShared) {
+                window.DataTablesShared.syncOrderFilter(table, 3);
+            } else {
+                table.ajax.reload(null, false);
+            }
         });
 
         $('#reset-filter-btn').on('click', function() {
             $('#search-name').val('');
             $('#status-filter').val('');
             $('#order-filter').val('ASC');
-            table.ajax.reload(null, false);
+            if (window.DataTablesShared) {
+                window.DataTablesShared.syncOrderFilter(table, 3);
+            } else {
+                table.ajax.reload(null, false);
+            }
         });
 
         $('#filter-form').on('submit', function(e) {
