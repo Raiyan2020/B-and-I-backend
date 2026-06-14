@@ -7,6 +7,7 @@
         let table = $('#opportunities-table').DataTable({
             processing: true,
             serverSide: true,
+            searching: false,
             ajax: {
                 url: "{{ route('admin.opportunities.index') }}",
                 data: function(d) {

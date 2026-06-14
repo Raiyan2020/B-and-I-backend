@@ -22,8 +22,8 @@
             serverSide: true,
             lengthMenu: [10, 20, 40, 60, 80, 100],
             pageLength: 10,
-            language: {
-                search: window.dashboardDataTablesSearch || 'Search',
+            language: window.dashboardDataTablesLanguage || {
+                search: window.dashboardDataTablesSearch || 'Search:',
                 processing: "<span class='fa-stack fa-lg'><i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i></span>",
                 lengthMenu: window.dashboardDataTablesLengthMenu || "Show _MENU_ entries",
                 info: window.dashboardDataTablesInfo || "Showing _START_ to _END_ of _TOTAL_ entries",

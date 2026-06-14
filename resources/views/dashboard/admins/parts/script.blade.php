@@ -4,6 +4,7 @@
 
             processing: true,
             serverSide: true,
+            searching: false,
             lengthMenu: [5,10, 20, 40, 60, 80, 100],
             pageLength: 5,
             ajax: {

@@ -3,6 +3,7 @@
         const table = $('#company-investor-interest-requests-table').DataTable({
             processing: true,
             serverSide: true,
+            searching: false,
             ajax: {
                 url: "{{ route('admin.company-investor-interest-requests.index') }}",
                 data: function(d) {

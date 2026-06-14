@@ -493,4 +493,11 @@
     body.dark-layout .table-image-placeholder {
         background: linear-gradient(135deg, #323a5a 0%, #2b3553 100%) !important;
     }
+
+    /* Table header add button — match filter section button size */
+    .card-header a .btn.btn-primary {
+        padding: 0.786rem 1.5rem;
+        font-size: 1rem;
+        line-height: 1;
+    }
 </style>
