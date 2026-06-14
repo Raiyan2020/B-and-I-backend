@@ -305,9 +305,13 @@
             // Pass translations to JS (with :start placeholder to be replaced in JS)
             window.dashboardTranslations = {
                 phone_must_start_with: '{{ __('dashboard.phone_must_start_with') }}',
-                table_phone: '{{ __('dashboard.table phone') }}'
+                table_phone: '{{ __('dashboard.table phone') }}',
+                company_license_file_size_error: @json(__('dashboard.company_license_file_size_error')),
+                company_license_file_type_error: @json(__('dashboard.company_license_file_type_error')),
             };
+            window.companyLicenseMaxSizeMb = 2;
         </script>
+        <script src="{{ asset('dashboardAssets/custom/js/company-license-validator.js') }}"></script>
         <script src="{{ asset('dashboardAssets/custom/js/shared/country-code-selector.js') }}"></script>
     @endpush
 </x-dashboard.layouts.master>

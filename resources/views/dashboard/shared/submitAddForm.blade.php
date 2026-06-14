@@ -14,6 +14,52 @@
             $form.find('.text-danger').remove();
             $form.find('input, textarea, select').removeClass('border-danger');
 
+            var $companyLicense = $form.find('#company-license');
+            if ($companyLicense.length && $companyLicense[0].files[0]) {
+                var licenseFile = $companyLicense[0].files[0];
+                var licenseMaxSize = (window.companyLicenseMaxSizeMb || 2) * 1024 * 1024;
+                var licenseTranslations = window.dashboardTranslations || {};
+                var allowedLicenseTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+
+                if (allowedLicenseTypes.indexOf(licenseFile.type) === -1) {
+                    var licenseTypeError = licenseTranslations.company_license_file_type_error ||
+                        '{{ __('dashboard.company_license_file_type_error') }}';
+                    $companyLicense.addClass('border-danger');
+                    $companyLicense.closest('.form-group').append(
+                        '<span class="text-danger d-block mt-1">' + licenseTypeError + '</span>'
+                    );
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            position: "top-start",
+                            icon: "error",
+                            title: licenseTypeError,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    }
+                    return;
+                }
+
+                if (licenseFile.size > licenseMaxSize) {
+                    var licenseSizeError = licenseTranslations.company_license_file_size_error ||
+                        '{{ __('dashboard.company_license_file_size_error') }}';
+                    $companyLicense.addClass('border-danger');
+                    $companyLicense.closest('.form-group').append(
+                        '<span class="text-danger d-block mt-1">' + licenseSizeError + '</span>'
+                    );
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            position: "top-start",
+                            icon: "error",
+                            title: licenseSizeError,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    }
+                    return;
+                }
+            }
+
             $.ajax({
                 url: url,
                 method: method === 'PUT' || method === 'PATCH' ? 'POST' : 'POST',
@@ -73,7 +119,7 @@
 
                             // Check if this is an image/photo validation error and show toast
                             var keyLower = key.toLowerCase();
-                            if (!imageErrorShown && (keyLower.indexOf('image') !== -1 || keyLower.indexOf('photo') !== -1)) {
+                            if (!imageErrorShown && (keyLower.indexOf('image') !== -1 || keyLower.indexOf('photo') !== -1 || keyLower === 'company_license')) {
                                 if (typeof Swal !== 'undefined') {
                                     Swal.fire({
                                         position: "top-start",

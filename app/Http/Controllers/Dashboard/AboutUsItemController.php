@@ -7,9 +7,11 @@ use App\Http\Requests\Dashboard\AboutUsItems\UpdateRequest;
 use App\Models\AboutUsItem;
 use App\Models\GeneralSetting;
 use App\Services\Dashboard\AboutUsItemService;
+use App\Support\QueryOptions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class AboutUsItemController extends AdminBasicController
 {
@@ -35,7 +37,19 @@ class AboutUsItemController extends AdminBasicController
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
-            return parent::index();
+            $rows = $this->serviceName->all(
+                (new QueryOptions())
+                    ->paginateNum(30)
+                    ->scopes($this->indexScopes ?? 'search')
+                    ->conditions($this->indexConditions ?? [])
+                    ->with($this->with ?? [])
+                    ->latest(true)
+            );
+
+            return DataTables::of($rows)
+                ->order(function () {})
+                ->editColumn('image', fn (AboutUsItem $item): ?string => $this->aboutUsItemImageUrl($item))
+                ->make(true);
         }
 
         $legacyTitle = GeneralSetting::getValueForKey('about_us_title');
@@ -47,6 +61,27 @@ class AboutUsItemController extends AdminBasicController
             'about_us_description_ar' => GeneralSetting::getValueForKey('about_us_description_ar') ?: $legacyDescription,
             'about_us_description_en' => GeneralSetting::getValueForKey('about_us_description_en') ?: '',
         ]);
+    }
+
+    private function aboutUsItemImageUrl(AboutUsItem $item): ?string
+    {
+        $image = $item->getRawImageAttribute();
+
+        if (empty($image)) {
+            return null;
+        }
+
+        if (filter_var($image, FILTER_VALIDATE_URL)) {
+            return $image;
+        }
+
+        $relativePath = 'storage/images/' . AboutUsItem::FOLDER . '/' . $image;
+
+        if (! file_exists(public_path($relativePath))) {
+            return null;
+        }
+
+        return asset($relativePath);
     }
 
     /**

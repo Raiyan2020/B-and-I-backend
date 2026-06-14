@@ -37,6 +37,31 @@ class AboutUsItem extends BaseModel
      */
     public $translatable = ['title', 'description'];
 
+    public function getAttribute($key)
+    {
+        if ($key === 'image') {
+            $image = $this->attributes['image'] ?? null;
+
+            if (empty($image)) {
+                return null;
+            }
+
+            if (filter_var($image, FILTER_VALIDATE_URL)) {
+                return $image;
+            }
+
+            $relativePath = 'storage/images/' . self::FOLDER . '/' . $image;
+
+            if (! file_exists(public_path($relativePath))) {
+                return null;
+            }
+
+            return asset($relativePath);
+        }
+
+        return parent::getAttribute($key);
+    }
+
     public function scopeSearch(Builder $query, array $filters = []): Builder
     {
         $filters = $filters ?: (array) request()->input('filters', []);

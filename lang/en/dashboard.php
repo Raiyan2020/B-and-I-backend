@@ -190,6 +190,8 @@ return [
     'uploaded_file_image' => 'Uploaded File Must Be Image',
     'image_file_size_error' => 'The image size must not exceed 2 megabytes.',
     'image_file_type_error' => 'Please make sure to upload an image file.',
+    'company_license_file_size_error' => 'The company license size must not exceed 2 megabytes.',
+    'company_license_file_type_error' => 'The company license must be a file of type: jpg, jpeg, png, pdf.',
     'users' => 'Customers',
     'users attract' => 'A tool to attract a customer',
     'users count' => 'Users Count',

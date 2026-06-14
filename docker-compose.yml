@@ -1,7 +1,7 @@
 services:
   mysql:
     image: mysql:8.0
-    container_name: b_and_i_mysql
+    container_name: b_and_i_backend_mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: b_and_i
@@ -10,7 +10,7 @@ services:
     ports:
       - "33066:3306"
     volumes:
-      - b_and_i_mysql_data:/var/lib/mysql
+      - b_and_i_backend_mysql_data:/var/lib/mysql
 
 volumes:
-  b_and_i_mysql_data:
+  b_and_i_backend_mysql_data:

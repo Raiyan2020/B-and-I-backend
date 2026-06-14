@@ -92,8 +92,21 @@ class StoreRequest extends FormRequest
             $message = str_replace(':start', '', $message);
         }
 
-        return [
+        return array_merge([
             'phone.regex' => $message,
+        ], $this->companyLicenseFileMessages());
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function companyLicenseFileMessages(): array
+    {
+        return [
+            'company_license.max' => __('dashboard.company_license_file_size_error'),
+            'company_license.uploaded' => __('dashboard.company_license_file_size_error'),
+            'company_license.file' => __('dashboard.company_license_file_size_error'),
+            'company_license.mimes' => __('dashboard.company_license_file_type_error'),
         ];
     }
 }
