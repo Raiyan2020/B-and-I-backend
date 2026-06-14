@@ -121,13 +121,13 @@
                                 $input = $form.find('input[type="file"][name^="' + baseKey + '"]');
                             }
 
-                            // If still not found, try without type filter
+                            // If still not found, try without type filter (exact name only)
                             if (!$input.length) {
                                 $input = $form.find('input[name="' + key + '"], input[name="' + baseKey + '"]');
                             }
 
-                            var $select = $form.find('select[name="' + key + '"], select[name^="' + selectorKey + '"]');
-                            var $textarea = $form.find('textarea[name="' + key + '"], textarea[name^="' + selectorKey + '"]');
+                            var $select = $form.find('select[name="' + key + '"], select[name="' + selectorKey + '"]');
+                            var $textarea = $form.find('textarea[name="' + key + '"], textarea[name="' + selectorKey + '"]');
 
                             // Handle file inputs (image components)
                             if ($input.length && $input.attr('type') === 'file') {

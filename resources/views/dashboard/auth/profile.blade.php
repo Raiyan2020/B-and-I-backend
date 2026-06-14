@@ -224,9 +224,6 @@
                                                             <i class="fa fa-lock"></i>
                                                         </div>
                                                     </div>
-                                                    @error('password_confirmation')
-                                                        <span class="text-danger">{{ $message }}</span>
-                                                    @enderror
                                                 </div>
                                             </div>
 

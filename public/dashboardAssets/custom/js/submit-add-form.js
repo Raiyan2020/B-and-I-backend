@@ -6,37 +6,34 @@
 (function() {
     'use strict';
 
-    function collectValidationMessages(errors) {
-        var lines = [];
-        if (!errors || typeof errors !== 'object') {
-            return lines;
-        }
-        $.each(errors, function(key, value) {
-            if ($.isArray(value)) {
-                $.each(value, function(i, msg) {
-                    if (msg) {
-                        lines.push(msg);
-                    }
-                });
-            } else if (typeof value === 'string') {
-                lines.push(value);
-            }
-        });
-        return lines;
-    }
-
-    function showValidationToast(lines) {
-        if (!lines.length) {
+    function appendFieldError($field, msgText) {
+        if (!$field.length) {
             return;
         }
-        var body = lines.join('<br>');
-        var title = window.dashboardValidationTitle || 'Validation';
-        if (typeof toastr !== 'undefined') {
-            toastr.error(body, title, {
-                timeOut: 12000,
-                enableHtml: true
-            });
+
+        $field.addClass('border-danger');
+
+        var $parent = $field.parent();
+        if ($parent.hasClass('position-relative') || $parent.hasClass('has-icon-left')) {
+            $parent.after('<span class="mt-5 text-danger">' + msgText + '</span>');
+            return;
         }
+
+        if ($field.is('select') && $parent.hasClass('form-group')) {
+            $parent.append('<span class="mt-5 text-danger">' + msgText + '</span>');
+            return;
+        }
+
+        $field.after('<span class="mt-5 text-danger">' + msgText + '</span>');
+    }
+
+    function resolveFieldSelector(key) {
+        if (key.indexOf('.') >= 0) {
+            var split = key.split('.');
+            return split[0] + '\\[' + split[1] + '\\]';
+        }
+
+        return key;
     }
 
     // Wait for jQuery and SweetAlert2
@@ -70,19 +67,19 @@
                     processData: false,
                     contentType: false,
                     beforeSend: function() {
-                        $(".submit_button").html(
+                        form.find('.submit_button').html(
                             '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'
                         ).attr('disabled', true);
                     },
                     success: function(response) {
-                        $(".text-danger").remove();
-                        $('.store input').removeClass('border-danger');
-                        $(".submit_button").html(window.dashboardSendText || "Send").attr('disabled', false);
+                        form.find('.text-danger').remove();
+                        form.find('input, select, textarea').removeClass('border-danger');
+                        form.find('.submit_button').html(window.dashboardSendText || 'Send').attr('disabled', false);
 
                         if (typeof Swal !== 'undefined') {
                             Swal.fire({
-                                position: "top-start",
-                                icon: "success",
+                                position: 'top-start',
+                                icon: 'success',
                                 title: response.msg || (window.dashboardAddedSuccessfully || 'Added successfully'),
                                 showConfirmButton: false,
                                 buttonsStyling: false,
@@ -98,63 +95,43 @@
 
                         if (response.redirect === false) {
                             return;
+                        }
+
+                        if (typeof window.resetDashboardForm === 'function') {
+                            window.resetDashboardForm(form);
                         } else {
-                            if (typeof window.resetDashboardForm === 'function') {
-                                window.resetDashboardForm(form);
-                            } else {
-                                form.trigger('reset');
-                            }
-                            var table = form.closest('.card').next().find('table');
-                            if ($.fn.DataTable && $.fn.DataTable.isDataTable(table)) {
-                                table.DataTable().ajax.reload(null, false);
-                            }
+                            form.trigger('reset');
+                        }
+
+                        var table = form.closest('.card').next().find('table');
+                        if ($.fn.DataTable && $.fn.DataTable.isDataTable(table)) {
+                            table.DataTable().ajax.reload(null, false);
                         }
                     },
                     error: function(xhr) {
-                        $(".submit_button").html(window.dashboardSendText || "Send").attr('disabled', false);
-                        $(".text-danger").remove();
-                        $('.store input').removeClass('border-danger');
-                        $('.store select').removeClass('border-danger');
-                        $('.store textarea').removeClass('border-danger');
-
-                        var toastLines = [];
+                        form.find('.submit_button').html(window.dashboardSendText || 'Send').attr('disabled', false);
+                        form.find('.text-danger').remove();
+                        form.find('input, select, textarea').removeClass('border-danger');
 
                         if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            toastLines = collectValidationMessages(xhr.responseJSON.errors);
-                            showValidationToast(toastLines);
-
                             $.each(xhr.responseJSON.errors, function(key, value) {
-                                // if key has "." it means that input has two languages do this action to handle input name
-                                if (key.indexOf(".") >= 0) {
-                                    var split = key.split('.');
-                                    key = split[0] + '\\[' + split[1] + '\\]';
-                                }
-
+                                var selectorKey = resolveFieldSelector(key);
                                 var msgText = $.isArray(value) ? value[0] : value;
 
-                                $('.store .after .error.' + key).append(
-                                    `<span class="mt-5 text-danger">${msgText}</span>`);
+                                form.find('.after .error.' + selectorKey).append(
+                                    '<span class="mt-5 text-danger">' + msgText + '</span>'
+                                );
 
-                                // normal inputs
-                                $('.store input[name^=' + key + ']').addClass('border-danger');
-                                $('.store input[name^=' + key + '][type!=file]').parent().after(
-                                    `<span class="mt-5 text-danger">${msgText}</span>`);
-
-                                // for textarea
-                                $('.store textarea[name^=' + key + ']').addClass('border-danger');
-                                $('.store textarea[name^=' + key + ']').after(
-                                    `<span class="mt-5 text-danger">${msgText}</span>`);
-
-                                // for select input
-                                $('.store select[name^=' + key + ']').addClass('border-danger');
-                                $('.store select[name^=' + key + ']').parent().after(
-                                    `<span class="mt-5 text-danger">${msgText}</span>`);
+                                appendFieldError(form.find('input[name="' + selectorKey + '"][type!="file"]'), msgText);
+                                appendFieldError(form.find('textarea[name="' + selectorKey + '"]'), msgText);
+                                appendFieldError(form.find('select[name="' + selectorKey + '"]'), msgText);
                             });
                         } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                            toastLines = [xhr.responseJSON.message];
-                            showValidationToast(toastLines);
-                        } else if (xhr.status >= 400) {
-                            showValidationToast([window.dashboardGenericError || 'Error']);
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(xhr.responseJSON.message, window.dashboardValidationTitle || 'Validation');
+                            }
+                        } else if (xhr.status >= 400 && typeof toastr !== 'undefined') {
+                            toastr.error(window.dashboardGenericError || 'Error');
                         }
                     },
                 });

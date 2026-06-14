@@ -30,7 +30,7 @@
                                             <div class="form-group">
                                                 <label for="first-name-icon">{{ __('dashboard.role name') }}</label>
                                                 <select name="role" class="select2 form-control" required>
-                                                    <option disabled selected>{{ __('dashboard.choose role') }}</option>
+                                                    <option value="" disabled selected>{{ __('dashboard.choose role') }}</option>
                                                     @foreach ($roles as $role)
                                                         <option value="{{ $role->name }}">{{ $role->display_name }}</option>
                                                     @endforeach
