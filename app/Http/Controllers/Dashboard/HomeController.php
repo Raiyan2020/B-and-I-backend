@@ -31,6 +31,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.admins'),
                 link: route('admin.admins.index'),
+                permission: 'admins',
                 icon: 'feather icon-shield',
                 color: 'danger',
                 queryFactory: fn () => Admin::query(),
@@ -39,6 +40,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.investors'),
                 link: route('admin.investors.index'),
+                permission: 'users',
                 icon: 'feather icon-trending-up',
                 color: 'success',
                 queryFactory: fn () => User::query()->where('role', UserRole::Investor->value),
@@ -47,6 +49,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.advertisers_companies'),
                 link: route('admin.advertisers.index'),
+                permission: 'users',
                 icon: 'feather icon-briefcase',
                 color: 'primary',
                 queryFactory: fn () => User::query()->where('role', UserRole::Advertiser->value),
@@ -55,6 +58,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.categories'),
                 link: route('admin.categories.index'),
+                permission: 'categories',
                 icon: 'feather icon-list',
                 color: 'warning',
                 queryFactory: fn () => Category::query(),
@@ -63,6 +67,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.opportunities_menu'),
                 link: route('admin.opportunities.index'),
+                permission: 'opportunities',
                 icon: 'feather icon-layout',
                 color: 'info',
                 queryFactory: fn () => Opportunity::query(),
@@ -71,6 +76,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.investment_seats_menu'),
                 link: route('admin.investment-seats.index'),
+                permission: 'investment-seats',
                 icon: 'feather icon-file-text',
                 color: 'secondary',
                 queryFactory: fn () => InvestmentSeat::query(),
@@ -79,6 +85,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.proposed_deals'),
                 link: route('admin.interest-requests.index'),
+                permission: 'interest-requests',
                 icon: 'feather icon-git-pull-request',
                 color: 'primary',
                 queryFactory: fn () => InterestRequest::query(),
@@ -87,6 +94,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.successful_deals'),
                 link: route('admin.opportunities.index'),
+                permission: 'opportunities',
                 icon: 'feather icon-award',
                 color: 'success',
                 queryFactory: fn () => Opportunity::query()->where('status', OpportunityStatus::Completed->value),
@@ -95,6 +103,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.subscription_packages_menu'),
                 link: route('admin.subscription_packages.index'),
+                permission: 'subscription-packages',
                 icon: 'feather icon-layers',
                 color: 'danger',
                 queryFactory: fn () => SubscriptionPackage::query(),
@@ -103,6 +112,7 @@ class HomeController extends Controller
             $this->buildStatCard(
                 title: __('dashboard.preferred_sectors'),
                 link: route('admin.preferred_sectors.index'),
+                permission: 'preferred-sectors',
                 icon: 'feather icon-target',
                 color: 'warning',
                 queryFactory: fn () => PreferredSector::query(),
@@ -175,6 +185,7 @@ class HomeController extends Controller
             'last7Days' => $last7Days,
             'activitySections' => array_values(array_filter($activitySections, fn (array $section) => ! empty($section['items']))),
             'categoryChart' => $categoryChart,
+            'showQuickLinks' => $this->hasAnyQuickLinkPermission(),
         ]);
     }
 
@@ -183,7 +194,7 @@ class HomeController extends Controller
      * @param  Collection<int, Carbon>  $days
      * @return array<string, mixed>
      */
-    private function buildStatCard(string $title, string $link, string $icon, string $color, callable $queryFactory, Collection $days): array
+    private function buildStatCard(string $title, string $link, string $permission, string $icon, string $color, callable $queryFactory, Collection $days): array
     {
         $chartData = $days->map(function (Carbon $date) use ($queryFactory): int {
             $query = $queryFactory();
@@ -206,10 +217,23 @@ class HomeController extends Controller
             'chartData' => $chartData,
             'growth' => $this->growthPercentage($queryFactory),
             'todayCount' => $todayCount,
-            'link' => $link,
+            'link' => auth()->user()?->can($permission) ? $link : null,
             'icon' => $icon,
             'color' => $color,
         ];
+    }
+
+    private function hasAnyQuickLinkPermission(): bool
+    {
+        $permissions = ['admins', 'users', 'categories', 'preferred-sectors', 'opportunities'];
+
+        foreach ($permissions as $permission) {
+            if (auth()->user()?->can($permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

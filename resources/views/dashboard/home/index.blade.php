@@ -74,6 +74,7 @@
                             :activitySections="$activitySections" />
                     </div>
 
+                    @if($showQuickLinks)
                     <!-- Divider: Quick Links -->
                     <div class="row mt-2">
                         <div class="col-12">
@@ -92,6 +93,7 @@
                     <div class="row">
                         <x-dashboard.home.quickLinks />
                     </div>
+                    @endif
 
                 </section>
             </div>
