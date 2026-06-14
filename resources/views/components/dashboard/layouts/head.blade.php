@@ -94,7 +94,7 @@ use App\Models\GeneralSetting;
     <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/admin-collapsible-panels.css') }}">
 
     <!-- Table Toolkit CSS (Global - For checkbox selection and bulk actions)-->
-    <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/shared/table-toolkit.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('dashboardAssets/custom/css/shared/table-toolkit.css') }}?v={{ filemtime(public_path('dashboardAssets/custom/css/shared/table-toolkit.css')) }}">
 
     <!-- Component Styles (Upload Image, DataTables)-->
     <x-dashboard.layouts.upload-image-style/>

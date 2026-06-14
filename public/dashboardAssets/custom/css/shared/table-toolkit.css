@@ -19,37 +19,33 @@
     accent-color: #9C88FF;
 }
 
-/* Bulk Actions Bar */
+/* Bulk Actions Bar - lives in card header, outside scrollable table area */
 .bulk-actions-bar {
-    animation: slideUp 0.3s ease-out;
-    min-width: 400px;
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    margin-inline-end: 0.75rem;
+    border-radius: 8px;
+    background: #f8f9ff;
+    border: 1px solid #d8d2ff;
+    box-shadow: 0 2px 8px rgba(156, 136, 255, 0.12);
 }
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
+.bulk-actions-bar.is-visible {
+    display: flex;
 }
 
 .bulk-actions-bar .selected-count {
     color: #9C88FF;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 .bulk-actions-bar .btn {
     border-radius: 6px;
     font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.bulk-actions-bar .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
 }
 
 /* Selected Row Highlight */
@@ -63,9 +59,17 @@ tbody tr:has(.dt-select-row:checked) {
     accent-color: #9C88FF;
 }
 
+.card-header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-inline-start: auto;
+}
+
 /* Dark Mode Support */
 body.dark-layout .bulk-actions-bar {
-    background: #2b3553 !important;
+    background: #323a5a !important;
     border-color: #414561 !important;
     color: #ebeefd !important;
 }
@@ -81,19 +85,25 @@ body.dark-layout tbody tr:has(.dt-select-row:checked) {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .bulk-actions-bar {
-        min-width: auto;
-        width: 90%;
-        padding: 0.75rem 1rem;
-        bottom: 70px;
-    }
-
-    .bulk-actions-bar .d-flex {
+    .card-header {
         flex-direction: column;
-        gap: 0.5rem !important;
+        align-items: flex-start !important;
+        gap: 0.75rem;
     }
 
-    .bulk-actions-bar .btn {
+    .card-header-actions {
         width: 100%;
+        margin-inline-start: 0;
+    }
+
+    .bulk-actions-bar {
+        width: 100%;
+        margin-inline-end: 0;
+        flex-wrap: wrap;
+    }
+
+    .bulk-actions-bar .d-flex.gap-2 {
+        width: 100%;
+        flex-wrap: wrap;
     }
 }

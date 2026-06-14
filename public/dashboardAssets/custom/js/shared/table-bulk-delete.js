@@ -24,9 +24,9 @@
                 confirmText: window.dashboardBulkDeleteText || 'سيتم حذف العناصر المحددة. لا يمكن التراجع عن هذا الإجراء!',
                 confirmButtonText: window.dashboardConfirm || 'نعم، احذف',
                 cancelButtonText: window.dashboardCancel || 'إلغاء',
-                successTitle: window.dashboardSuccess || 'نجح',
+                successTitle: window.dashboardSuccessTitle || 'نجح',
                 successText: window.dashboardItemsDeletedSuccessfully || 'تم الحذف بنجاح',
-                errorTitle: window.dashboardError || 'خطأ',
+                errorTitle: window.dashboardErrorTitle || 'خطأ',
                 errorText: window.dashboardErrorText || 'حدث خطأ أثناء الحذف',
                 selectedCountText: window.dashboardSelectedItems || 'عنصر محدد'
             };

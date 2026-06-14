@@ -120,6 +120,8 @@
     window.dashboardConfirm = @json(__('dashboard.confirm'));
     window.dashboardCancel = @json(__('dashboard.cancel'));
     window.dashboardItemDeletedSuccessfully = @json(__('dashboard.item deleted successfully'));
+    window.dashboardSuccessTitle = @json(__('dashboard.success'));
+    window.dashboardErrorTitle = @json(__('dashboard.error'));
 
     // Bulk delete translations
     window.dashboardBulkDeleteText = @json(__('dashboard.bulk_delete_text', ['default' => 'سيتم حذف العناصر المحددة. لا يمكن التراجع عن هذا الإجراء!']));
@@ -140,12 +142,12 @@
 <script src="{{ asset('dashboardAssets/custom/js/swal-flash.js') }}"></script>
 
 <!-- Table Delete Row Handler (Global - Replaces inline deleteOne.blade.php)-->
-<script src="{{ asset('dashboardAssets/custom/js/shared/table-delete-row.js') }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/shared/table-delete-row.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/shared/table-delete-row.js')) }}"></script>
 
 <!-- Table Toolkit (Selection + Bulk Delete) - Loaded globally for reuse -->
-<script src="{{ asset('dashboardAssets/custom/js/shared/table-selection.js') }}"></script>
-<script src="{{ asset('dashboardAssets/custom/js/shared/table-bulk-delete.js') }}"></script>
-<script src="{{ asset('dashboardAssets/custom/js/shared/table-toggle-block.js') }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/shared/table-selection.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/shared/table-selection.js')) }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/shared/table-bulk-delete.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/shared/table-bulk-delete.js')) }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/shared/table-toggle-block.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/shared/table-toggle-block.js')) }}"></script>
 <script src="{{ asset('dashboardAssets/custom/js/shared/table-helpers.js') }}"></script>
 <script src="{{ asset('dashboardAssets/custom/js/shared/datatables-shared.js') }}"></script>
 

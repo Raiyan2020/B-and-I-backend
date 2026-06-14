@@ -6,6 +6,15 @@
 (function() {
     'use strict';
 
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     window.TableHelpers = {
         /**
          * Render image column for DataTables
@@ -43,6 +52,19 @@
             var config = isActive ? options.active : options.inactive;
             
             return `<span class="badge badge-${config.class}">${config.text}</span>`;
+        },
+
+        /**
+         * Render phone numbers left-to-right so international plus codes stay in place in RTL layouts.
+         * @param {string} phone - Full phone number
+         * @returns {string} HTML string
+         */
+        renderPhone: function(phone) {
+            if (!phone) {
+                return '-';
+            }
+
+            return `<span dir="ltr" class="d-inline-block text-nowrap" style="unicode-bidi: isolate;">${escapeHtml(phone)}</span>`;
         },
 
         /**

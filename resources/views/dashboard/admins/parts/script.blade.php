@@ -53,7 +53,14 @@
                 },
                 {
                     data: 'phone',
-                    name: 'phone'
+                    name: 'phone',
+                    render: function(data, type) {
+                        if (type !== 'display') {
+                            return data;
+                        }
+
+                        return window.TableHelpers ? window.TableHelpers.renderPhone(data) : data;
+                    }
                 },
                 {
                     data: 'email',
