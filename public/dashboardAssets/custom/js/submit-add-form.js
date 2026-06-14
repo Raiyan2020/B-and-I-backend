@@ -122,7 +122,7 @@
                                     '<span class="mt-5 text-danger">' + msgText + '</span>'
                                 );
 
-                                appendFieldError(form.find('input[name="' + selectorKey + '"][type!="file"]'), msgText);
+                                appendFieldError(form.find('input[name="' + selectorKey + '"]'), msgText);
                                 appendFieldError(form.find('textarea[name="' + selectorKey + '"]'), msgText);
                                 appendFieldError(form.find('select[name="' + selectorKey + '"]'), msgText);
                             });

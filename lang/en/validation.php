@@ -178,6 +178,7 @@ return [
         'email_verification_code' => 'Email verification code',
         'change_email_code' => 'Change email code',
         'status' => 'Status',
+        'company_license' => 'Company License',
     ],
 
 ];
