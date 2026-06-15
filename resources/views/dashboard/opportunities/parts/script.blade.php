@@ -7,14 +7,24 @@
         let table = $('#opportunities-table').DataTable({
             processing: true,
             serverSide: true,
+            searching: false,
+            ordering: false,
             ajax: {
                 url: "{{ route('admin.opportunities.index') }}",
                 data: function(d) {
                     d.filters = {
-                        status: $('#status-filter').val() || '',
-                        goal: $('#goal-filter').val() || '',
                         company_name: $('#search-company').val() || '',
                     };
+
+                    var status = $('#status-filter').val();
+                    if (status !== '') {
+                        d.filters['status__eq'] = status;
+                    }
+
+                    var goal = $('#goal-filter').val();
+                    if (goal !== '') {
+                        d.filters['goal__eq'] = goal;
+                    }
                 }
             },
             columns: [

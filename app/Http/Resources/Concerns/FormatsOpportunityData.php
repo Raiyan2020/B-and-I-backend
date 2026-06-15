@@ -4,6 +4,7 @@ namespace App\Http\Resources\Concerns;
 
 use App\Enums\OpportunityStatus;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 trait FormatsOpportunityData
 {
@@ -58,5 +59,35 @@ trait FormatsOpportunityData
             ->map(fn (OpportunityStatus $status) => $this->statusPayload($status))
             ->values()
             ->all();
+    }
+
+    protected function localizedOptionPayload(?string $value, string $translationGroup): ?array
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        $candidates = array_unique(array_filter([
+            $value,
+            Str::snake($value),
+            Str::snake(Str::lower($value)),
+        ]));
+
+        foreach ($candidates as $candidate) {
+            $translationKey = "enums.{$translationGroup}.{$candidate}";
+            $label = __($translationKey);
+
+            if ($label !== $translationKey) {
+                return [
+                    'key' => $value,
+                    'label' => $label,
+                ];
+            }
+        }
+
+        return [
+            'key' => $value,
+            'label' => $value,
+        ];
     }
 }

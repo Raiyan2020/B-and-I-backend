@@ -6,43 +6,55 @@
 (function() {
     'use strict';
 
-    // Wait for jQuery and DataTables
+    function getLanguageConfig() {
+        if (window.dashboardDataTablesLanguage) {
+            return window.dashboardDataTablesLanguage;
+        }
+
+        return {
+            search: window.dashboardDataTablesSearch || 'Search:',
+            processing: "<span class='fa-stack fa-lg'><i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i></span>",
+            lengthMenu: window.dashboardDataTablesLengthMenu || 'Show _MENU_ entries',
+            info: window.dashboardDataTablesInfo || 'Showing _START_ to _END_ of _TOTAL_ entries',
+            infoEmpty: window.dashboardDataTablesInfoEmpty || 'Showing 0 to 0 of 0 entries',
+            infoFiltered: window.dashboardDataTablesInfoFiltered || '(filtered from _MAX_ total entries)',
+            emptyTable: window.dashboardDataTablesEmptyTable || 'No data available in table',
+            zeroRecords: window.dashboardDataTablesZeroRecords || 'No matching records found',
+            paginate: {
+                first: window.dashboardDataTablesFirst || 'First',
+                last: window.dashboardDataTablesLast || 'Last',
+                next: window.dashboardDataTablesNext || 'Next',
+                previous: window.dashboardDataTablesPrevious || 'Previous',
+            },
+            aria: {
+                sortAscending: window.dashboardDataTablesSortAscending || ': activate to sort column ascending',
+                sortDescending: window.dashboardDataTablesSortDescending || ': activate to sort column descending',
+            },
+        };
+    }
+
+    function applyDataTablesDefaults() {
+        if (typeof jQuery === 'undefined' || typeof jQuery.fn.dataTable === 'undefined') {
+            return false;
+        }
+
+        jQuery.extend(true, jQuery.fn.dataTable.defaults, {
+            language: getLanguageConfig(),
+        });
+
+        return true;
+    }
+
     function initDataTables() {
-        if (typeof jQuery === 'undefined' || typeof $.fn.dataTable === 'undefined') {
-            setTimeout(initDataTables, 100);
+        if (applyDataTablesDefaults()) {
             return;
         }
 
-        var $ = jQuery;
-
-        // Extend DataTables defaults
-        $.extend(true, $.fn.dataTable.defaults, {
-            language: {
-                search: window.dashboardDataTablesSearch || "Search",
-                "processing": "<span class='fa-stack fa-lg'>\n\
-                            <i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i>\n\
-                       </span>",
-                "lengthMenu": window.dashboardDataTablesLengthMenu || "Show _MENU_ entries",
-                "info": window.dashboardDataTablesInfo || "Showing _START_ to _END_ of _TOTAL_ entries",
-                "infoEmpty": window.dashboardDataTablesInfoEmpty || "Showing 0 to 0 of 0 entries",
-                "infoFiltered": window.dashboardDataTablesInfoFiltered || "(filtered from _MAX_ total entries)",
-                "emptyTable": window.dashboardDataTablesEmptyTable || "No data available in table",
-                "zeroRecords": window.dashboardDataTablesZeroRecords || "No matching records found",
-                "paginate": {
-                    "first": window.dashboardDataTablesFirst || "First",
-                    "last": window.dashboardDataTablesLast || "Last",
-                    "next": window.dashboardDataTablesNext || "Next",
-                    "previous": window.dashboardDataTablesPrevious || "Previous"
-                },
-                "aria": {
-                    "sortAscending": window.dashboardDataTablesSortAscending || ": activate to sort column ascending",
-                    "sortDescending": window.dashboardDataTablesSortDescending || ": activate to sort column descending"
-                }
-            }
-        });
+        setTimeout(initDataTables, 100);
     }
 
-    // Initialize when DOM is ready
+    window.dashboardApplyDataTablesDefaults = applyDataTablesDefaults;
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initDataTables);
     } else {

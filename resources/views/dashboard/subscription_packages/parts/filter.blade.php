@@ -25,8 +25,9 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2 d-flex align-items-end">
-            <button type="button" id="filter-btn" class="btn btn-primary btn-sm mr-1">
+        <div class="col-md-12 col-lg-12 d-flex align-items-end gap-2 mt-2">
+            <button type="button" id="filter-btn" class="btn btn-primary">
+                <i class="feather icon-filter"></i>
                 {{ __('dashboard.filter') }}
             </button>
         </div>

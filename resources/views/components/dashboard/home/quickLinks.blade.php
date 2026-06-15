@@ -9,6 +9,7 @@
         <div class="card-content">
             <div class="card-body">
                 <div class="quick-links-grid">
+                    @can('admins')
                     <a href="{{ route('admin.admins.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-danger">
                             <i class="feather icon-shield"></i>
@@ -21,7 +22,9 @@
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
+                    @endcan
 
+                    @can('users')
                     <a href="{{ route('admin.advertisers.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-success">
                             <i class="feather icon-briefcase"></i>
@@ -34,7 +37,9 @@
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
+                    @endcan
 
+                    @can('users')
                     <a href="{{ route('admin.investors.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-primary">
                             <i class="feather icon-trending-up"></i>
@@ -47,7 +52,9 @@
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
+                    @endcan
 
+                    @can('categories')
                     <a href="{{ route('admin.categories.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-info">
                             <i class="feather icon-list"></i>
@@ -60,7 +67,9 @@
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
+                    @endcan
 
+                    @can('preferred-sectors')
                     <a href="{{ route('admin.preferred_sectors.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-warning">
                             <i class="feather icon-target"></i>
@@ -73,7 +82,9 @@
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
+                    @endcan
 
+                    @can('opportunities')
                     <a href="{{ route('admin.opportunities.index') }}" class="quick-link-item">
                         <div class="quick-link-icon bg-secondary">
                             <i class="feather icon-layout"></i>
@@ -86,6 +97,7 @@
                             <i class="feather icon-arrow-{{ app()->getLocale() == 'ar' ? 'left' : 'right' }}"></i>
                         </div>
                     </a>
+                    @endcan
                 </div>
             </div>
         </div>

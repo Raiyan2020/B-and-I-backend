@@ -244,6 +244,24 @@
         };
 
 
+        function showImageUploadAlert(message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: @json(__('dashboard.validation_errors_title')),
+                    text: message,
+                    confirmButtonText: @json(__('dashboard.confirm')),
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
+                    }
+                });
+                return;
+            }
+
+            alert(message);
+        }
+
         // Simple File Validate Function
         function fileValidate(fileType, fileSize, uploadedFileIconText) {
             // File Type Validation
@@ -264,10 +282,12 @@
                 if (fileSize <= 2000000) { // 2MB :)
                     return true;
                 } else { // Else File Size
-                    return alert('Please Your File Should be 2 Megabytes or Less');
+                    showImageUploadAlert(@json(__('dashboard.image_file_size_error')));
+                    return false;
                 };
             } else { // Else File Type
-                return alert('Please make sure to upload An Image File Type');
+                showImageUploadAlert(@json(__('dashboard.image_file_type_error')));
+                return false;
             };
         };
 

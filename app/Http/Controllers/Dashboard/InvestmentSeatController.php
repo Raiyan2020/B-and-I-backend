@@ -28,6 +28,7 @@ class InvestmentSeatController extends Controller
                 ->latest('id');
 
             return DataTables::eloquent($query)
+                ->order(function () {})
                 ->addColumn('opportunity_id', function (InvestmentSeat $seat): int|string {
                     return $seat->opportunity_id ?? '';
                 })

@@ -59,28 +59,45 @@
 
 <!-- Flash Messages Handler (Global - Handles Laravel flash messages)-->
 <script>
-    // Pass Laravel flash messages to JavaScript (validation errors show inline via @error)
+    // Pass Laravel flash messages to JavaScript; validation errors are rendered inline.
     window.dashboardErrors = '';
     window.dashboardSuccess = @json(session('success') ?: '');
     window.dashboardError = @json(session('error') ?: '');
-    window.dashboardDataTablesSearch = @json(__('dashboard.search'));
-    // DataTables translations - MUST be defined before datatable-initializer.js loads
-    window.dashboardDataTablesLengthMenu = @json(__('dashboard.entries'));
-    window.dashboardDataTablesInfo = @json(__('dashboard.showing') . ' _START_ ' . __('dashboard.to') . ' _END_ ' . __('dashboard.of') . ' _TOTAL_ ' . __('dashboard.entries'));
-    window.dashboardDataTablesInfoEmpty = @json(__('dashboard.showing') . ' 0 ' . __('dashboard.to') . ' 0 ' . __('dashboard.of') . ' 0 ' . __('dashboard.entries'));
-    window.dashboardDataTablesInfoFiltered = @json('(' . __('dashboard.filtered from') . ' _MAX_ ' . __('dashboard.total entries') . ')');
-    window.dashboardDataTablesEmptyTable = @json(__('dashboard.no data available in table'));
-    window.dashboardDataTablesZeroRecords = @json(__('dashboard.no matching records found'));
-    window.dashboardDataTablesFirst = @json(__('dashboard.first'));
-    window.dashboardDataTablesLast = @json(__('dashboard.last'));
-    window.dashboardDataTablesNext = @json(__('dashboard.next'));
-    window.dashboardDataTablesPrevious = @json(__('dashboard.previous'));
-    window.dashboardDataTablesSortAscending = @json(__('dashboard.activate to sort column ascending'));
-    window.dashboardDataTablesSortDescending = @json(__('dashboard.activate to sort column descending'));
+    window.dashboardDataTablesSearch = @json(__('dashboard.search') . ':');
+    window.dashboardDataTablesLanguage = {
+        search: @json(__('dashboard.search') . ':'),
+        processing: "<span class='fa-stack fa-lg'><i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i></span>",
+        lengthMenu: @json(__('dashboard.show') . ' _MENU_ ' . __('dashboard.entries')),
+        info: @json(__('dashboard.showing') . ' _START_ ' . __('dashboard.to') . ' _END_ ' . __('dashboard.of') . ' _TOTAL_ ' . __('dashboard.entries')),
+        infoEmpty: @json(__('dashboard.showing') . ' 0 ' . __('dashboard.to') . ' 0 ' . __('dashboard.of') . ' 0 ' . __('dashboard.entries')),
+        infoFiltered: @json('(' . __('dashboard.filtered from') . ' _MAX_ ' . __('dashboard.total entries') . ')'),
+        emptyTable: @json(__('dashboard.no data available in table')),
+        zeroRecords: @json(__('dashboard.no matching records found')),
+        paginate: {
+            first: @json(__('dashboard.first')),
+            last: @json(__('dashboard.last')),
+            next: @json(__('dashboard.next')),
+            previous: @json(__('dashboard.previous')),
+        },
+        aria: {
+            sortAscending: @json(__('dashboard.activate to sort column ascending')),
+            sortDescending: @json(__('dashboard.activate to sort column descending')),
+        },
+    };
+    // Backward-compatible aliases used by datatables-shared.js
+    window.dashboardDataTablesLengthMenu = window.dashboardDataTablesLanguage.lengthMenu;
+    window.dashboardDataTablesInfo = window.dashboardDataTablesLanguage.info;
+    window.dashboardDataTablesInfoEmpty = window.dashboardDataTablesLanguage.infoEmpty;
+    window.dashboardDataTablesInfoFiltered = window.dashboardDataTablesLanguage.infoFiltered;
+    window.dashboardDataTablesEmptyTable = window.dashboardDataTablesLanguage.emptyTable;
+    window.dashboardDataTablesZeroRecords = window.dashboardDataTablesLanguage.zeroRecords;
+    window.dashboardDataTablesFirst = window.dashboardDataTablesLanguage.paginate.first;
+    window.dashboardDataTablesLast = window.dashboardDataTablesLanguage.paginate.last;
+    window.dashboardDataTablesNext = window.dashboardDataTablesLanguage.paginate.next;
+    window.dashboardDataTablesPrevious = window.dashboardDataTablesLanguage.paginate.previous;
+    window.dashboardDataTablesSortAscending = window.dashboardDataTablesLanguage.aria.sortAscending;
+    window.dashboardDataTablesSortDescending = window.dashboardDataTablesLanguage.aria.sortDescending;
 </script>
-
-<!-- DataTables Initializer (Global - Sets defaults) - MUST load after translations are defined -->
-<script src="{{ asset('dashboardAssets/custom/js/datatable-initializer.js') }}"></script>
 <script src="{{ asset('dashboardAssets/custom/js/admin-collapsible-panels.js') }}"></script>
 
 <!-- Form Reset Handler (Global - Used on create forms)-->
@@ -103,6 +120,8 @@
     window.dashboardConfirm = @json(__('dashboard.confirm'));
     window.dashboardCancel = @json(__('dashboard.cancel'));
     window.dashboardItemDeletedSuccessfully = @json(__('dashboard.item deleted successfully'));
+    window.dashboardSuccessTitle = @json(__('dashboard.success'));
+    window.dashboardErrorTitle = @json(__('dashboard.error'));
 
     // Bulk delete translations
     window.dashboardBulkDeleteText = @json(__('dashboard.bulk_delete_text', ['default' => 'سيتم حذف العناصر المحددة. لا يمكن التراجع عن هذا الإجراء!']));
@@ -123,17 +142,21 @@
 <script src="{{ asset('dashboardAssets/custom/js/swal-flash.js') }}"></script>
 
 <!-- Table Delete Row Handler (Global - Replaces inline deleteOne.blade.php)-->
-<script src="{{ asset('dashboardAssets/custom/js/shared/table-delete-row.js') }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/shared/table-delete-row.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/shared/table-delete-row.js')) }}"></script>
 
 <!-- Table Toolkit (Selection + Bulk Delete) - Loaded globally for reuse -->
-<script src="{{ asset('dashboardAssets/custom/js/shared/table-selection.js') }}"></script>
-<script src="{{ asset('dashboardAssets/custom/js/shared/table-bulk-delete.js') }}"></script>
-<script src="{{ asset('dashboardAssets/custom/js/shared/table-toggle-block.js') }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/shared/table-selection.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/shared/table-selection.js')) }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/shared/table-bulk-delete.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/shared/table-bulk-delete.js')) }}"></script>
+<script src="{{ asset('dashboardAssets/custom/js/shared/table-toggle-block.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/shared/table-toggle-block.js')) }}"></script>
 <script src="{{ asset('dashboardAssets/custom/js/shared/table-helpers.js') }}"></script>
 <script src="{{ asset('dashboardAssets/custom/js/shared/datatables-shared.js') }}"></script>
 
 <!-- Stacks for vendor and page-specific scripts -->
 @stack('vendor-scripts')
+
+<!-- DataTables Initializer — MUST load after DataTables vendor JS and translations -->
+<script src="{{ asset('dashboardAssets/custom/js/datatable-initializer.js') }}"></script>
+
 @stack('page-scripts')
 @yield('script')
 @stack('script')

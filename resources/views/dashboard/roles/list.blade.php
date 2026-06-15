@@ -92,7 +92,7 @@
                         }
                     },
                     "paging": true,
-                    order : [[2,'asc']],
+                    ordering: false,
                     columns: [
                         {data: 'display_name', name:'display_name'},
                         {data: 'users_count', name:'users_count',

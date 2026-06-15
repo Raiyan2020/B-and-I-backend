@@ -9,9 +9,11 @@
             <label class="form-label">{{ __('dashboard.table status') }}</label>
             <select class="form-control" id="status-filter">
                 <option value="">{{ __('dashboard.all') }}</option>
-                <option value="pending_review">{{ __('dashboard.opportunity_status_pending_review') }}</option>
-                <option value="approved">{{ __('dashboard.opportunity_status_approved') }}</option>
-                <option value="needs_modification">{{ __('dashboard.opportunity_status_needs_modification') }}</option>
+                <option value="pending">{{ __('dashboard.opportunity_status_pending') }}</option>
+                <option value="needs_revision">{{ __('dashboard.opportunity_status_needs_revision') }}</option>
+                <option value="published">{{ __('dashboard.opportunity_status_published') }}</option>
+                <option value="reserved">{{ __('dashboard.opportunity_status_reserved') }}</option>
+                <option value="completed">{{ __('dashboard.opportunity_status_completed') }}</option>
             </select>
         </div>
         <div class="col-md-3">

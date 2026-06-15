@@ -32,6 +32,7 @@ class InterestRequestController extends Controller
                 ->latest('id');
 
             return DataTables::eloquent($query)
+                ->order(function () {})
                 ->addColumn('opportunity_id', function (InterestRequest $interestRequest): int|string {
                     return $interestRequest->opportunity_id ?? '';
                 })

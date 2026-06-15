@@ -65,7 +65,9 @@ class AdminBasicController extends Controller
                 ->with($this->with ?? [])
                 ->latest(true);
             $rows = $this->serviceName->all($limitOptions);
-            return DataTables::of($rows)->make(true);
+            return DataTables::of($rows)
+                ->order(function () {})
+                ->make(true);
         }
 
         return view(

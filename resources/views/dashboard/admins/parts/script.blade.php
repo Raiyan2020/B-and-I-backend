@@ -4,6 +4,7 @@
 
             processing: true,
             serverSide: true,
+            searching: false,
             lengthMenu: [5,10, 20, 40, 60, 80, 100],
             pageLength: 5,
             ajax: {
@@ -17,12 +18,15 @@
                         name: $('#search-name').val() || '',
                         phone: $('#search-phone').val() || '',
                         'roles.name': $('#role-filter').val() || '',
-                        order: $('#order-filter').val() || 'ASC',
+                        order: window.DataTablesShared
+                            ? window.DataTablesShared.getOrderFilterValue()
+                            : ($('#order-filter').val() || 'DESC'),
                         is_blocked: $('#block-status-filter').val() || ''
                     };
                 }
             },
             "paging": true,
+            ordering: false,
             columns: [{
                     // Checkbox column (rendered by DataTables with row ID)
                     data: 'id',
@@ -52,7 +56,14 @@
                 },
                 {
                     data: 'phone',
-                    name: 'phone'
+                    name: 'phone',
+                    render: function(data, type) {
+                        if (type !== 'display') {
+                            return data;
+                        }
+
+                        return window.TableHelpers ? window.TableHelpers.renderPhone(data) : data;
+                    }
                 },
                 {
                     data: 'email',
@@ -136,7 +147,7 @@
             $('#search-phone').val('');
             $('#role-filter').val('');
             $('#block-status-filter').val('');
-            $('#order-filter').val('ASC');
+            $('#order-filter').val('DESC');
             // Reload table with reset filters
             table.ajax.reload(null, false);
         });

@@ -13,6 +13,21 @@
 
         $field.addClass('border-danger');
 
+        var fieldId = $field.attr('id');
+        if (fieldId && typeof CKEDITOR !== 'undefined' && CKEDITOR.instances[fieldId]) {
+            var $editor = $('#cke_' + fieldId);
+            $editor.addClass('border-danger');
+            $editor.after('<span class="mt-5 text-danger d-block">' + msgText + '</span>');
+            return;
+        }
+
+        var $uploadImageContainer = $field.closest('.upload-image-container');
+        if ($field.is('input[type="file"]') && $uploadImageContainer.length) {
+            $uploadImageContainer.find('.upload-area, .drop-zoon').addClass('border-danger');
+            $uploadImageContainer.after('<span class="mt-5 text-danger d-block text-center">' + msgText + '</span>');
+            return;
+        }
+
         var $parent = $field.parent();
         if ($parent.hasClass('position-relative') || $parent.hasClass('has-icon-left')) {
             $parent.after('<span class="mt-5 text-danger">' + msgText + '</span>');
@@ -73,7 +88,7 @@
                     },
                     success: function(response) {
                         form.find('.text-danger').remove();
-                        form.find('input, select, textarea').removeClass('border-danger');
+                        form.find('input, select, textarea, .upload-area, .drop-zoon, .cke').removeClass('border-danger');
                         form.find('.submit_button').html(window.dashboardSendText || 'Send').attr('disabled', false);
 
                         if (typeof Swal !== 'undefined') {
@@ -111,7 +126,7 @@
                     error: function(xhr) {
                         form.find('.submit_button').html(window.dashboardSendText || 'Send').attr('disabled', false);
                         form.find('.text-danger').remove();
-                        form.find('input, select, textarea').removeClass('border-danger');
+                        form.find('input, select, textarea, .upload-area, .drop-zoon, .cke').removeClass('border-danger');
 
                         if (xhr.responseJSON && xhr.responseJSON.errors) {
                             $.each(xhr.responseJSON.errors, function(key, value) {
@@ -122,7 +137,7 @@
                                     '<span class="mt-5 text-danger">' + msgText + '</span>'
                                 );
 
-                                appendFieldError(form.find('input[name="' + selectorKey + '"][type!="file"]'), msgText);
+                                appendFieldError(form.find('input[name="' + selectorKey + '"]'), msgText);
                                 appendFieldError(form.find('textarea[name="' + selectorKey + '"]'), msgText);
                                 appendFieldError(form.find('select[name="' + selectorKey + '"]'), msgText);
                             });

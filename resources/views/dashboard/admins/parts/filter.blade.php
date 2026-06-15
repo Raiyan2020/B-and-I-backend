@@ -11,8 +11,8 @@
         <div class="col-md-2">
             <label class="form-label">{{ __('dashboard.order') }}</label>
             <select class="form-control" id="order-filter">
-                <option value="DESC">{{ __('dashboard.desc') }}</option>
-                <option value="ASC" selected>{{ __('dashboard.asc') }}</option>
+                <option value="DESC" selected>{{ __('dashboard.desc') }}</option>
+                <option value="ASC">{{ __('dashboard.asc') }}</option>
             </select>
         </div>
         <div class="col-md-2">

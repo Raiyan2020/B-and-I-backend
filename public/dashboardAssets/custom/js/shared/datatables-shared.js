@@ -22,8 +22,8 @@
             serverSide: true,
             lengthMenu: [10, 20, 40, 60, 80, 100],
             pageLength: 10,
-            language: {
-                search: window.dashboardDataTablesSearch || 'Search',
+            language: window.dashboardDataTablesLanguage || {
+                search: window.dashboardDataTablesSearch || 'Search:',
                 processing: "<span class='fa-stack fa-lg'><i class='fa fa-spinner fa-spin fa-stack-2x fa-fw'></i></span>",
                 lengthMenu: window.dashboardDataTablesLengthMenu || "Show _MENU_ entries",
                 info: window.dashboardDataTablesInfo || "Showing _START_ to _END_ of _TOTAL_ entries",
@@ -43,6 +43,7 @@
                 }
             },
             order: [[0, 'desc']],
+            ordering: false,
             autoWidth: false,
             responsive: true,
         },
@@ -135,6 +136,23 @@
                 }
                 return data;
             };
+        },
+
+        /**
+         * Reload table so backend filter ordering is applied.
+         */
+        syncOrderFilter: function(table) {
+            if (table) {
+                table.ajax.reload(null, false);
+            }
+        },
+
+        /**
+         * Read sort direction from the order filter dropdown.
+         */
+        getOrderFilterValue: function(filterSelector) {
+            filterSelector = filterSelector || '#order-filter';
+            return ($(filterSelector).val() || 'DESC').toUpperCase();
         },
 
         /**

@@ -29,22 +29,30 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         $user = $this->user();
+        $countryCode = $this->input('country_code', $user?->country_code);
+        $isKuwait = ($countryCode === '+965' || $countryCode === '965');
+        $digitsRule = $isKuwait ? 'digits:8' : 'digits_between:8,15';
+
+        $phoneRules = [
+            'required_with:country_code',
+            'sometimes',
+            $digitsRule,
+            Rule::unique('users', 'phone')
+                ->where('country_code', $countryCode)
+                ->whereNull('deleted_at')
+                ->ignore($user?->id),
+        ];
+
+        if ($isKuwait) {
+            $phoneRules[] = 'regex:/^[4569]/';
+        }
 
         $rules = [
             // Shared rules between Investor and Company
             'image' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'first_name' => ['sometimes', 'string', 'max:100'],
             'last_name' => ['sometimes', 'string', 'max:100'],
-            'phone' => [
-                'required_with:country_code',
-                'sometimes',
-                // 'regex:/^[4569]\d{7}$/',
-                'digits_between:8,11',
-                Rule::unique('users', 'phone')
-                    ->where('country_code', $this->country_code)
-                    ->whereNull('deleted_at')
-                    ->ignore($user?->id),
-            ],
+            'phone' => $phoneRules,
             'country_code' => [
                 'required_with:phone',
                 'sometimes',
@@ -63,8 +71,8 @@ class UpdateProfileRequest extends FormRequest
             // For investor accounts
             $rules = array_merge($rules, [
                 'investor_type' => ['sometimes', new Enum(InvestorType::class)],
-                'capital' => ['sometimes', 'numeric', 'min:1000'],
-                'available_capital' => ['sometimes', 'nullable', 'numeric', 'min:1000'],
+                'capital' => ['sometimes', 'numeric', 'min:1000' ,'max:1000000000'],
+                'available_capital' => ['sometimes', 'nullable', 'numeric', 'min:1000' ,'max:1000000000'],
                 'preferred_sector_id' => [
                     'sometimes',
                     'integer',
@@ -82,5 +90,36 @@ class UpdateProfileRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        $user = $this->user();
+        $countryCode = $this->input('country_code', $user?->country_code);
+        $phoneStart = null;
+
+        if ($countryCode) {
+            $country = \App\Helpers\CountryHelper::getCountryByCode($countryCode);
+            if ($country && isset($country['phone_start'])) {
+                $phoneStart = $country['phone_start'];
+            }
+        }
+
+        $isKuwait = ($countryCode === '+965' || $countryCode === '965');
+        if ($isKuwait) {
+            $phoneStart = '5, 4, 6, 9';
+        }
+
+        $message = __('dashboard.phone_must_start_with');
+        if ($phoneStart) {
+            $message = str_replace(':start', $phoneStart, $message);
+        } else {
+            $message = str_replace(' :start', '', $message);
+            $message = str_replace(':start', '', $message);
+        }
+
+        return [
+            'phone.regex' => $message,
+        ];
     }
 }

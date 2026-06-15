@@ -190,6 +190,10 @@ return [
     'twitter link' => 'لينك تويتر',
     'unavailable' => 'غير متاح',
     'uploaded_file_image' => 'الملف المرفق يجب ان يكون صورة',
+    'image_file_size_error' => 'يجب ألا يزيد حجم الصورة عن 2 ميجابايت.',
+    'image_file_type_error' => 'يرجى التأكد من رفع ملف صورة.',
+    'company_license_file_size_error' => 'يجب ألا يزيد حجم ترخيص الشركة عن 2 ميجابايت.',
+    'company_license_file_type_error' => 'يجب أن يكون ترخيص الشركة ملفاً من الأنواع: jpg، jpeg، png، pdf.',
     'users' => 'العملاء',
     'users attract' => 'أداه لجذب العميل',
     'users count' => 'عدد المستخدمين',
@@ -586,5 +590,5 @@ return [
     'interest_requests' => 'طلبات الاهتمام',
     'send_to_group' => 'إرسال إلى',
     'platform_notification_admins' => 'المشرفين',
-    'platform_notification_queued_successfully' => 'تمت جدولة إشعار المنصة وسيتم إرساله في الخلفية.',
+    'platform_notification_queued_successfully' => 'تم إرسال الإشعارات بنجاح',
 ];

@@ -4,6 +4,7 @@
 
             processing: true,
             serverSide: true,
+            searching: false,
             lengthMenu: [5, 10, 20, 40, 60, 80, 100],
             pageLength: 10,
             ajax: {
@@ -19,7 +20,7 @@
                 }
             },
             "paging": true,
-            order: [[5, 'desc']],
+            ordering: false,
             columns: [{
                     data: 'id',
                     orderable: false,

@@ -30,9 +30,7 @@ class HomeController extends Controller
 {
     use ResponseTrait;
 
-    public function __construct(private readonly DeviceService $deviceService)
-    {
-    }
+    public function __construct(private readonly DeviceService $deviceService) {}
 
     /**
      * Change application language (ar/en only)
@@ -135,7 +133,11 @@ class HomeController extends Controller
                 (new QueryOptions())
                     ->latest()
                     ->conditions(['status' => true])
-                    ->withCount(['opportunities'])
+                    ->withCount(['opportunities' => function ($query) {
+                        $query->whereIn('status', [OpportunityStatus::Published->value, OpportunityStatus::Reserved->value]);
+                        if (auth('sanctum')->check())
+                            $query->where('user_id', '!=', auth('sanctum')->user()->id);
+                    }])
             );
         $data = [
             'website_name'         => $websiteName ?? '',
@@ -154,6 +156,9 @@ class HomeController extends Controller
                         \App\Enums\OpportunityStatus::Published->value,
                         \App\Enums\OpportunityStatus::Reserved->value,
                     ])
+                    ->when(auth('sanctum')->check(), function ($query) {
+                        $query->where('user_id', '!=', auth('sanctum')->user()->id);
+                    })
                     ->latest()
                     ->limit(6)
                     ->get()

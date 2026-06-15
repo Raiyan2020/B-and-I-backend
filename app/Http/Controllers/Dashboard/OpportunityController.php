@@ -31,6 +31,7 @@ class OpportunityController extends AdminBasicController
             );
 
             return DataTables::of($rows)
+                ->order(function () {})
                 ->editColumn('created_at', function (Opportunity $opportunity) {
                     return $opportunity->created_at
                         ? $opportunity->created_at

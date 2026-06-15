@@ -532,7 +532,17 @@
                 var checkedPermissions = $('.permission-checkbox:checked').length;
                 if (checkedPermissions === 0) {
                     e.preventDefault();
-                    alert('{{__('dashboard.please select at least one permission')}}');
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            position: 'top-start',
+                            icon: 'warning',
+                            title: @json(__('dashboard.validation_errors_title')),
+                            text: @json(__('dashboard.please select at least one permission')),
+                            confirmButtonText: @json(__('dashboard.confirm'))
+                        });
+                    } else {
+                        alert(@json(__('dashboard.please select at least one permission')));
+                    }
                     return false;
                 }
             });

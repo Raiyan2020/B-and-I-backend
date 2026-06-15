@@ -3,6 +3,7 @@
         var table = $('#preferred-sectors-table').DataTable({
             processing: true,
             serverSide: true,
+            searching: false,
             lengthMenu: [5, 10, 20, 40, 60, 80, 100],
             pageLength: 5,
             ajax: {
@@ -14,7 +15,9 @@
                     var st = $('#status-filter').val();
                     d.filters = {
                         name: $('#search-name').val() || '',
-                        order: $('#order-filter').val() || 'ASC',
+                        order: window.DataTablesShared
+                            ? window.DataTablesShared.getOrderFilterValue()
+                            : ($('#order-filter').val() || 'DESC'),
                         order_by: 'created_at',
                     };
                     if (st !== '') {
@@ -23,7 +26,7 @@
                 }
             },
             paging: true,
-            order: [[3, 'desc']],
+            ordering: false,
             columns: [{
                     data: 'id',
                     orderable: false,
@@ -106,14 +109,22 @@
         });
 
         $('#filter-btn').on('click', function() {
-            table.ajax.reload(null, false);
+            if (window.DataTablesShared) {
+                window.DataTablesShared.syncOrderFilter(table);
+            } else {
+                table.ajax.reload(null, false);
+            }
         });
 
         $('#reset-filter-btn').on('click', function() {
             $('#search-name').val('');
             $('#status-filter').val('');
-            $('#order-filter').val('ASC');
-            table.ajax.reload(null, false);
+            $('#order-filter').val('DESC');
+            if (window.DataTablesShared) {
+                window.DataTablesShared.syncOrderFilter(table);
+            } else {
+                table.ajax.reload(null, false);
+            }
         });
 
         $('#filter-form').on('submit', function(e) {

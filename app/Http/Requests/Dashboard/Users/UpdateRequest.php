@@ -45,6 +45,10 @@ class UpdateRequest extends FormRequest
 
         $phoneRules = ['required', $digitsRule, Rule::unique('users', 'phone')->whereNull('deleted_at')->ignore($userId)];
 
+        if ($countryCode === '+965' || $countryCode === '965') {
+            $phoneRules[] = 'regex:/^[4569]/';
+        }
+
         // if ($phoneStart && $this->input('phone')) {
         //     $phoneRules[] = 'regex:/^' . preg_quote($phoneStart, '/') . '/';
         // }
@@ -59,8 +63,8 @@ class UpdateRequest extends FormRequest
             'lang' => ['required', Rule::in(['ar', 'en'])],
             'company_license' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Advertiser->value && ! $user?->company_license), 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
             'investor_type' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), Rule::in(\App\Enums\InvestorType::values())],
-            'capital' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:1000'],
-            'available_capital' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:1000'],
+            'capital' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:1000', 'max:1000000000'],
+            'available_capital' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:1000', 'max:1000000000'],
             'preferred_sector_id' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'integer', Rule::exists('preferred_sectors', 'id')->where('status', true)],
             'category_id' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'integer', Rule::exists('categories', 'id')->where('status', true)],
             'experience_level' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:0', 'max:100'],
@@ -87,6 +91,11 @@ class UpdateRequest extends FormRequest
             }
         }
 
+        $isKuwait = ($countryCode === '+965' || $countryCode === '965');
+        if ($isKuwait) {
+            $phoneStart = '5, 4, 6, 9';
+        }
+
         // Build the error message with the phone start digit
         $message = __('dashboard.phone_must_start_with');
         if ($phoneStart) {
@@ -97,8 +106,21 @@ class UpdateRequest extends FormRequest
             $message = str_replace(':start', '', $message);
         }
 
-        return [
+        return array_merge([
             'phone.regex' => $message,
+        ], $this->companyLicenseFileMessages());
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function companyLicenseFileMessages(): array
+    {
+        return [
+            'company_license.max' => __('dashboard.company_license_file_size_error'),
+            'company_license.uploaded' => __('dashboard.company_license_file_size_error'),
+            'company_license.file' => __('dashboard.company_license_file_size_error'),
+            'company_license.mimes' => __('dashboard.company_license_file_type_error'),
         ];
     }
 }

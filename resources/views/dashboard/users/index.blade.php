@@ -20,15 +20,18 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="card">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                                         <h4 class="card-title mb-0">{{ $listTitle ?? __('dashboard.users list') }}</h4>
-                                        @can('add-user')
-                                            <a href="{{ route($createRouteName ?? 'admin.users.create') }}">
-                                                <button class="btn btn-primary btn-sm">
-                                                    <i class="mr-1 feather icon-plus"></i>{{ $createTitle ?? __('dashboard.add user') }}
-                                                </button>
-                                            </a>
-                                        @endcan
+                                        <div class="card-header-actions">
+                                            <x-dashboard.tables.bulk-actions-bar />
+                                            @can('add-user')
+                                                <a href="{{ route($createRouteName ?? 'admin.users.create') }}">
+                                                    <button class="btn btn-primary btn-sm">
+                                                        <i class="mr-1 feather icon-plus"></i>{{ $createTitle ?? __('dashboard.add user') }}
+                                                    </button>
+                                                </a>
+                                            @endcan
+                                        </div>
                                     </div>
                                     <div class="card-content">
                                         <div class="card-body card-dashboard">
@@ -52,7 +55,6 @@
                                                     <tbody class="text text-center ">
                                                     </tbody>
                                                 </table>
-                                                <x-dashboard.tables.bulk-actions-bar />
                                             </div>
                                         </div>
                                     </div>

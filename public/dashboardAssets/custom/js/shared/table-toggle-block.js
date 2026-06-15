@@ -21,8 +21,8 @@
                 confirmText: window.dashboardToggleBlockText || 'هل تريد تغيير حالة الحظر لهذا العنصر؟',
                 confirmButtonText: window.dashboardConfirm || 'نعم',
                 cancelButtonText: window.dashboardCancel || 'إلغاء',
-                successTitle: window.dashboardSuccess || 'نجح',
-                errorTitle: window.dashboardError || 'خطأ',
+                successTitle: window.dashboardSuccessTitle || 'نجح',
+                errorTitle: window.dashboardErrorTitle || 'خطأ',
                 errorText: window.dashboardErrorText || 'حدث خطأ أثناء العملية'
             };
 
