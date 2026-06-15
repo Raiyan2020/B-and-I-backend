@@ -587,5 +587,6 @@ return [
     'interest_requests' => 'Interest Requests',
     'send_to_group' => 'Send To',
     'platform_notification_admins' => 'Admins',
-    'platform_notification_queued_successfully' => 'Platform notification queued successfully and will be sent in the background.',
+   'platform_notification_queued_successfully' => 'Notifications sent successfully',
+
 ];

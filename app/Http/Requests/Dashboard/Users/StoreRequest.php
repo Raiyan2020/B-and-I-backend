@@ -39,6 +39,10 @@ class StoreRequest extends FormRequest
 
         $phoneRules = ['required', $digitsRule, Rule::unique('users', 'phone')->whereNull('deleted_at')];
 
+        if ($countryCode === '+965' || $countryCode === '965') {
+            $phoneRules[] = 'regex:/^[4569]/';
+        }
+
         // if ($phoneStart && $this->input('phone')) {
         //     $phoneRules[] = 'regex:/^' . preg_quote($phoneStart, '/') . '/';
         // }
@@ -80,6 +84,11 @@ class StoreRequest extends FormRequest
             if ($country && isset($country['phone_start'])) {
                 $phoneStart = $country['phone_start'];
             }
+        }
+
+        $isKuwait = ($countryCode === '+965' || $countryCode === '965');
+        if ($isKuwait) {
+            $phoneStart = '5, 4, 6, 9';
         }
 
         // Build the error message with the phone start digit

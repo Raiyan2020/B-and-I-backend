@@ -590,5 +590,5 @@ return [
     'interest_requests' => 'طلبات الاهتمام',
     'send_to_group' => 'إرسال إلى',
     'platform_notification_admins' => 'المشرفين',
-    'platform_notification_queued_successfully' => 'تم انشاء إشعار المنصة وسيتم إرساله في الخلفية.',
+    'platform_notification_queued_successfully' => 'تم إرسال الإشعارات بنجاح',
 ];
