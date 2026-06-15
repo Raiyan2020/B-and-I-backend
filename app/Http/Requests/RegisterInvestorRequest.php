@@ -53,7 +53,7 @@ class RegisterInvestorRequest extends FormRequest
 
             'investor_type' => ['required', new Enum(InvestorType::class)],
             'capital' => ['required', 'numeric', 'min:1000', 'max:1000000000'],
-            'available_capital' => ['required', 'numeric', 'min:1000', 'max:1000000000'],
+            'available_capital' => ['required', 'numeric', 'min:1000', 'max:' . $this->input('capital')],
             'preferred_sector_id' => [
                 'required',
                 'integer',
