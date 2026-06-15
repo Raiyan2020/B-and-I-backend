@@ -323,7 +323,7 @@ return [
     'profile_update_request' => 'Profile Update Request',
     'profile_update_requests' => 'Profile Update Requests',
     'profile_update_request_details' => 'Profile Update Request Details',
-    'profile_update_request_review_saved' => 'Profile update request reviewed successfully.',
+    'profile_update_request_review_saved' => 'Edits approved successfully',
     'profile_update_request_already_reviewed' => 'This profile update request has already been reviewed.',
     'account_deletion_request' => 'Account Deletion Request',
     'account_deletion_requests' => 'Account Deletion Requests',
