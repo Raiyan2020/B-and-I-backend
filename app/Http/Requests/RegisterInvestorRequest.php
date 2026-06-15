@@ -47,8 +47,8 @@ class RegisterInvestorRequest extends FormRequest
             'password' => ['required', 'string', 'min:8', 'max:100'],
 
             'investor_type' => ['required', new Enum(InvestorType::class)],
-            'capital' => ['required', 'numeric', 'min:1000'],
-            'available_capital' => ['required', 'numeric', 'min:1000'],
+            'capital' => ['required', 'numeric', 'min:1000', 'max:1000000000'],
+            'available_capital' => ['required', 'numeric', 'min:1000', 'max:1000000000'],
             'preferred_sector_id' => [
                 'required',
                 'integer',

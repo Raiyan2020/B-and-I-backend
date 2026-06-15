@@ -63,8 +63,8 @@ class UpdateProfileRequest extends FormRequest
             // For investor accounts
             $rules = array_merge($rules, [
                 'investor_type' => ['sometimes', new Enum(InvestorType::class)],
-                'capital' => ['sometimes', 'numeric', 'min:1000'],
-                'available_capital' => ['sometimes', 'nullable', 'numeric', 'min:1000'],
+                'capital' => ['sometimes', 'numeric', 'min:1000' ,'max:1000000000'],
+                'available_capital' => ['sometimes', 'nullable', 'numeric', 'min:1000' ,'max:1000000000'],
                 'preferred_sector_id' => [
                     'sometimes',
                     'integer',
