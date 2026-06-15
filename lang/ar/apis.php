@@ -85,6 +85,7 @@ return [
     'interest_submission_unavailable_for_opportunity' => 'هذا الإعلان غير متاح لتسجيل الاهتمام.',
     'interest_submitted_successfully' => 'تم تسجيل الاهتمام بنجاح، وسيقوم فريقنا بالتواصل معك قريباً.',
     'company_investor_interest_request_created' => 'تم إرسال طلب اهتمام الشركة بالمستثمر بنجاح.',
+    'company_investor_interest_already_submitted' => 'أنت مهتم بالفعل بهذا المستثمر.',
     'success' => 'تم بنجاح',
     'account_blocked' => 'تم حظر حسابك من قبل الإدارة.',
     'account_inactive' => 'تم تعطيل حسابك من قبل الإدارة.',
