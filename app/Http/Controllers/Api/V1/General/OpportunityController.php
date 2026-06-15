@@ -60,9 +60,10 @@ class OpportunityController extends Controller
                         ->where('user_id', $user->id),
                 ]);
             })
-            ->when($request->has('order') && $request->order == 'latest', function ($query) {
-                $query->latest();
-            })
+            // ->when($request->has('order') && $request->order == 'latest', function ($query) {
+            //     $query->latest();
+            // })
+            ->latest()
             ->paginate(15);
 
         return $this->jsonResponse(data: [
