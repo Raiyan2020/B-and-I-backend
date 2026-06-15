@@ -173,10 +173,18 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
      */
     public function setImageAttribute($value)
     {
-        if (null != $value && is_file($value)) {
+        if ($value === null || $value === '') {
+            $this->attributes['image'] = null;
+            return;
+        }
+
+        if ($value instanceof UploadedFile || is_file($value)) {
             isset($this->attributes['image']) ? $this->deleteFile($this->attributes['image'], self::FOLDER) : '';
             $this->attributes['image'] = $this->uploadAllTypes($value, self::FOLDER);
+            return;
         }
+
+        $this->attributes['image'] = $value;
     }
 
     /**
