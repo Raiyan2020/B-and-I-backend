@@ -64,7 +64,7 @@ class UpdateRequest extends FormRequest
             'company_license' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Advertiser->value && ! $user?->company_license), 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
             'investor_type' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), Rule::in(\App\Enums\InvestorType::values())],
             'capital' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:1000', 'max:1000000000'],
-            'available_capital' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:1000', 'max:1000000000'],
+            'available_capital' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:1000', 'max:'.$this->input('capital')],
             'preferred_sector_id' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'integer', Rule::exists('preferred_sectors', 'id')->where('status', true)],
             'category_id' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'integer', Rule::exists('categories', 'id')->where('status', true)],
             'experience_level' => [Rule::requiredIf(fn () => $role === \App\Enums\UserRole::Investor->value), 'nullable', 'numeric', 'min:0', 'max:100'],
