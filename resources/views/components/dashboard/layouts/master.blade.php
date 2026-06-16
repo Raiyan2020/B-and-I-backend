@@ -106,6 +106,10 @@
 
 <x-dashboard.layouts.footer />
 @php
+    $adminNotificationSoundPath = public_path('dashboardAssets/sounds/admin-notification.wav');
+    $adminNotificationSoundVersion = file_exists($adminNotificationSoundPath)
+        ? filemtime($adminNotificationSoundPath)
+        : time();
     $firebaseConfig = [
         'apiKey' => config('services.firebase.api_key'),
         'authDomain' => config('services.firebase.auth_domain'),
@@ -119,9 +123,10 @@
         'logoutUrl' => route('admin.logout'),
         'locale' => app()->getLocale(),
         'csrfToken' => csrf_token(),
-        'notificationSoundUrl' => asset('dashboardAssets/sounds/admin-notification.wav'),
+        'notificationSoundUrl' => asset('dashboardAssets/sounds/admin-notification.wav') . '?v=' . $adminNotificationSoundVersion,
     ];
 @endphp
+<script src="{{ asset('dashboardAssets/custom/js/admin-notification-sound.js') }}?v={{ filemtime(public_path('dashboardAssets/custom/js/admin-notification-sound.js')) }}"></script>
 @if (filled(config('services.firebase.api_key')) && filled(config('services.firebase.messaging_sender_id')) && filled(config('services.firebase.app_id')))
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js';
@@ -132,62 +137,16 @@
         const notificationCounter = document.getElementById('notification-counter');
         const notificationHeaderCount = document.getElementById('notification-header-count');
         const notificationList = document.getElementById('notification-list');
-        let adminNotificationAudio = null;
+
+        if (window.AdminNotificationSound) {
+            window.AdminNotificationSound.init(firebaseConfig.notificationSoundUrl);
+        }
 
         function playAdminNotificationSound() {
-            if (!firebaseConfig.notificationSoundUrl) {
-                return;
-            }
-
-            try {
-                if (!adminNotificationAudio) {
-                    adminNotificationAudio = new Audio(firebaseConfig.notificationSoundUrl);
-                    adminNotificationAudio.preload = 'auto';
-                }
-
-                adminNotificationAudio.currentTime = 0;
-                const playPromise = adminNotificationAudio.play();
-
-                if (playPromise) {
-                    playPromise.catch(() => {});
-                }
-            } catch (error) {
-                console.warn('Admin notification sound failed:', error);
+            if (window.AdminNotificationSound) {
+                window.AdminNotificationSound.play();
             }
         }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                if (event.data?.type === 'ADMIN_NOTIFICATION_SOUND') {
-                    playAdminNotificationSound();
-                }
-            });
-        }
-
-        function unlockAdminNotificationAudio() {
-            if (!firebaseConfig.notificationSoundUrl) {
-                return;
-            }
-
-            if (!adminNotificationAudio) {
-                adminNotificationAudio = new Audio(firebaseConfig.notificationSoundUrl);
-                adminNotificationAudio.preload = 'auto';
-            }
-
-            adminNotificationAudio.volume = 0.01;
-            adminNotificationAudio.play()
-                .then(() => {
-                    adminNotificationAudio.pause();
-                    adminNotificationAudio.currentTime = 0;
-                    adminNotificationAudio.volume = 1;
-                })
-                .catch(() => {
-                    adminNotificationAudio.volume = 1;
-                });
-        }
-
-        document.addEventListener('click', unlockAdminNotificationAudio, { once: true });
-        document.addEventListener('keydown', unlockAdminNotificationAudio, { once: true });
 
         function escapeHtml(value) {
             return String(value ?? '')
@@ -270,6 +229,10 @@
 
             if (Notification.permission !== 'granted') {
                 return;
+            }
+
+            if (window.AdminNotificationSound) {
+                await window.AdminNotificationSound.unlock();
             }
 
             const tokenOptions = {

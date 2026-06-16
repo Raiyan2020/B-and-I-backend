@@ -24,6 +24,12 @@ messaging.onBackgroundMessage(function(payload) {
         });
     });
 
+    if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('admin-notification-sound');
+        channel.postMessage({ type: 'ADMIN_NOTIFICATION_SOUND' });
+        channel.close();
+    }
+
     return self.registration.showNotification(title, {
         body: notification.body || data.body || '',
         icon: notification.icon || data.icon || '/favicon.ico',
