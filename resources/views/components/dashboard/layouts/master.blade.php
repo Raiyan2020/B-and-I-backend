@@ -119,6 +119,7 @@
         'logoutUrl' => route('admin.logout'),
         'locale' => app()->getLocale(),
         'csrfToken' => csrf_token(),
+        'notificationSoundUrl' => asset('dashboardAssets/sounds/admin-notification.wav'),
     ];
 @endphp
 @if (filled(config('services.firebase.api_key')) && filled(config('services.firebase.messaging_sender_id')) && filled(config('services.firebase.app_id')))
@@ -131,6 +132,62 @@
         const notificationCounter = document.getElementById('notification-counter');
         const notificationHeaderCount = document.getElementById('notification-header-count');
         const notificationList = document.getElementById('notification-list');
+        let adminNotificationAudio = null;
+
+        function playAdminNotificationSound() {
+            if (!firebaseConfig.notificationSoundUrl) {
+                return;
+            }
+
+            try {
+                if (!adminNotificationAudio) {
+                    adminNotificationAudio = new Audio(firebaseConfig.notificationSoundUrl);
+                    adminNotificationAudio.preload = 'auto';
+                }
+
+                adminNotificationAudio.currentTime = 0;
+                const playPromise = adminNotificationAudio.play();
+
+                if (playPromise) {
+                    playPromise.catch(() => {});
+                }
+            } catch (error) {
+                console.warn('Admin notification sound failed:', error);
+            }
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data?.type === 'ADMIN_NOTIFICATION_SOUND') {
+                    playAdminNotificationSound();
+                }
+            });
+        }
+
+        function unlockAdminNotificationAudio() {
+            if (!firebaseConfig.notificationSoundUrl) {
+                return;
+            }
+
+            if (!adminNotificationAudio) {
+                adminNotificationAudio = new Audio(firebaseConfig.notificationSoundUrl);
+                adminNotificationAudio.preload = 'auto';
+            }
+
+            adminNotificationAudio.volume = 0.01;
+            adminNotificationAudio.play()
+                .then(() => {
+                    adminNotificationAudio.pause();
+                    adminNotificationAudio.currentTime = 0;
+                    adminNotificationAudio.volume = 1;
+                })
+                .catch(() => {
+                    adminNotificationAudio.volume = 1;
+                });
+        }
+
+        document.addEventListener('click', unlockAdminNotificationAudio, { once: true });
+        document.addEventListener('keydown', unlockAdminNotificationAudio, { once: true });
 
         function escapeHtml(value) {
             return String(value ?? '')
@@ -269,9 +326,12 @@
                     clickAction,
                 });
 
+                playAdminNotificationSound();
+
                 registration.showNotification(title, {
                     body,
                     icon: notification?.icon || data?.icon || '/favicon.ico',
+                    silent: false,
                     data: {
                         click_action: clickAction,
                     },

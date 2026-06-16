@@ -18,9 +18,16 @@ messaging.onBackgroundMessage(function(payload) {
     const data = payload.data || {};
     const title = notification.title || data.title || 'New notification';
 
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+        clientList.forEach(function(client) {
+            client.postMessage({ type: 'ADMIN_NOTIFICATION_SOUND' });
+        });
+    });
+
     return self.registration.showNotification(title, {
         body: notification.body || data.body || '',
         icon: notification.icon || data.icon || '/favicon.ico',
+        silent: false,
         data: {
             click_action: data.click_action || notification.click_action || '/',
         },
