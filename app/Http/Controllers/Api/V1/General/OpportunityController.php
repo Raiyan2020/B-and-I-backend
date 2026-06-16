@@ -42,9 +42,9 @@ class OpportunityController extends Controller
                     $query->orderBy('investment_required', $order == 'price_asc' ? 'asc' : 'desc');
                 }
             })
-            ->when(auth('sanctum')->check(), function ($query) {
-                $query->where('user_id', '!=', auth('sanctum')->user()->id);
-            })
+            // ->when(auth('sanctum')->check(), function ($query) {
+            //     $query->where('user_id', '!=', auth('sanctum')->user()->id);
+            // })
             ->withCount(['investmentSeats', 'interestRequests'])
             ->whereIn('status', [
                 OpportunityStatus::Published->value,
